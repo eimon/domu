@@ -6,6 +6,7 @@ from datetime import datetime
 
 # Shared properties
 class UserBase(BaseModel):
+    username: str
     email: EmailStr
     full_name: Optional[str] = None
     role: UserRole = UserRole.MANAGER

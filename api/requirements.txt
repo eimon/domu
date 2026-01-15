@@ -4,7 +4,9 @@ sqlalchemy
 asyncpg
 pydantic-settings
 python-jose[cryptography]
-passlib[bcrypt]
+passlib[argon2]
+argon2-cffi
 httpx
 python-multipart
 email-validator
+icalendar>=5.0.11

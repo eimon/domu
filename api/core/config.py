@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     
     # Database
     DATABASE_URL: str
+    
+    # iCalendar
+    DOMAIN: str = "domu.ar"
 
     class Config:
         case_sensitive = True
