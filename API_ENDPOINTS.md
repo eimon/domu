@@ -90,10 +90,14 @@ Crear propiedad.
   "name": "string",
   "address": "string",
   "description": "string (optional)",
-  "owner_id": "uuid (optional)"
+  "owner_id": "uuid (optional)",
+  "base_price": 100.00,
+  "avg_stay_days": 3
 }
 ```
 > `manager_id` se asigna automáticamente del usuario autenticado
+> `base_price`: Precio BRUTO por noche (lo que paga el huésped al 100% rentabilidad)
+> `avg_stay_days`: Días promedio de estadía para cálculo de costos
 
 **Response:** `201 Created`
 ```json
@@ -104,6 +108,8 @@ Crear propiedad.
   "description": "string",
   "manager_id": "uuid",
   "owner_id": "uuid",
+  "base_price": 100.00,
+  "avg_stay_days": 3,
   "created_at": "datetime",
   "updated_at": "datetime",
   "is_active": true
@@ -173,7 +179,9 @@ Actualizar propiedad.
   "name": "string (optional)",
   "address": "string (optional)",
   "description": "string (optional)",
-  "owner_id": "uuid (optional)"
+  "owner_id": "uuid (optional)",
+  "base_price": 100.00,
+  "avg_stay_days": 3
 }
 ```
 
@@ -420,4 +428,122 @@ Listar reservas de una propiedad específica.
 
 - `ADMIN`: Acceso completo
 - `MANAGER`: Gestión de propiedades, reservas y huéspedes
+
 - `OWNER`: Solo visualización de propiedades
+
+## Costos (Costs)
+
+### POST /properties/{id}/costs
+Agregar costo a propiedad.
+**Auth:** Manager/Admin
+
+**Body:**
+```json
+{
+  "name": "Internet",
+  "category": "RECURRING_MONTHLY" | "RECURRING_DAILY" | "PER_RESERVATION",
+  "calculation_type": "FIXED_AMOUNT" | "PERCENTAGE",
+  "value": 50.00
+}
+```
+
+**Categorías de Costo:**
+- `RECURRING_MONTHLY`: Se cobra una vez al mes (Ej: Internet, Expensas)
+- `RECURRING_DAILY`: Se cobra por cada día ocupado (Ej: Electricidad variable)
+- `PER_RESERVATION`: Se cobra por cada reserva (Ej: Limpieza, Check-in)
+
+**Tipos de Cálculo:**
+- `FIXED_AMOUNT`: Monto fijo en pesos
+- `PERCENTAGE`: Porcentaje sobre ingresos (Ej: Comisiones)
+
+### GET /properties/{id}/costs
+Listar costos.
+**Auth:** Authenticated
+
+### PUT /costs/{id}
+Actualizar costo.
+
+### DELETE /costs/{id}
+Eliminar costo (soft delete).
+
+## Pricing (Precios Dinámicos)
+
+### POST /properties/{id}/pricing-rules
+Crear una regla de precio (temporada).
+**Auth:** Manager/Admin
+
+**Body:**
+```json
+{
+  "name": "Temporada Alta",
+  "start_date": "2026-12-20",
+  "end_date": "2027-01-05",
+  "profitability_percent": 120.0,
+  "priority": 10
+}
+```
+> `profitability_percent`: 100 = Base Price / 0 = Floor Price.
+
+**Modelo de Precios:**
+- `base_price` (Property): Precio BRUTO que paga el huésped al 100% rentabilidad
+- `Floor Price`: Costos operativos estimados por día [(Fijos/30) + Diarios + (Reserva/AvgStay)]
+- `Profitability 0%`: Precio = Floor (Solo cubre costos)
+- `Profitability 100%`: Precio = Base Price
+- `Profitability 120%`: Precio = Floor + 1.2 × (Base - Floor)
+- **Comisiones**: Se DEDUCEN del precio bruto, no se suman
+
+### GET /properties/{id}/pricing-rules
+Listar reglas de precio de una propiedad.
+**Auth:** Authenticated
+
+### GET /properties/{id}/calendar
+Obtener calendario con precios calculados día por día.
+**Auth:** Authenticated
+
+**Query Params:**
+- `start_date`: YYYY-MM-DD
+- `end_date`: YYYY-MM-DD
+
+**Response:** Array de objetos diarios
+```json
+[
+  {
+    "date": "2026-01-01",
+    "price": 100.00,
+    "status": "AVAILABLE" | "RESERVED",
+    "rule_name": "Año Nuevo",
+    "floor_price": 50.00,
+    "profitability_percent": 120.0
+  }
+]
+```
+
+### GET /properties/{id}/financial-summary
+Obtener resumen financiero mensual con datos reales.
+**Auth:** Authenticated
+
+**Query Params:**
+- `year`: int (YYYY)
+- `month`: int (1-12)
+
+**Response:**
+```json
+{
+  "year": 2026,
+  "month": 1,
+  "days_in_month": 31,
+  "occupied_days": 20,
+  "occupancy_rate": 64.52,
+  "total_bookings": 5,
+  "total_income": 2000.00,
+  "costs": {
+    "fixed_monthly": 900.00,
+    "fixed_daily": 300.00,
+    "variable_per_reservation": 150.00,
+    "commissions": 200.00,
+    "total": 1550.00
+  },
+  "net_profit": 450.00,
+  "profit_margin_percent": 22.5
+}
+```

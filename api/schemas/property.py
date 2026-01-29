@@ -1,12 +1,15 @@
 from pydantic import BaseModel, UUID4, Field
 from datetime import datetime
 from typing import Optional
+from decimal import Decimal
 
 
 class PropertyBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     address: str = Field(..., min_length=1)
     description: Optional[str] = None
+    base_price: Decimal = Field(default=0, ge=0, description="GROSS price per night (what guest pays)")
+    avg_stay_days: int = Field(default=3, gt=0)
 
 
 class PropertyCreate(PropertyBase):
@@ -17,6 +20,8 @@ class PropertyUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=200)
     address: Optional[str] = Field(None, min_length=1)
     description: Optional[str] = None
+    base_price: Optional[Decimal] = Field(None, ge=0)
+    avg_stay_days: Optional[int] = Field(None, gt=0)
 
 
 class PropertyResponse(PropertyBase):
@@ -26,6 +31,8 @@ class PropertyResponse(PropertyBase):
     created_at: datetime
     updated_at: Optional[datetime]
     is_active: bool
+    base_price: Decimal
+    avg_stay_days: int
 
     class Config:
         from_attributes = True
