@@ -32,6 +32,26 @@ async def list_pricing_rules(
     """List all pricing rules for a property."""
     return await PricingService(db).list_rules_by_property(property_id)
 
+@router.put("/pricing-rules/{rule_id}", response_model=PricingRuleResponse)
+async def update_pricing_rule(
+    rule_id: UUID,
+    rule_in: PricingRuleUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: Usuario = Depends(has_role(Role.ROLE_PROPERTY_UPDATE))
+):
+    """Update a pricing rule."""
+    return await PricingService(db).update_rule(rule_id, rule_in)
+
+@router.delete("/pricing-rules/{rule_id}")
+async def delete_pricing_rule(
+    rule_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: Usuario = Depends(has_role(Role.ROLE_PROPERTY_UPDATE))
+):
+    """Delete a pricing rule."""
+    await PricingService(db).delete_rule(rule_id)
+    return {"message": "Regla de precio eliminada correctamente"}
+
 @router.get("/properties/{property_id}/calendar")
 async def get_calendar(
     property_id: UUID,

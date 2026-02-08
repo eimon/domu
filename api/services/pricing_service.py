@@ -32,7 +32,34 @@ class PricingService:
         if not prop:
             raise NotFoundException("Propiedad no encontrada")
             
+        # Check for overlaps
+        if await self.pricing_repo.check_overlap(property_id, rule_in.start_date, rule_in.end_date):
+            raise BadRequestException("El período de la regla se solapa con una regla existente")
+            
         return await self.pricing_repo.create(property_id, rule_in)
+
+    async def update_rule(self, rule_id: uuid.UUID, rule_in: PricingRuleUpdate) -> object:
+        db_rule = await self.pricing_repo.get_by_id(rule_id)
+        if not db_rule:
+            raise NotFoundException("Regla de precio no encontrada")
+            
+        # Validate dates if provided
+        start_date = rule_in.start_date or db_rule.start_date
+        end_date = rule_in.end_date or db_rule.end_date
+        
+        if start_date >= end_date:
+            raise BadRequestException("Fecha fin debe ser posterior a inicio")
+            
+        # Check for overlaps (excluding the current rule)
+        if await self.pricing_repo.check_overlap(db_rule.property_id, start_date, end_date, exclude_id=rule_id):
+            raise BadRequestException("El período de la regla se solapa con una regla existente")
+            
+        return await self.pricing_repo.update(rule_id, rule_in)
+
+    async def delete_rule(self, rule_id: uuid.UUID) -> bool:
+        if not await self.pricing_repo.delete(rule_id):
+            raise NotFoundException("Regla de precio no encontrada")
+        return True
 
     async def list_rules_by_property(self, property_id: uuid.UUID):
         return await self.pricing_repo.get_by_property(property_id)

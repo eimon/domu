@@ -1,5 +1,7 @@
 # Domu - Sistema de Gestión de Alquiler Turístico
 
+Proyecto creado con Vibecode utilizando patrones de diseño SOLID y Clean Architecture.
+
 Domu es una plataforma integral diseñada para maximizar la rentabilidad de propiedades de alquiler turístico. Centraliza la gestión para administradores y ofrece transparencia total a los propietarios.
 
 ## 🚀 Visión General
@@ -19,7 +21,7 @@ El proyecto utiliza una arquitectura moderna y desacoplada:
 
 ## 🧩 Arquitectura del Sistema
 
-```mermaid
+```
 graph TD
     User[Usuarios]
     
@@ -54,21 +56,6 @@ Sistema de pricing dinámico que elimina el cálculo manual:
 *   Cálculo de **Costo de No Alquilar** (Pérdida por vacancia).
 
 ### 3. Roles
+*   **Admin**: Control total del sistema.
 *   **Gestor**: Control total de precios, disponibilidad y mantenimientos.
 *   **Dueño**: Visibilidad de calendario, reporte de ingresos netos y acceso simplificado.
-
-## 📂 Estructura del Proyecto (Propuesta)
-
-```bash
-domu/
-├── backend/          # FastAPI application
-├── web-manager/      # Next.js dashboard
-├── mobile-owner/     # Expo application
-└── docs/             # Documentación y assets
-```
-
-## 🚦 Próximos Pasos
-
-1.  Inicialización del repositorio y estructura de carpetas.
-2.  Configuración de entorno de desarrollo (Docker/DevContainers).
-3.  Implementación del modelo de base de datos base.

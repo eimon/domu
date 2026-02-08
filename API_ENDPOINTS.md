@@ -469,7 +469,7 @@ Eliminar costo (soft delete).
 ## Pricing (Precios Dinámicos)
 
 ### POST /properties/{id}/pricing-rules
-Crear una regla de precio (temporada).
+Crear una regla de precio (temporada). Valida que no existan colisiones de fechas.
 **Auth:** Manager/Admin
 
 **Body:**
@@ -495,6 +495,16 @@ Crear una regla de precio (temporada).
 ### GET /properties/{id}/pricing-rules
 Listar reglas de precio de una propiedad.
 **Auth:** Authenticated
+
+### PUT /pricing-rules/{id}
+Actualizar una regla de precio. Valida colisiones excluyendo la regla actual.
+**Auth:** Manager/Admin
+
+**Body:** `PricingRuleUpdate` (campos opcionales)
+
+### DELETE /pricing-rules/{id}
+Eliminar una regla de precio.
+**Auth:** Manager/Admin
 
 ### GET /properties/{id}/calendar
 Obtener calendario con precios calculados día por día.

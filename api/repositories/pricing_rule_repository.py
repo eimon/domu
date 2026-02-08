@@ -70,3 +70,27 @@ class PricingRuleRepository:
 
         await self.db.delete(db_rule)
         return True
+
+    async def check_overlap(
+        self, 
+        property_id: uuid.UUID, 
+        start_date: date, 
+        end_date: date, 
+        exclude_id: uuid.UUID | None = None
+    ) -> bool:
+        """
+        Check if a given date range overlaps with existing rules for a property.
+        Overlapping logic: (S1 <= E2) AND (E1 >= S2)
+        """
+        query = select(PricingRule).where(
+            PricingRule.property_id == property_id,
+            PricingRule.start_date <= end_date,
+            PricingRule.end_date >= start_date
+        )
+        
+        if exclude_id:
+            query = query.where(PricingRule.id != exclude_id)
+            
+        result = await self.db.execute(query)
+        overlap = result.scalars().first()
+        return overlap is not None
