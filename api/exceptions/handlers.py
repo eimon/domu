@@ -34,9 +34,26 @@ def unhandled_exception_handler(request: Request, exc: Exception):
 
 async def integrity_error_handler(request: Request, exc: IntegrityError):
     logger.error(f"[SQL] {request.url.path}: {exc}", exc_info=True)
+    detail = "Conflicto de integridad en la base de datos."
+    orig = str(exc.orig) if exc.orig else ""
+
+    if "exclusion constraint" in orig or "exclude" in orig.lower():
+        detail = "Las fechas se solapan con un registro existente."
+    elif "foreign key" in orig.lower() or "restrict" in orig.lower():
+        detail = "No se puede eliminar porque está en uso por otros registros."
+    elif "check constraint" in orig.lower():
+        if "checkout_after_checkin" in orig or "end_after_start" in orig:
+            detail = "La fecha de fin debe ser posterior a la fecha de inicio."
+        elif "non_negative" in orig or "positive" in orig:
+            detail = "El valor numérico está fuera del rango permitido."
+        else:
+            detail = "Violación de restricción de datos."
+    elif "unique" in orig.lower() or "duplicate" in orig.lower():
+        detail = "Ya existe un registro con estos datos."
+
     return JSONResponse(
         status_code=409,
-        content={"detail": "No se puede eliminar porque está en uso."},
+        content={"detail": detail},
     )
 
 

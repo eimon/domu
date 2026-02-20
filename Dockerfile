@@ -1,17 +1,29 @@
+# ---- builder stage ----
+FROM python:3.13-slim AS builder
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY api/requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir --prefix=/install -r /tmp/requirements.txt
+
+# ---- final stage ----
 FROM python:3.13-slim
 
-WORKDIR /api
+COPY --from=builder /install /usr/local
 
-# Install system dependencies (needed for some python packages like psycopg2/asyncpg if they need to build)
-RUN apt-get update && apt-get install -y gcc
+RUN groupadd --system appgroup \
+    && useradd --system --gid appgroup appuser
 
-# Copy requirements first to leverage cache
-COPY ./api/requirements.txt /api/requirements.txt
+WORKDIR /app
+COPY api /app/
 
-RUN pip install --no-cache-dir --upgrade -r /api/requirements.txt
+RUN sed -i 's/\r$//' /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
-# Copy the rest of the application
-COPY ./api /api
+USER appuser
 
-# Command is handled by docker-compose, but we set a default here
-CMD ["uvicorn", "main:app", "host", "0.0.0.0", "--port", "8000"]
+EXPOSE 8000
+
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

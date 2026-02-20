@@ -13,7 +13,9 @@ class GuestRepository:
         db_guest = Guest(
             full_name=guest_create.full_name,
             email=guest_create.email,
-            phone=guest_create.phone
+            phone=guest_create.phone,
+            document_type=guest_create.document_type,
+            document_number=guest_create.document_number,
         )
         self.db.add(db_guest)
         await self.db.flush()

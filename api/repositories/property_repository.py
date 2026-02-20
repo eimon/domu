@@ -14,6 +14,8 @@ class PropertyRepository:
             name=property_create.name,
             address=property_create.address,
             description=property_create.description,
+            base_price=property_create.base_price,
+            avg_stay_days=property_create.avg_stay_days,
             manager_id=manager_id,
             owner_id=property_create.owner_id
         )

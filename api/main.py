@@ -1,25 +1,15 @@
 from fastapi import FastAPI
 from core.config import settings
-from core.database import engine, Base
 from routers import auth, property, guest, booking, cost, pricing
-import contextlib
 from exceptions.handlers import register_exception_handlers
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-@contextlib.asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup: Create tables
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    yield
-    # Shutdown
 
 app = FastAPI(
-    title=settings.PROJECT_NAME, 
+    title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
-    lifespan=lifespan
 )
 register_exception_handlers(app)
 app.include_router(auth.router)
