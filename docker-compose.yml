@@ -5,7 +5,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./api:/api
+      - ./api:/app
     environment:
       SECRET_KEY: ${SECRET_KEY:-supersecretkey}
       ALGORITHM: ${ALGORITHM:-HS256}
@@ -21,6 +21,25 @@ services:
       retries: 3
       start_period: 10s
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    container_name: domu_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      # - /app/.next
+    environment:
+      - NEXT_PUBLIC_API_URL=http://web:8000
+      - JWT_SECRET_KEY=${SECRET_KEY:-supersecretkey}
+      - ALGORITHM=${ALGORITHM:-HS256}
+    depends_on:
+      - web
+    restart: unless-stopped
 
   db:
     image: postgres:16

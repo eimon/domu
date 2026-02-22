@@ -1,0 +1,147 @@
+{
+    "Navigation": {
+        "dashboard": "Dashboard",
+        "properties": "Properties",
+        "logout": "Logout",
+        "login": "Login",
+        "profile": "Profile",
+        "guests": "Guests",
+        "bookings": "Bookings"
+    },
+    "Guests": {
+        "title": "Guests",
+        "addNew": "Add New Guest",
+        "fullName": "Full Name",
+        "email": "Email",
+        "phone": "Phone",
+        "documentType": "Document Type",
+        "documentNumber": "Document Number",
+        "noGuests": "No guests found"
+    },
+    "Bookings": {
+        "title": "Bookings",
+        "addNew": "Add New Booking",
+        "noBookings": "No bookings found",
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "summary": "Summary",
+        "status": "Status",
+        "source": "Source"
+    },
+    "Common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "delete": "Delete",
+        "loading": "Loading...",
+        "confirmDelete": "Are you sure you want to delete this?",
+        "back": "Back",
+        "name": "Name",
+        "category": "Category",
+        "type": "Type",
+        "value": "Value",
+        "add": "Add",
+        "update": "Update",
+        "active": "Active",
+        "openSidebar": "Open sidebar",
+        "property": "Property",
+        "guest": "Guest",
+        "bookings": "Bookings",
+        "guests": "Guests",
+        "actions": "Actions"
+    },
+    "Properties": {
+        "title": "Properties",
+        "myManaged": "My Managed Properties",
+        "addNew": "Add New Property",
+        "details": "Property Details",
+        "costs": "Costs & Fees",
+        "calendar": "Availability & Pricing",
+        "rules": "Pricing Rules",
+        "noProperties": "No properties found",
+        "create": {
+            "title": "Add New Property",
+            "name": "Property Name",
+            "address": "Address",
+            "description": "Description",
+            "basePrice": "Base Price",
+            "avgStay": "Avg Stay Days",
+            "submit": "Create Property"
+        },
+        "tabs": {
+            "details": "Details & Costs",
+            "calendar": "Calendar",
+            "reports": "Reports"
+        }
+    },
+    "Calendar": {
+        "available": "Available",
+        "reserved": "Reserved"
+    },
+    "Auth": {
+        "loginTitle": "Welcome back",
+        "loginSubtitle": "Sign in to your account",
+        "username": "Username",
+        "password": "Password",
+        "signIn": "Sign In",
+        "signingIn": "Signing in...",
+        "noAccount": "Don't have an account?",
+        "contactAdmin": "Contact Admin"
+    },
+    "Home": {
+        "heroTitle": "Domu Frontend",
+        "heroSubtitle": "Welcome to the new frontend for the Domu API. This project is built with Next.js 16, TypeScript, and Tailwind CSS.",
+        "feature1Title": "Modern Stack",
+        "feature1Desc": "Powered by Next.js 16 (App Router), React 19, and Tailwind CSS v4.",
+        "feature2Title": "API Ready",
+        "feature2Desc": "Pre-configured Axios client and TypeScript interfaces for your API endpoints.",
+        "feature3Title": "Type Safe",
+        "feature3Desc": "End-to-end type safety using TypeScript and strictly typed API responses.",
+        "cta": "Start Building",
+        "devServerNote": "Check console logs to verify dev server operation."
+    },
+    "Reports": {
+        "title": "Financial Report",
+        "noData": "No financial data available for this period.",
+        "summary": "Summary",
+        "income": "Total Income",
+        "costs": "Total Costs",
+        "margin": "Profit Margin",
+        "occupancy": "Occupancy Rate",
+        "occupiedDays": "Occupied Days",
+        "totalBookings": "Total Bookings",
+        "netProfit": "Net Profit",
+        "fixedMonthly": "Fixed Monthly Costs",
+        "fixedDaily": "Fixed Daily Costs",
+        "variableCosts": "Variable Costs (Reservation)",
+        "commissions": "Commissions",
+        "breakdown": "Cost Breakdown",
+        "details": "View your property's financial performance overview."
+    },
+    "Enums": {
+        "CostCategory": {
+            "RECURRING_MONTHLY": "Recurring Monthly",
+            "RECURRING_DAILY": "Recurring Daily",
+            "PER_RESERVATION": "Per Reservation"
+        },
+        "CostCalculationType": {
+            "FIXED_AMOUNT": "Fixed Amount",
+            "PERCENTAGE": "Percentage"
+        },
+        "BookingStatus": {
+            "CONFIRMED": "Confirmed",
+            "TENTATIVE": "Tentative",
+            "CANCELLED": "Cancelled"
+        },
+        "BookingSource": {
+            "AIRBNB": "Airbnb",
+            "BOOKING": "Booking.com",
+            "DOMU": "Domu",
+            "MANUAL": "Manual"
+        },
+        "DocumentType": {
+            "DU": "DNI/DU",
+            "EXTRANJERO": "Foreign ID"
+        }
+    }
+}

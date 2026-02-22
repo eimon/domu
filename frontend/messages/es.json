@@ -1,0 +1,147 @@
+{
+    "Navigation": {
+        "dashboard": "Panel Principal",
+        "properties": "Propiedades",
+        "logout": "Cerrar Sesión",
+        "login": "Iniciar Sesión",
+        "profile": "Perfil",
+        "guests": "Huéspedes",
+        "bookings": "Reservas"
+    },
+    "Guests": {
+        "title": "Huéspedes",
+        "addNew": "Agregar Huésped",
+        "fullName": "Nombre Completo",
+        "email": "Email",
+        "phone": "Teléfono",
+        "documentType": "Tipo de Documento",
+        "documentNumber": "Número de Documento",
+        "noGuests": "No se encontraron huéspedes"
+    },
+    "Bookings": {
+        "title": "Reservas",
+        "addNew": "Agregar Reserva",
+        "noBookings": "No se encontraron reservas",
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "summary": "Resumen",
+        "status": "Estado",
+        "source": "Fuente"
+    },
+    "Common": {
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "loading": "Cargando...",
+        "confirmDelete": "¿Estás seguro de que quieres eliminar esto?",
+        "back": "Volver",
+        "name": "Nombre",
+        "category": "Categoría",
+        "type": "Tipo",
+        "value": "Valor",
+        "add": "Agregar",
+        "update": "Actualizar",
+        "active": "Activo",
+        "openSidebar": "Abrir barra lateral",
+        "property": "Propiedad",
+        "guest": "Huésped",
+        "bookings": "Reservas",
+        "guests": "Huéspedes",
+        "actions": "Acciones"
+    },
+    "Properties": {
+        "title": "Propiedades",
+        "myManaged": "Mis Propiedades Gestionadas",
+        "addNew": "Agregar Nueva Propiedad",
+        "details": "Detalles de la Propiedad",
+        "costs": "Costos y Tarifas",
+        "calendar": "Disponibilidad y Precios",
+        "rules": "Reglas de Precios",
+        "noProperties": "No se encontraron propiedades",
+        "create": {
+            "title": "Agregar Nueva Propiedad",
+            "name": "Nombre de la Propiedad",
+            "address": "Dirección",
+            "description": "Descripción",
+            "basePrice": "Precio Base",
+            "avgStay": "Estadía Promedio (días)",
+            "submit": "Crear Propiedad"
+        },
+        "tabs": {
+            "details": "Detalles y Costos",
+            "calendar": "Calendario",
+            "reports": "Reportes"
+        }
+    },
+    "Calendar": {
+        "available": "Disponible",
+        "reserved": "Reservado"
+    },
+    "Auth": {
+        "loginTitle": "Bienvenido de nuevo",
+        "loginSubtitle": "Inicia sesión en tu cuenta",
+        "username": "Usuario",
+        "password": "Contraseña",
+        "signIn": "Ingresar",
+        "signingIn": "Iniciando sesión...",
+        "noAccount": "¿No tienes una cuenta?",
+        "contactAdmin": "Contactar al Administrador"
+    },
+    "Home": {
+        "heroTitle": "Domu Frontend",
+        "heroSubtitle": "Bienvenido al nuevo frontend de la API de Domu. Este proyecto está construido con Next.js 16, TypeScript y Tailwind CSS.",
+        "feature1Title": "Stack Moderno",
+        "feature1Desc": "Impulsado por Next.js 16 (App Router), React 19 y Tailwind CSS v4.",
+        "feature2Title": "Listo para API",
+        "feature2Desc": "Cliente Axios preconfigurado e interfaces de TypeScript para tus endpoints de API.",
+        "feature3Title": "Tipado Seguro",
+        "feature3Desc": "Seguridad de tipos de extremo a extremo usando TypeScript y respuestas de API estrictamente tipadas.",
+        "cta": "Comenzar a Construir",
+        "devServerNote": "Revisa los logs de la consola para verificar la operación del servidor de desarrollo."
+    },
+    "Reports": {
+        "title": "Reporte Financiero",
+        "noData": "No hay datos financieros disponibles para este período.",
+        "summary": "Resumen",
+        "income": "Ingresos Totales",
+        "costs": "Costos Totales",
+        "margin": "Margen de Ganancia",
+        "occupancy": "Tasa de Ocupación",
+        "occupiedDays": "Días Ocupados",
+        "totalBookings": "Reservas Totales",
+        "netProfit": "Ganancia Neta",
+        "fixedMonthly": "Costos Fijos Mensuales",
+        "fixedDaily": "Costos Fijos Diarios",
+        "variableCosts": "Costos Variables (Reserva)",
+        "commissions": "Comisiones",
+        "breakdown": "Desglose de Costos",
+        "details": "Visualiza el resumen del rendimiento financiero de tu propiedad."
+    },
+    "Enums": {
+        "CostCategory": {
+            "RECURRING_MONTHLY": "Recurrente Mensual",
+            "RECURRING_DAILY": "Recurrente Diario",
+            "PER_RESERVATION": "Por Reserva"
+        },
+        "CostCalculationType": {
+            "FIXED_AMOUNT": "Monto Fijo",
+            "PERCENTAGE": "Porcentaje"
+        },
+        "BookingStatus": {
+            "CONFIRMED": "Confirmado",
+            "TENTATIVE": "Tentativo",
+            "CANCELLED": "Cancelado"
+        },
+        "BookingSource": {
+            "AIRBNB": "Airbnb",
+            "BOOKING": "Booking.com",
+            "DOMU": "Domu",
+            "MANUAL": "Manual"
+        },
+        "DocumentType": {
+            "DU": "DNI/DU",
+            "EXTRANJERO": "Documento Extranjero"
+        }
+    }
+}

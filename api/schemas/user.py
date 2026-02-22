@@ -9,7 +9,7 @@ class UserBase(BaseModel):
     username: str
     email: EmailStr
     full_name: Optional[str] = None
-    role: UserRole = UserRole.MANAGER
+    role: str
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):

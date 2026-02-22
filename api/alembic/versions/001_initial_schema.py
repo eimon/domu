@@ -20,7 +20,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # Enums
-    userrole = postgresql.ENUM("admin", "manager", "owner", name="userrole", create_type=False)
+    userrole = postgresql.ENUM("ADMIN", "MANAGER", "OWNER", name="userrole", create_type=False)
     bookingstatus = postgresql.ENUM("CONFIRMED", "TENTATIVE", "CANCELLED", name="bookingstatus", create_type=False)
     bookingsource = postgresql.ENUM("AIRBNB", "BOOKING", "DOMU", "MANUAL", name="bookingsource", create_type=False)
     documenttype = postgresql.ENUM("DU", "EXTRANJERO", name="documenttype", create_type=False)
@@ -42,7 +42,7 @@ def upgrade() -> None:
         sa.Column("email", sa.String(), nullable=False),
         sa.Column("hashed_password", sa.String(), nullable=False),
         sa.Column("full_name", sa.String(), nullable=True),
-        sa.Column("role", userrole, nullable=False, server_default="manager"),
+        sa.Column("role", userrole, nullable=False, server_default="MANAGER"),
         sa.Column("is_active", sa.Boolean(), server_default=sa.text("true")),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now()),
     )

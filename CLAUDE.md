@@ -70,3 +70,7 @@ api/
 ## Sub-Agent: api/
 
 El directorio `api/` tiene su propio `CLAUDE.md` con las convenciones exactas de código (patrones de model, schema, repository, service, router), enums, permisos y deploy. Cuando trabajes en código dentro de `api/`, consultalo para seguir los patrones establecidos. También existe `api/API_ENDPOINTS.md` como especificación completa de la API.
+
+## Sub-Agent: frontend/
+
+El directorio `frontend/` tiene su propio `CLAUDE.md` con las convenciones exactas del frontend: stack (Next.js 16, TypeScript, Tailwind v4, next-intl), estructura de directorios, patrones de Server Actions, helpers de API (`serverApi` vs axios), componentes, i18n y autenticación. Cuando trabajes en código dentro de `frontend/`, consultalo para seguir los patrones establecidos. También existe `frontend/AGENTS.md` como resumen de las features ya implementadas.

@@ -38,6 +38,28 @@ postgres_data/
 .vscode/
 .idea/
 
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Next.js
+.next/
+out/
+.env*.local
+
+# Production
+# build/ (already in Python section)
+
+# Vercel
+.vercel/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
 # OS
 .DS_Store
 Thumbs.db
