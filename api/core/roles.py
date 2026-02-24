@@ -1,6 +1,7 @@
 from enum import Enum
 
 class Role(str, Enum):
+    ROLE_ADMIN = "ROLE_ADMIN"
     # Property roles
     ROLE_PROPERTY_CREATE = "ROLE_PROPERTY_CREATE"
     ROLE_PROPERTY_DELETE = "ROLE_PROPERTY_DELETE"
@@ -15,11 +16,18 @@ class Role(str, Enum):
     # Guest roles
     ROLE_GUEST_MANAGE = "ROLE_GUEST_MANAGE"
 
+    # User management roles
+    ROLE_USER_LIST = "ROLE_USER_LIST"
+    ROLE_USER_UPDATE = "ROLE_USER_UPDATE"
+    ROLE_USER_DELETE = "ROLE_USER_DELETE"
+
 role_hierarchy = {
     "ADMIN": [
+        Role.ROLE_ADMIN,
         Role.ROLE_PROPERTY_CREATE, Role.ROLE_PROPERTY_DELETE, Role.ROLE_PROPERTY_UPDATE,
         Role.ROLE_BOOKING_CREATE, Role.ROLE_BOOKING_UPDATE, Role.ROLE_BOOKING_DELETE, Role.ROLE_BOOKING_SYNC,
-        Role.ROLE_GUEST_MANAGE
+        Role.ROLE_GUEST_MANAGE,
+        Role.ROLE_USER_LIST, Role.ROLE_USER_UPDATE, Role.ROLE_USER_DELETE,
     ],
     "MANAGER": [
         Role.ROLE_PROPERTY_CREATE, Role.ROLE_PROPERTY_DELETE, Role.ROLE_PROPERTY_UPDATE,

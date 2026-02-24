@@ -6,7 +6,8 @@
         "login": "Iniciar Sesión",
         "profile": "Perfil",
         "guests": "Huéspedes",
-        "bookings": "Reservas"
+        "bookings": "Reservas",
+        "users": "Usuarios"
     },
     "Guests": {
         "title": "Huéspedes",
@@ -118,6 +119,22 @@
         "breakdown": "Desglose de Costos",
         "details": "Visualiza el resumen del rendimiento financiero de tu propiedad."
     },
+    "Users": {
+        "title": "Usuarios",
+        "addNew": "Nuevo Usuario",
+        "username": "Usuario",
+        "email": "Email",
+        "fullName": "Nombre Completo",
+        "role": "Rol",
+        "password": "Contraseña",
+        "status": "Estado",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "noUsers": "No se encontraron usuarios",
+        "editUser": "Editar Usuario",
+        "deleteConfirm": "¿Estás seguro de que quieres eliminar este usuario?",
+        "passwordHint": "Dejar vacío para no cambiar la contraseña"
+    },
     "Enums": {
         "CostCategory": {
             "RECURRING_MONTHLY": "Recurrente Mensual",
@@ -142,6 +159,11 @@
         "DocumentType": {
             "DU": "DNI/DU",
             "EXTRANJERO": "Documento Extranjero"
+        },
+        "UserRole": {
+            "ADMIN": "Administrador",
+            "MANAGER": "Gestor",
+            "OWNER": "Propietario"
         }
     }
 }

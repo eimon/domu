@@ -7,6 +7,8 @@ from services.auth_service import AuthService
 from core.database import get_db
 from dependencies.auth import get_current_user
 from models.user import User as Usuario
+from core.roles import Role
+from dependencies.auth import has_role
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -14,7 +16,8 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/register", response_model=UserResponse)
 async def register(
     user_in: UserCreate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: Usuario = Depends(has_role(Role.ROLE_ADMIN))
 ):
     """Register a new user."""
     return await AuthService(db).register_user(user_in)

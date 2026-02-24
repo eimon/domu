@@ -1,19 +1,21 @@
 "use client";
 
 import { useSidebar } from "@/context/SidebarContext";
-import { X, Home, Building2, Users, CalendarDays, LogOut } from "lucide-react";
+import { X, Home, Building2, Users, CalendarDays, LogOut, UserCog } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/routing";
 import { logout } from "@/actions/auth";
 
 const navigation = [
-    { name: "properties", href: "/properties", icon: Building2 },
-    { name: "bookings", href: "/bookings", icon: CalendarDays },
-    { name: "guests", href: "/guests", icon: Users },
+    { name: "properties", href: "/properties", icon: Building2, adminOnly: false },
+    { name: "bookings", href: "/bookings", icon: CalendarDays, adminOnly: false },
+    { name: "guests", href: "/guests", icon: Users, adminOnly: false },
+    { name: "users", href: "/users", icon: UserCog, adminOnly: true },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ userRole }: { userRole: string | null }) {
     const { isOpen, close } = useSidebar();
+    const visibleNavigation = navigation.filter(item => !item.adminOnly || userRole === "admin");
     const pathname = usePathname();
     const t = useTranslations("Navigation");
 
@@ -61,7 +63,7 @@ export default function Sidebar() {
                             {t('dashboard')}
                         </Link>
 
-                        {navigation.map((item) => {
+                        {visibleNavigation.map((item) => {
                             const isActive = pathname.startsWith(item.href);
                             return (
                                 <Link

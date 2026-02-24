@@ -70,6 +70,7 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
 
 export async function logout() {
     const cookieStore = await cookies();
+    const locale = cookieStore.get("NEXT_LOCALE")?.value || "en";
     cookieStore.delete("access_token");
-    redirect("/auth/login");
+    redirect({ href: "/auth/login", locale });
 }

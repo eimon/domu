@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from core.config import settings
-from routers import auth, property, guest, booking, cost, pricing
+from routers import auth, property, guest, booking, cost, pricing, users
 from exceptions.handlers import register_exception_handlers
 import logging
 
@@ -18,6 +18,7 @@ app.include_router(guest.router)
 app.include_router(booking.router)
 app.include_router(cost.router)
 app.include_router(pricing.router)
+app.include_router(users.router)
 
 @app.get("/")
 async def root():
