@@ -22,6 +22,10 @@ class Property(Base):
     base_price = Column(Numeric(10, 2), default=0, nullable=False)  # GROSS price (what guest pays)
     avg_stay_days = Column(Integer, default=3, nullable=False)  # For cost amortization
 
+    # Geocoordinates (from address autocomplete)
+    latitude = Column(Numeric(9, 6), nullable=True)
+    longitude = Column(Numeric(9, 6), nullable=True)
+
     # Foreign keys
     manager_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
     owner_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)

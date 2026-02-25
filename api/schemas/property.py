@@ -10,6 +10,8 @@ class PropertyBase(BaseModel):
     description: Optional[str] = None
     base_price: Decimal = Field(default=0, ge=0, description="GROSS price per night (what guest pays)")
     avg_stay_days: int = Field(default=3, gt=0)
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 
 class PropertyCreate(PropertyBase):
@@ -22,6 +24,8 @@ class PropertyUpdate(BaseModel):
     description: Optional[str] = None
     base_price: Optional[Decimal] = Field(None, ge=0)
     avg_stay_days: Optional[int] = Field(None, gt=0)
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 
 class PropertyResponse(PropertyBase):

@@ -6,6 +6,7 @@ import { updateProperty, PropertyFormState } from "@/actions/properties";
 import { X, Loader2 } from "lucide-react";
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
+import AddressAutocomplete from "@/components/AddressAutocomplete";
 
 interface EditPropertyDialogProps {
     property: Property;
@@ -16,6 +17,12 @@ export default function EditPropertyDialog({ property, onClose }: EditPropertyDi
     const initialState: PropertyFormState = { error: "", success: false };
     const t = useTranslations("Properties.create");
     const tCommon = useTranslations("Common");
+
+    const existingCoords =
+        property.latitude != null && property.longitude != null
+            ? { lat: String(property.latitude), lon: String(property.longitude) }
+            : null;
+    const [coords, setCoords] = useState<{ lat: string; lon: string } | null>(existingCoords);
 
     const updateWithId = updateProperty.bind(null, property.id);
     const [state, formAction, isPending] = useActionState(updateWithId, initialState);
@@ -63,13 +70,15 @@ export default function EditPropertyDialog({ property, onClose }: EditPropertyDi
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             {t('address')}
                         </label>
-                        <input
+                        <AddressAutocomplete
                             name="address"
-                            type="text"
                             required
                             defaultValue={property.address}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            onSelect={(lat, lon) => setCoords({ lat, lon })}
                         />
+                        <input type="hidden" name="latitude" value={coords?.lat ?? ""} />
+                        <input type="hidden" name="longitude" value={coords?.lon ?? ""} />
                     </div>
 
                     <div>

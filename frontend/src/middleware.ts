@@ -6,22 +6,43 @@ import { routing } from './i18n/routing';
 
 const intlMiddleware = createMiddleware(routing);
 
+/**
+ * Detects the best matching locale for a request, in priority order:
+ * 1. NEXT_LOCALE cookie (user's explicit preference, set by next-intl)
+ * 2. Locale already present in the URL path (/es/..., /en/...)
+ * 3. Browser's Accept-Language header
+ * 4. Default locale (en)
+ */
+function detectLocale(request: NextRequest): string {
+    const locales = routing.locales as readonly string[];
+
+    const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
+    if (cookieLocale && locales.includes(cookieLocale)) return cookieLocale;
+
+    const urlLocale = request.nextUrl.pathname.match(/^\/([a-z]{2})(\/|$)/)?.[1];
+    if (urlLocale && locales.includes(urlLocale)) return urlLocale;
+
+    const acceptLang = request.headers.get("accept-language") ?? "";
+    for (const part of acceptLang.split(",")) {
+        const tag = part.split(";")[0].trim().toLowerCase();
+        if (locales.includes(tag)) return tag;
+        const prefix = tag.split("-")[0];
+        if (locales.includes(prefix)) return prefix;
+    }
+
+    return routing.defaultLocale;
+}
+
 export async function middleware(request: NextRequest) {
-    // 1. Run next-intl middleware first to handle redirects and locale
     const response = intlMiddleware(request);
 
-    // 2. Auth Logic
     const token = request.cookies.get("access_token")?.value;
     const secret = process.env.JWT_SECRET_KEY;
-
-    // Public paths need to account for locale prefix (e.g., /en/auth/login or /auth/login)
-    // We normalize the path by removing the locale if present
     const pathname = request.nextUrl.pathname;
 
-    // Check if path is public (auth pages, static assets, etc)
     const isPublicPath =
-        pathname.match(/^\/([a-z]{2})?\/auth\//) || // /en/auth/..., /es/auth/...
-        pathname.includes("/auth/") ||              // /auth/... (unprefixed)
+        pathname.match(/^\/([a-z]{2})?\/auth\//) ||
+        pathname.includes("/auth/") ||
         pathname.match(/\.(ico|svg|png|jpg|jpeg)$/) ||
         pathname.startsWith("/_next");
 
@@ -29,23 +50,23 @@ export async function middleware(request: NextRequest) {
         return response;
     }
 
-    // Protected Routes Logic
+    const redirectToLogin = (locale: string) => {
+        const res = NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url));
+        // Persist the detected locale so the login page and post-login redirect use it
+        res.cookies.set("NEXT_LOCALE", locale, { path: "/", sameSite: "lax", maxAge: 60 * 60 * 24 * 365 });
+        return res;
+    };
+
     if (!token) {
-        // Redirect to login, preserving locale if present
-        const locale = pathname.match(/^\/([a-z]{2})\//)?.[1] || routing.defaultLocale;
-        return NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url));
+        return redirectToLogin(detectLocale(request));
     }
 
     try {
         if (!secret) throw new Error("JWT_SECRET_KEY not defined");
-        const secretKey = new TextEncoder().encode(secret);
-        await jwtVerify(token, secretKey);
-        // Token valid, proceed with the response from intlMiddleware
+        await jwtVerify(token, new TextEncoder().encode(secret));
         return response;
-    } catch (error) {
-        // Token invalid
-        const locale = pathname.match(/^\/([a-z]{2})\//)?.[1] || routing.defaultLocale;
-        return NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url));
+    } catch {
+        return redirectToLogin(detectLocale(request));
     }
 }
 

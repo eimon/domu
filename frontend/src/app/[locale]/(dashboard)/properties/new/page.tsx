@@ -1,14 +1,16 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { createProperty, PropertyFormState } from "@/actions/properties";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
+import AddressAutocomplete from "@/components/AddressAutocomplete";
 
 export default function NewPropertyPage() {
     const initialState: PropertyFormState = { error: "", success: false };
     const [state, formAction, isPending] = useActionState(createProperty, initialState);
+    const [coords, setCoords] = useState<{ lat: string; lon: string } | null>(null);
     const t = useTranslations("Properties.create");
     const tCommon = useTranslations("Common");
 
@@ -53,14 +55,15 @@ export default function NewPropertyPage() {
                             <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
                                 {t('address')}
                             </label>
-                            <input
-                                id="address"
+                            <AddressAutocomplete
                                 name="address"
-                                type="text"
-                                placeholder="123 Ocean Drive, Miami"
                                 required
+                                placeholder="Av. Corrientes 1234, Buenos Aires"
                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                onSelect={(lat, lon) => setCoords({ lat, lon })}
                             />
+                            <input type="hidden" name="latitude" value={coords?.lat ?? ""} />
+                            <input type="hidden" name="longitude" value={coords?.lon ?? ""} />
                         </div>
 
                         <div>

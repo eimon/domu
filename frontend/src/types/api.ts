@@ -103,6 +103,8 @@ export interface Property {
     owner_id?: string; // uuid
     base_price: number; // NEW: Precio bruto por noche
     avg_stay_days: number; // NEW: Días promedio de estadía
+    latitude?: number | null;
+    longitude?: number | null;
     created_at: string; // datetime
     updated_at: string; // datetime
     is_active: boolean;
