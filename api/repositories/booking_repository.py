@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import and_, or_
 from models.booking import Booking
+from models.property import Property as PropertyModel
 from schemas.booking import BookingCreate, BookingUpdate
 from core.enums import BookingStatus
 from datetime import date
@@ -51,6 +52,18 @@ class BookingRepository:
 
     async def get_all(self, skip: int = 0, limit: int = 100) -> list[Booking]:
         result = await self.db.execute(select(Booking).offset(skip).limit(limit))
+        return list(result.scalars().all())
+
+    async def get_all_by_manager(
+        self, manager_id: uuid.UUID, skip: int = 0, limit: int = 100
+    ) -> list[Booking]:
+        result = await self.db.execute(
+            select(Booking)
+            .join(PropertyModel, Booking.property_id == PropertyModel.id)
+            .where(PropertyModel.manager_id == manager_id)
+            .offset(skip)
+            .limit(limit)
+        )
         return list(result.scalars().all())
 
     async def check_conflicts(

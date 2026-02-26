@@ -31,7 +31,7 @@ async def list_bookings(
     current_user: Usuario = Depends(get_current_user)
 ):
     """List all bookings. Authenticated users only."""
-    return await BookingService(db).list_bookings(skip, limit)
+    return await BookingService(db).list_bookings(skip, limit, current_user)
 
 
 @router.get("/{booking_id}", response_model=BookingResponse)
@@ -41,7 +41,7 @@ async def get_booking(
     current_user: Usuario = Depends(get_current_user)
 ):
     """Get booking details. Authenticated users only."""
-    return await BookingService(db).get_booking(booking_id)
+    return await BookingService(db).get_booking(booking_id, current_user)
 
 
 @router.put("/{booking_id}", response_model=BookingResponse)
@@ -52,7 +52,7 @@ async def update_booking(
     current_user: Usuario = Depends(has_role(Role.ROLE_BOOKING_UPDATE))
 ):
     """Update a booking. Requires MANAGER or ADMIN role."""
-    return await BookingService(db).update_booking(booking_id, booking_update)
+    return await BookingService(db).update_booking(booking_id, booking_update, current_user)
 
 
 @router.delete("/{booking_id}", status_code=204)
@@ -62,7 +62,7 @@ async def cancel_booking(
     current_user: Usuario = Depends(has_role(Role.ROLE_BOOKING_DELETE))
 ):
     """Cancel a booking (soft delete). Requires MANAGER or ADMIN role."""
-    await BookingService(db).cancel_booking(booking_id)
+    await BookingService(db).cancel_booking(booking_id, current_user)
 
 
 # Property-specific bookings
@@ -75,4 +75,4 @@ async def list_property_bookings(
     current_user: Usuario = Depends(get_current_user)
 ):
     """List bookings for a specific property. Authenticated users only."""
-    return await BookingService(db).list_bookings_by_property(property_id, skip, limit)
+    return await BookingService(db).list_bookings_by_property(property_id, skip, limit, current_user)

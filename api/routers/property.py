@@ -31,7 +31,7 @@ async def list_properties(
     current_user: Usuario = Depends(get_current_user)
 ):
     """List all properties. Authenticated users only."""
-    return await PropertyService(db).list_properties(skip, limit)
+    return await PropertyService(db).list_properties(skip, limit, current_user)
 
 
 @router.get("/my-managed", response_model=List[PropertyResponse])
@@ -59,7 +59,7 @@ async def get_property(
     current_user: Usuario = Depends(get_current_user)
 ):
     """Get property details. Authenticated users only."""
-    return await PropertyService(db).get_property(property_id)
+    return await PropertyService(db).get_property(property_id, current_user)
 
 
 @router.put("/{property_id}", response_model=PropertyResponse)
@@ -70,7 +70,7 @@ async def update_property(
     current_user: Usuario = Depends(has_role(Role.ROLE_PROPERTY_UPDATE))
 ):
     """Update a property. Requires MANAGER or ADMIN role."""
-    return await PropertyService(db).update_property(property_id, property_update)
+    return await PropertyService(db).update_property(property_id, property_update, current_user)
 
 
 @router.delete("/{property_id}", status_code=204)
@@ -80,4 +80,4 @@ async def delete_property(
     current_user: Usuario = Depends(has_role(Role.ROLE_PROPERTY_DELETE))
 ):
     """Delete a property (soft delete). Requires ADMIN role."""
-    await PropertyService(db).delete_property(property_id)
+    await PropertyService(db).delete_property(property_id, current_user)
