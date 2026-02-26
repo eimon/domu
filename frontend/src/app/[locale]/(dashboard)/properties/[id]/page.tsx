@@ -1,5 +1,5 @@
 import { serverApi } from "@/lib/server-api";
-import { Property, Cost } from "@/types/api";
+import { Property, Cost, PropertyBasePrice } from "@/types/api";
 import { notFound } from "next/navigation";
 import { MapPin, ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/routing";
@@ -11,6 +11,7 @@ import PropertyTabs from "@/components/PropertyTabs";
 import FinancialReport from "@/components/FinancialReport";
 import { PricingRule } from "@/types/api";
 import PropertyActions from "./PropertyActions";
+import BasePriceCard from "@/components/BasePriceCard";
 import { getTranslations } from "next-intl/server";
 
 interface PageProps {
@@ -36,6 +37,12 @@ async function getPropertyPricingRules(id: string): Promise<PricingRule[]> {
     return res.json();
 }
 
+async function getBasePriceHistory(id: string): Promise<PropertyBasePrice[]> {
+    const res = await serverApi(`/properties/${id}/base-price/history`);
+    if (!res.ok) return [];
+    return res.json();
+}
+
 export default async function PropertyDetailsPage({ params, searchParams }: PageProps) {
     const { id } = await params;
     const { tab = "details" } = await searchParams;
@@ -49,6 +56,8 @@ export default async function PropertyDetailsPage({ params, searchParams }: Page
 
     const costs = await getPropertyCosts(id);
     const pricingRules = await getPropertyPricingRules(id);
+    const basePriceHistory = await getBasePriceHistory(id);
+    const currentBasePrice = basePriceHistory.at(-1) ?? null;
 
     return (
         <div className="space-y-6">
@@ -87,6 +96,15 @@ export default async function PropertyDetailsPage({ params, searchParams }: Page
                                 <p className="text-gray-600 leading-relaxed">{property.description}</p>
                             </div>
                         )}
+
+                        {/* Base Price Section */}
+                        <section>
+                            <div className="mb-3">
+                                <h2 className="text-xl font-bold text-gray-900">{t('basePriceLabel')}</h2>
+                                <p className="text-sm text-gray-500">{t('basePriceDescription')}</p>
+                            </div>
+                            <BasePriceCard property={property} currentBasePrice={currentBasePrice} />
+                        </section>
 
                         {/* Costs Section */}
                         <section>

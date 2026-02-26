@@ -41,3 +41,4 @@ class Property(Base):
     bookings = relationship("Booking", back_populates="property")
     costs = relationship("PropertyCost", back_populates="property", cascade="all, delete-orphan")
     pricing_rules = relationship("PricingRule", back_populates="property", cascade="all, delete-orphan")
+    base_prices = relationship("PropertyBasePrice", back_populates="property", cascade="all, delete-orphan")

@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, DateTime, Enum, Numeric, Boolean, ForeignKey, CheckConstraint
+from sqlalchemy import Column, String, DateTime, Date, Enum, Numeric, Boolean, ForeignKey, CheckConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -11,6 +11,10 @@ class PropertyCost(Base):
     __tablename__ = "property_costs"
     __table_args__ = (
         CheckConstraint("value >= 0", name="ck_property_costs_value_non_negative"),
+        CheckConstraint(
+            "end_date IS NULL OR start_date IS NULL OR end_date >= start_date",
+            name="ck_property_costs_end_after_start",
+        ),
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
@@ -21,6 +25,16 @@ class PropertyCost(Base):
     calculation_type = Column(Enum(CostCalculationType), nullable=False)
     value = Column(Numeric(10, 2), nullable=False)  # Supports up to 99,999,999.99
     is_active = Column(Boolean, default=True)
+
+    # Temporal versioning
+    start_date = Column(Date(), nullable=True)
+    end_date = Column(Date(), nullable=True)
+    root_cost_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("property_costs.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

@@ -18,6 +18,7 @@ from models.booking import Booking  # noqa: F401
 from models.guest import Guest  # noqa: F401
 from models.pricing_rule import PricingRule  # noqa: F401
 from models.property_cost import PropertyCost  # noqa: F401
+from models.property_base_price import PropertyBasePrice  # noqa: F401
 
 # ---------- Test database ----------
 
@@ -57,6 +58,7 @@ async def clean_tables():
         await conn.execute(text("DELETE FROM bookings"))
         await conn.execute(text("DELETE FROM pricing_rules"))
         await conn.execute(text("DELETE FROM property_costs"))
+        await conn.execute(text("DELETE FROM property_base_prices"))
         await conn.execute(text("DELETE FROM properties"))
         await conn.execute(text("DELETE FROM guests"))
         await conn.execute(text("DELETE FROM users"))

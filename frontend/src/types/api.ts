@@ -17,9 +17,9 @@ export enum DocumentType {
 }
 
 export enum UserRole {
-    ADMIN = "ADMIN",
-    MANAGER = "MANAGER",
-    OWNER = "OWNER",
+    ADMIN = "admin",
+    MANAGER = "manager",
+    OWNER = "owner",
 }
 
 export enum CostCategory {
@@ -40,8 +40,17 @@ export interface Cost {
     category: string | CostCategory;
     calculation_type: string | CostCalculationType;
     value: number;
+    is_active: boolean;
+    start_date?: string | null; // YYYY-MM-DD, null = "from the beginning"
+    end_date?: string | null;   // YYYY-MM-DD, null = currently active
+    root_cost_id?: string | null; // uuid, null = this is the root version
     created_at?: string;
     updated_at?: string;
+}
+
+export interface CostModify {
+    value: number;
+    start_date: string; // YYYY-MM-DD
 }
 
 export interface PricingRule {
@@ -141,4 +150,21 @@ export interface Booking {
 export interface AuthResponse {
     access_token: string;
     token_type: string;
+}
+
+export interface PropertyBasePrice {
+    id: string; // uuid
+    property_id: string; // uuid
+    value: number;
+    is_active: boolean;
+    start_date?: string | null;   // YYYY-MM-DD, null = "from the beginning"
+    end_date?: string | null;     // YYYY-MM-DD, null = currently active
+    root_price_id?: string | null; // uuid, null = this is the root version
+    created_at?: string;
+    updated_at?: string;
+}
+
+export interface PropertyBasePriceModify {
+    value: number;
+    start_date: string; // YYYY-MM-DD
 }

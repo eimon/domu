@@ -79,6 +79,7 @@ export async function createProperty(prevState: PropertyFormState, formData: For
     revalidatePath("/properties");
     const locale = (await cookies()).get("NEXT_LOCALE")?.value || "en";
     redirect({ href: "/properties", locale });
+    return { success: true };
 }
 
 export async function updateProperty(

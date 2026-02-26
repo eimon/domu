@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { Cost } from "@/types/api";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, CalendarClock, RotateCcw } from "lucide-react";
 import EditCostDialog from "./EditCostDialog";
-import { deleteCost } from "@/actions/costs";
+import ModifyCostDialog from "./ModifyCostDialog";
+import { deleteCost, revertCost } from "@/actions/costs";
 import { useTranslations } from "next-intl";
 
 interface CostsTableProps {
@@ -14,23 +15,29 @@ interface CostsTableProps {
 
 export default function CostsTable({ costs, propertyId }: CostsTableProps) {
     const [editingCost, setEditingCost] = useState<Cost | null>(null);
+    const [modifyingCost, setModifyingCost] = useState<Cost | null>(null);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
+    const [isReverting, setIsReverting] = useState<string | null>(null);
     const t = useTranslations("Properties");
     const tCommon = useTranslations("Common");
     const tEnums = useTranslations("Enums");
 
     const handleDelete = async (cost: Cost) => {
-        if (!confirm(tCommon('confirmDelete'))) {
-            return;
-        }
+        if (!confirm(tCommon('confirmDelete'))) return;
 
         setIsDeleting(cost.id);
         const result = await deleteCost(cost.id, propertyId);
-
-        if (result.error) {
-            alert(result.error);
-        }
+        if (result.error) alert(result.error);
         setIsDeleting(null);
+    };
+
+    const handleRevert = async (cost: Cost) => {
+        if (!confirm(t('confirmRevert'))) return;
+
+        setIsReverting(cost.id);
+        const result = await revertCost(cost.id, propertyId);
+        if (result.error) alert(result.error);
+        setIsReverting(null);
     };
 
     if (costs.length === 0) {
@@ -83,6 +90,23 @@ export default function CostsTable({ costs, propertyId }: CostsTableProps) {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
                                         <div className="flex items-center justify-end space-x-2">
                                             <button
+                                                onClick={() => setModifyingCost(cost)}
+                                                className="p-1.5 text-amber-600 hover:bg-amber-50 rounded transition-colors"
+                                                title={t('modifyCost')}
+                                            >
+                                                <CalendarClock size={16} />
+                                            </button>
+                                            {cost.root_cost_id && (
+                                                <button
+                                                    onClick={() => handleRevert(cost)}
+                                                    disabled={isReverting === cost.id}
+                                                    className="p-1.5 text-purple-600 hover:bg-purple-50 rounded transition-colors disabled:opacity-50"
+                                                    title={t('revertCost')}
+                                                >
+                                                    <RotateCcw size={16} />
+                                                </button>
+                                            )}
+                                            <button
                                                 onClick={() => setEditingCost(cost)}
                                                 className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
                                                 title={tCommon('edit')}
@@ -112,6 +136,15 @@ export default function CostsTable({ costs, propertyId }: CostsTableProps) {
                     propertyId={propertyId}
                     isOpen={!!editingCost}
                     onClose={() => setEditingCost(null)}
+                />
+            )}
+
+            {modifyingCost && (
+                <ModifyCostDialog
+                    cost={modifyingCost}
+                    propertyId={propertyId}
+                    isOpen={!!modifyingCost}
+                    onClose={() => setModifyingCost(null)}
                 />
             )}
         </>

@@ -22,7 +22,6 @@ class PropertyUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=200)
     address: Optional[str] = Field(None, min_length=1)
     description: Optional[str] = None
-    base_price: Optional[Decimal] = Field(None, ge=0)
     avg_stay_days: Optional[int] = Field(None, gt=0)
     latitude: Optional[float] = None
     longitude: Optional[float] = None

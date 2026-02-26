@@ -44,6 +44,7 @@
         "add": "Add",
         "update": "Update",
         "active": "Active",
+        "startDate": "Effective from",
         "openSidebar": "Open sidebar",
         "property": "Property",
         "guest": "Guest",
@@ -73,11 +74,34 @@
             "details": "Details & Costs",
             "calendar": "Calendar",
             "reports": "Reports"
-        }
+        },
+        "modifyCost": "Modify cost",
+        "modifyBasePrice": "Modify",
+        "currentValue": "Current value",
+        "newValue": "New value",
+        "applyChange": "Apply change",
+        "modifyDateHint": "The previous value will remain active until the day before this date.",
+        "basePriceLabel": "Base Price",
+        "basePriceDescription": "Gross price per night used as the ceiling for profitability calculations.",
+        "revertCost": "Revert to previous value",
+        "revertBasePrice": "Revert",
+        "confirmRevert": "This will undo the last change and restore the previous value. Continue?"
     },
     "Calendar": {
         "available": "Available",
-        "reserved": "Reserved"
+        "reserved": "Reserved",
+        "selected": "Selected",
+        "selectingFrom": "From {date} — click another day to complete",
+        "cancelSelection": "Cancel selection",
+        "newRule": "New pricing rule",
+        "selectedRange": "{start} → {end}",
+        "ruleName": "Rule name",
+        "ruleNamePlaceholder": "E.g. High season",
+        "profitabilityPercent": "Profitability %",
+        "priority": "Priority",
+        "profitabilityHint": "100 = base price, 120 = +20%",
+        "priorityHint": "Higher number = higher priority",
+        "saveRule": "Save rule"
     },
     "Auth": {
         "loginTitle": "Welcome back",
@@ -161,9 +185,9 @@
             "EXTRANJERO": "Foreign ID"
         },
         "UserRole": {
-            "ADMIN": "Admin",
-            "MANAGER": "Manager",
-            "OWNER": "Owner"
+            "admin": "Admin",
+            "manager": "Manager",
+            "owner": "Owner"
         }
     }
 }

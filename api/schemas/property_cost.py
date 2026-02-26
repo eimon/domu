@@ -1,5 +1,5 @@
 from pydantic import BaseModel, UUID4, Field, field_validator
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
 from decimal import Decimal
 from core.enums import CostCategory, CostCalculationType
@@ -49,9 +49,22 @@ class PropertyCostUpdate(BaseModel):
         return v
 
 
+class PropertyCostModify(BaseModel):
+    value: Decimal = Field(..., gt=0, description="Nuevo monto o porcentaje. Debe ser mayor a 0.")
+    start_date: date = Field(..., description="Fecha a partir de la cual aplica el nuevo valor.")
+
+    @field_validator("value")
+    @classmethod
+    def validate_value(cls, v: Decimal, info) -> Decimal:
+        return v
+
+
 class PropertyCostResponse(PropertyCostBase):
     id: UUID4
     property_id: UUID4
+    start_date: Optional[date]
+    end_date: Optional[date]
+    root_cost_id: Optional[UUID4]
     created_at: datetime
     updated_at: Optional[datetime]
 

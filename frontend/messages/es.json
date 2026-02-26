@@ -44,6 +44,7 @@
         "add": "Agregar",
         "update": "Actualizar",
         "active": "Activo",
+        "startDate": "Vigente desde",
         "openSidebar": "Abrir barra lateral",
         "property": "Propiedad",
         "guest": "Huésped",
@@ -73,11 +74,34 @@
             "details": "Detalles y Costos",
             "calendar": "Calendario",
             "reports": "Reportes"
-        }
+        },
+        "modifyCost": "Modificar costo",
+        "modifyBasePrice": "Modificar",
+        "currentValue": "Valor actual",
+        "newValue": "Nuevo valor",
+        "applyChange": "Aplicar cambio",
+        "modifyDateHint": "El valor anterior seguirá vigente hasta el día anterior a esta fecha.",
+        "basePriceLabel": "Precio Base",
+        "basePriceDescription": "Precio bruto por noche utilizado como techo para los cálculos de rentabilidad.",
+        "revertCost": "Revertir al valor anterior",
+        "revertBasePrice": "Revertir",
+        "confirmRevert": "Se deshará el último cambio y se restaurará el valor anterior. ¿Continuar?"
     },
     "Calendar": {
         "available": "Disponible",
-        "reserved": "Reservado"
+        "reserved": "Reservado",
+        "selected": "Seleccionado",
+        "selectingFrom": "Desde {date} — click en otro día para completar",
+        "cancelSelection": "Cancelar selección",
+        "newRule": "Nueva regla de precio",
+        "selectedRange": "{start} → {end}",
+        "ruleName": "Nombre de la regla",
+        "ruleNamePlaceholder": "Ej: Temporada alta",
+        "profitabilityPercent": "Rentabilidad %",
+        "priority": "Prioridad",
+        "profitabilityHint": "100 = precio base, 120 = +20%",
+        "priorityHint": "Mayor número = mayor prioridad",
+        "saveRule": "Guardar regla"
     },
     "Auth": {
         "loginTitle": "Bienvenido de nuevo",
@@ -161,9 +185,9 @@
             "EXTRANJERO": "Documento Extranjero"
         },
         "UserRole": {
-            "ADMIN": "Administrador",
-            "MANAGER": "Gestor",
-            "OWNER": "Propietario"
+            "admin": "Administrador",
+            "manager": "Gestor",
+            "owner": "Propietario"
         }
     }
 }

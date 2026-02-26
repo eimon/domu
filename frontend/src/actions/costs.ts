@@ -89,6 +89,62 @@ export async function updateCost(
     return { success: true };
 }
 
+export type CostModifyFormState = {
+    error?: string;
+    success?: boolean;
+};
+
+export async function modifyCost(
+    costId: string,
+    propertyId: string,
+    prevState: CostModifyFormState,
+    formData: FormData
+): Promise<CostModifyFormState> {
+    const value = parseFloat(formData.get("value") as string);
+    const start_date = formData.get("start_date") as string;
+
+    if (!value || value <= 0) return { error: "El valor debe ser mayor a 0" };
+    if (!start_date) return { error: "La fecha de inicio es obligatoria" };
+
+    try {
+        const res = await serverApi(`/costs/${costId}/modify`, {
+            method: "POST",
+            body: JSON.stringify({ value, start_date }),
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            return { error: errorData.detail || "No se pudo modificar el costo" };
+        }
+    } catch (error) {
+        console.error("Modify Cost Error:", error);
+        return { error: "Something went wrong" };
+    }
+
+    revalidatePath(`/properties/${propertyId}`);
+    return { success: true };
+}
+
+export async function revertCost(
+    costId: string,
+    propertyId: string
+): Promise<{ success?: boolean; error?: string }> {
+    try {
+        const res = await serverApi(`/costs/${costId}/revert`, { method: "POST" });
+
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            return { error: errorData.detail || "No se pudo revertir el costo" };
+        }
+    } catch (error) {
+        console.error("Revert Cost Error:", error);
+        return { error: "Something went wrong" };
+    }
+
+    revalidatePath(`/properties/${propertyId}`);
+    return { success: true };
+}
+
 export async function deleteCost(
     costId: string,
     propertyId: string

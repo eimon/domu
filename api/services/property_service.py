@@ -1,6 +1,7 @@
 from models.property import Property
 from schemas.property import PropertyCreate, PropertyUpdate
 from repositories.property_repository import PropertyRepository
+from repositories.property_base_price_repository import PropertyBasePriceRepository
 from exceptions.general import NotFoundException
 from sqlalchemy.ext.asyncio import AsyncSession
 import uuid
@@ -10,10 +11,14 @@ class PropertyService:
     def __init__(self, db: AsyncSession):
         self.db = db
         self.property_repo = PropertyRepository(db)
+        self.base_price_repo = PropertyBasePriceRepository(db)
 
     async def create_property(self, property_create: PropertyCreate, manager_id: uuid.UUID) -> Property:
-        """Create a new property. Business logic goes here."""
-        return await self.property_repo.create(property_create, manager_id)
+        """Create a new property and its initial base price record."""
+        prop = await self.property_repo.create(property_create, manager_id)
+        if property_create.base_price > 0:
+            await self.base_price_repo.create(prop.id, property_create.base_price)
+        return prop
 
     async def get_property(self, property_id: uuid.UUID) -> Property:
         """Get property by ID."""

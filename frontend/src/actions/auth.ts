@@ -66,6 +66,7 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
 
 
     redirect({ href: "/", locale: (await cookies()).get("NEXT_LOCALE")?.value || "en" });
+    return { success: true };
 }
 
 export async function logout() {
