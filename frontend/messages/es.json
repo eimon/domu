@@ -29,7 +29,10 @@
         "status": "Estado",
         "source": "Fuente",
         "accept": "Aceptar reserva",
-        "confirmCancel": "¿Estás seguro de que quieres cancelar esta reserva?"
+        "confirmCancel": "¿Estás seguro de que quieres cancelar esta reserva?",
+        "next": "Siguiente",
+        "selectDatesHint": "Seleccioná un rango de fechas en el calendario para definir check-in y check-out",
+        "bookingDetails": "Detalles de la reserva"
     },
     "Common": {
         "save": "Guardar",

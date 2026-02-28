@@ -29,7 +29,10 @@
         "status": "Status",
         "source": "Source",
         "accept": "Accept booking",
-        "confirmCancel": "Are you sure you want to cancel this booking?"
+        "confirmCancel": "Are you sure you want to cancel this booking?",
+        "next": "Next",
+        "selectDatesHint": "Select a date range on the calendar to set check-in and check-out",
+        "bookingDetails": "Booking details"
     },
     "Common": {
         "save": "Save",

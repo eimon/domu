@@ -88,11 +88,16 @@ function dataReducer(state: DataState, action: DataAction): DataState {
 interface PropertyCalendarProps {
     propertyId: string;
     basePrice?: number;
+    /** When provided, the calendar operates in "booking" mode:
+     *  - calls this callback whenever the selection changes
+     *  - does NOT render the inline pricing-rule creation form
+     */
+    onRangeSelected?: (start: string | null, end: string | null) => void;
     // initialMonth is only used as the initial value (uncontrolled pattern)
     initialMonth?: Date;
 }
 
-export default function PropertyCalendar({ propertyId, basePrice = 0, initialMonth = new Date() }: PropertyCalendarProps) {
+export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSelected, initialMonth = new Date() }: PropertyCalendarProps) {
     const [selection, dispatchSelection] = useReducer(selectionReducer, {
         currentDate: initialMonth,
         selectionStart: null,
@@ -107,6 +112,13 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, initialMon
     });
 
     const [calendarProfitability, setCalendarProfitability] = useState(100);
+
+    // Notify parent whenever selection changes (booking mode)
+    useEffect(() => {
+        if (onRangeSelected && (selection.selectionStart || selection.selectionEnd)) {
+            onRangeSelected(selection.selectionStart, selection.selectionEnd);
+        }
+    }, [selection.selectionStart, selection.selectionEnd, onRangeSelected]);
 
     const t = useTranslations("Calendar");
     const locale = useLocale();
@@ -269,8 +281,8 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, initialMon
                         </div>
                     )}
 
-                    {/* Inline rule creation form */}
-                    {selection.selectionStart && selection.selectionEnd && (
+                    {/* Inline rule creation form — hidden in booking mode */}
+                    {selection.selectionStart && selection.selectionEnd && !onRangeSelected && (
                         <div className="mt-4 border border-blue-200 rounded-xl p-4 bg-blue-50">
                             <div className="flex items-center justify-between mb-3">
                                 <h4 className="text-sm font-semibold text-blue-900">{t('newRule')}</h4>
