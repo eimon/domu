@@ -27,7 +27,9 @@
         "checkOut": "Check-out",
         "summary": "Summary",
         "status": "Status",
-        "source": "Source"
+        "source": "Source",
+        "accept": "Accept booking",
+        "confirmCancel": "Are you sure you want to cancel this booking?"
     },
     "Common": {
         "save": "Save",
@@ -98,9 +100,7 @@
         "ruleName": "Rule name",
         "ruleNamePlaceholder": "E.g. High season",
         "profitabilityPercent": "Profitability %",
-        "priority": "Priority",
         "profitabilityHint": "100 = base price, 120 = +20%",
-        "priorityHint": "Higher number = higher priority",
         "saveRule": "Save rule"
     },
     "Auth": {

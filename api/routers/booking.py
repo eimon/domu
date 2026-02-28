@@ -55,14 +55,34 @@ async def update_booking(
     return await BookingService(db).update_booking(booking_id, booking_update, current_user)
 
 
-@router.delete("/{booking_id}", status_code=204)
+@router.post("/{booking_id}/accept", response_model=BookingResponse)
+async def accept_booking(
+    booking_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: Usuario = Depends(has_role(Role.ROLE_BOOKING_UPDATE))
+):
+    """Accept a TENTATIVE booking. Requires MANAGER or ADMIN role."""
+    return await BookingService(db).accept_booking(booking_id, current_user)
+
+
+@router.post("/{booking_id}/cancel", response_model=BookingResponse)
 async def cancel_booking(
+    booking_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: Usuario = Depends(has_role(Role.ROLE_BOOKING_UPDATE))
+):
+    """Cancel a booking (set status to CANCELLED). Requires MANAGER or ADMIN role."""
+    return await BookingService(db).cancel_booking(booking_id, current_user)
+
+
+@router.delete("/{booking_id}", status_code=204)
+async def delete_booking(
     booking_id: UUID,
     db: AsyncSession = Depends(get_db),
     current_user: Usuario = Depends(has_role(Role.ROLE_BOOKING_DELETE))
 ):
-    """Cancel a booking (soft delete). Requires MANAGER or ADMIN role."""
-    await BookingService(db).cancel_booking(booking_id, current_user)
+    """Permanently delete a CANCELLED booking. Requires MANAGER or ADMIN role."""
+    await BookingService(db).delete_booking(booking_id, current_user)
 
 
 # Property-specific bookings

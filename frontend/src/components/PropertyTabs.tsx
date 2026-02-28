@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { Suspense, useTransition } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,7 @@ interface PropertyTabsProps {
     activeTab: string;
 }
 
-export default function PropertyTabs({ activeTab }: PropertyTabsProps) {
+function PropertyTabsContent({ activeTab }: PropertyTabsProps) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -55,5 +55,13 @@ export default function PropertyTabs({ activeTab }: PropertyTabsProps) {
                 })}
             </nav>
         </div>
+    );
+}
+
+export default function PropertyTabs(props: PropertyTabsProps) {
+    return (
+        <Suspense fallback={<div className="border-b border-gray-200 h-[53px]" />}>
+            <PropertyTabsContent {...props} />
+        </Suspense>
     );
 }

@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createBooking, BookingFormState } from "@/actions/bookings";
-import { Plus, X, Loader2, Calendar } from "lucide-react";
+import { Plus, X, Loader2 } from "lucide-react";
 import { useActionState } from "react";
 import { BookingStatus, BookingSource, Property, Guest } from "@/types/api";
 import { useTranslations } from "next-intl";
 import { getMyProperties } from "@/actions/properties";
 import { getGuests } from "@/actions/guests";
+
+const INITIAL_STATE: BookingFormState = { error: "", success: false };
 
 export default function AddBookingDialog() {
     const [isOpen, setIsOpen] = useState(false);
@@ -15,39 +17,33 @@ export default function AddBookingDialog() {
     const [guests, setGuests] = useState<Guest[]>([]);
     const [isLoadingData, setIsLoadingData] = useState(false);
 
-    const initialState: BookingFormState = { error: "", success: false };
     const t = useTranslations("Common");
-    const tBooking = useTranslations("Navigation"); // Using navigation for 'bookings' key or we can add to Bookings section
     const tEnums = useTranslations("Enums");
-
-    // Let's assume we have a Bookings translation section
-    // I should check if I need to add one. For now I'll use keys I'll add later.
     const tBookings = useTranslations("Bookings");
 
-    const [state, formAction, isPending] = useActionState(createBooking, initialState);
-
-    useEffect(() => {
-        if (isOpen) {
-            const fetchData = async () => {
-                setIsLoadingData(true);
-                const [props, gst] = await Promise.all([getMyProperties(), getGuests()]);
-                setProperties(props);
-                setGuests(gst);
-                setIsLoadingData(false);
-            };
-            fetchData();
+    const wrappedCreateBooking = async (prevState: BookingFormState, formData: FormData): Promise<BookingFormState> => {
+        const result = await createBooking(prevState, formData);
+        if (result.success) {
+            setIsOpen(false);
         }
-    }, [isOpen]);
+        return result;
+    };
 
-    if (state.success && isOpen) {
-        setIsOpen(false);
-        state.success = false;
-    }
+    const [state, formAction, isPending] = useActionState(wrappedCreateBooking, INITIAL_STATE);
+
+    const handleOpen = async () => {
+        setIsOpen(true);
+        setIsLoadingData(true);
+        const [props, gst] = await Promise.all([getMyProperties(), getGuests()]);
+        setProperties(props);
+        setGuests(gst);
+        setIsLoadingData(false);
+    };
 
     return (
         <>
             <button
-                onClick={() => setIsOpen(true)}
+                onClick={handleOpen}
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
             >
                 <Plus size={16} className="mr-2" />
@@ -75,8 +71,9 @@ export default function AddBookingDialog() {
                             )}
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">{t('property')}</label>
+                                <label htmlFor="booking_property_id" className="block text-sm font-medium text-gray-700 mb-1">{t('property')}</label>
                                 <select
+                                    id="booking_property_id"
                                     name="property_id"
                                     required
                                     disabled={isLoadingData}
@@ -90,8 +87,9 @@ export default function AddBookingDialog() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">{t('guest')}</label>
+                                <label htmlFor="booking_guest_id" className="block text-sm font-medium text-gray-700 mb-1">{t('guest')}</label>
                                 <select
+                                    id="booking_guest_id"
                                     name="guest_id"
                                     disabled={isLoadingData}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
@@ -105,8 +103,9 @@ export default function AddBookingDialog() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">{tBookings('checkIn')}</label>
+                                    <label htmlFor="booking_check_in" className="block text-sm font-medium text-gray-700 mb-1">{tBookings('checkIn')}</label>
                                     <input
+                                        id="booking_check_in"
                                         name="check_in"
                                         type="date"
                                         required
@@ -114,8 +113,9 @@ export default function AddBookingDialog() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">{tBookings('checkOut')}</label>
+                                    <label htmlFor="booking_check_out" className="block text-sm font-medium text-gray-700 mb-1">{tBookings('checkOut')}</label>
                                     <input
+                                        id="booking_check_out"
                                         name="check_out"
                                         type="date"
                                         required
@@ -125,8 +125,9 @@ export default function AddBookingDialog() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">{tBookings('summary')}</label>
+                                <label htmlFor="booking_summary" className="block text-sm font-medium text-gray-700 mb-1">{tBookings('summary')}</label>
                                 <input
+                                    id="booking_summary"
                                     name="summary"
                                     type="text"
                                     required
@@ -137,8 +138,9 @@ export default function AddBookingDialog() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">{tBookings('status')}</label>
+                                    <label htmlFor="booking_status" className="block text-sm font-medium text-gray-700 mb-1">{tBookings('status')}</label>
                                     <select
+                                        id="booking_status"
                                         name="status"
                                         defaultValue={BookingStatus.CONFIRMED}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
@@ -149,8 +151,9 @@ export default function AddBookingDialog() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">{tBookings('source')}</label>
+                                    <label htmlFor="booking_source" className="block text-sm font-medium text-gray-700 mb-1">{tBookings('source')}</label>
                                     <select
+                                        id="booking_source"
                                         name="source"
                                         defaultValue={BookingSource.MANUAL}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"

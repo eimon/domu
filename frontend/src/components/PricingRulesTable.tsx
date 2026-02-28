@@ -11,9 +11,10 @@ import { useTranslations } from "next-intl";
 interface PricingRulesTableProps {
     rules: PricingRule[];
     propertyId: string;
+    basePrice: number;
 }
 
-export default function PricingRulesTable({ rules, propertyId }: PricingRulesTableProps) {
+export default function PricingRulesTable({ rules, propertyId, basePrice }: PricingRulesTableProps) {
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
     const [editingRule, setEditingRule] = useState<PricingRule | null>(null);
     const t = useTranslations("Properties");
@@ -47,7 +48,7 @@ export default function PricingRulesTable({ rules, propertyId }: PricingRulesTab
                     <h3 className="text-lg font-semibold text-gray-900">{t('rules')}</h3>
                     <p className="text-sm text-gray-500">Manage seasonal and special pricing periods</p>
                 </div>
-                <AddPricingRuleDialog propertyId={propertyId} />
+                <AddPricingRuleDialog propertyId={propertyId} basePrice={basePrice} />
             </div>
 
             {rules.length === 0 ? (
@@ -70,9 +71,6 @@ export default function PricingRulesTable({ rules, propertyId }: PricingRulesTab
                                         Profitability
                                     </th>
                                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Priority
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
@@ -88,9 +86,6 @@ export default function PricingRulesTable({ rules, propertyId }: PricingRulesTab
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-mono">
                                             {Number(rule.profitability_percent).toFixed(1)}%
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                                            {rule.priority}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
                                             <div className="flex items-center justify-end space-x-2">
@@ -123,6 +118,7 @@ export default function PricingRulesTable({ rules, propertyId }: PricingRulesTab
                 <EditPricingRuleDialog
                     rule={editingRule}
                     propertyId={propertyId}
+                    basePrice={basePrice}
                     onClose={() => setEditingRule(null)}
                 />
             )}

@@ -124,3 +124,12 @@ class BookingRepository:
         await self.db.flush()
         await self.db.refresh(db_booking)
         return db_booking
+
+    async def hard_delete(self, booking_id: uuid.UUID) -> bool:
+        """Permanently remove a booking from the database."""
+        db_booking = await self.get_by_id(booking_id)
+        if not db_booking:
+            return False
+
+        await self.db.delete(db_booking)
+        return True

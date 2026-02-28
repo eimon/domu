@@ -128,25 +128,47 @@ export async function updateBooking(
     return { success: true };
 }
 
-export async function deleteBooking(bookingId: string): Promise<{ success?: boolean; error?: string }> {
+export async function acceptBooking(bookingId: string): Promise<{ success?: boolean; error?: string }> {
     try {
-        const res = await serverApi(`/bookings/${bookingId}`, {
-            method: "DELETE",
-        });
-
+        const res = await serverApi(`/bookings/${bookingId}/accept`, { method: "POST" });
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
-            return {
-                error: errorData.detail || "Failed to cancel booking",
-            };
+            return { error: errorData.detail || "Failed to accept booking" };
+        }
+    } catch (error) {
+        console.error("Accept Booking Error:", error);
+        return { error: "Something went wrong" };
+    }
+    revalidatePath("/bookings");
+    return { success: true };
+}
+
+export async function cancelBooking(bookingId: string): Promise<{ success?: boolean; error?: string }> {
+    try {
+        const res = await serverApi(`/bookings/${bookingId}/cancel`, { method: "POST" });
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            return { error: errorData.detail || "Failed to cancel booking" };
+        }
+    } catch (error) {
+        console.error("Cancel Booking Error:", error);
+        return { error: "Something went wrong" };
+    }
+    revalidatePath("/bookings");
+    return { success: true };
+}
+
+export async function deleteBooking(bookingId: string): Promise<{ success?: boolean; error?: string }> {
+    try {
+        const res = await serverApi(`/bookings/${bookingId}`, { method: "DELETE" });
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            return { error: errorData.detail || "Failed to delete booking" };
         }
     } catch (error) {
         console.error("Delete Booking Error:", error);
-        return {
-            error: "Something went wrong",
-        };
+        return { error: "Something went wrong" };
     }
-
     revalidatePath("/bookings");
     return { success: true };
 }

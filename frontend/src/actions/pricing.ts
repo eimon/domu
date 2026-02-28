@@ -9,7 +9,6 @@ const pricingRuleSchema = z.object({
     start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
     end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
     profitability_percent: z.coerce.number().min(0, "Must be positive"),
-    priority: z.coerce.number().int().min(0, "Must be a positive integer"),
 });
 
 export type PricingRuleFormState = {

@@ -1,5 +1,6 @@
 import { ArrowRight, LayoutDashboard, Database, Shield } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/routing";
 
 export default async function Home() {
     const t = await getTranslations("Home");
@@ -55,10 +56,10 @@ export default async function Home() {
 
                 {/* Status Check / Actions */}
                 <div className="pt-8">
-                    <a href="#" className="inline-flex items-center space-x-2 bg-gray-900 text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition-colors">
+                    <Link href="/properties" className="inline-flex items-center space-x-2 bg-gray-900 text-white px-6 py-3 rounded-full font-medium hover:bg-gray-800 transition-colors">
                         <span>{t('cta')}</span>
                         <ArrowRight size={18} />
-                    </a>
+                    </Link>
                     <p className="mt-4 text-sm text-gray-400">
                         {t('devServerNote')}
                     </p>

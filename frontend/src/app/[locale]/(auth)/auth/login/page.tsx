@@ -79,9 +79,9 @@ export default function LoginPage() {
                 <div className="bg-gray-50 px-8 py-4 text-center">
                     <p className="text-sm text-gray-500">
                         {t('noAccount')}{" "}
-                        <a href="#" className="text-blue-600 hover:underline font-medium">
+                        <span className="text-blue-600 font-medium">
                             {t('contactAdmin')}
-                        </a>
+                        </span>
                     </p>
                 </div>
             </div>

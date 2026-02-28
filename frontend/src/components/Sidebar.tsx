@@ -23,8 +23,10 @@ export default function Sidebar({ userRole }: { userRole: string | null }) {
         <>
             {/* Mobile Backdrop */}
             {isOpen && (
-                <div
-                    className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden transition-opacity"
+                <button
+                    type="button"
+                    aria-label="Cerrar menú"
+                    className="fixed inset-0 z-40 w-full bg-gray-600 bg-opacity-75 lg:hidden transition-opacity cursor-default"
                     onClick={close}
                 />
             )}

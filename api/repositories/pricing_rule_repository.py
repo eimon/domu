@@ -17,7 +17,6 @@ class PricingRuleRepository:
             start_date=rule_create.start_date,
             end_date=rule_create.end_date,
             profitability_percent=rule_create.profitability_percent,
-            priority=rule_create.priority
         )
         self.db.add(db_rule)
         await self.db.flush()
@@ -29,16 +28,16 @@ class PricingRuleRepository:
         return result.scalars().first()
 
     async def get_by_property(self, property_id: uuid.UUID) -> list[PricingRule]:
-        """Get all rules for a property ordered by priority (desc)."""
+        """Get all rules for a property ordered by start_date (asc)."""
         result = await self.db.execute(
             select(PricingRule)
             .where(PricingRule.property_id == property_id)
-            .order_by(PricingRule.priority.desc())
+            .order_by(PricingRule.start_date.asc())
         )
         return list(result.scalars().all())
 
     async def get_active_rules_for_date(self, property_id: uuid.UUID, target_date: date) -> list[PricingRule]:
-        """Get rules applicable for a specific date (ordered by priority desc)."""
+        """Get rules applicable for a specific date."""
         result = await self.db.execute(
             select(PricingRule)
             .where(
@@ -46,7 +45,6 @@ class PricingRuleRepository:
                 PricingRule.start_date <= target_date,
                 PricingRule.end_date >= target_date
             )
-            .order_by(PricingRule.priority.desc())
         )
         return list(result.scalars().all())
 

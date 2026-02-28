@@ -27,6 +27,8 @@ export default function AddressAutocomplete({
     className = "",
     onSelect,
 }: AddressAutocompleteProps) {
+    // Intentional uncontrolled pattern: defaultValue only sets the initial state.
+    // If the parent needs to re-sync after mount, use a `key` prop at the call site.
     const [value, setValue] = useState(defaultValue);
     const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
     const [isLoading, setIsLoading] = useState(false);

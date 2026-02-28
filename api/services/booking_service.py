@@ -4,7 +4,7 @@ from schemas.booking import BookingCreate, BookingUpdate
 from repositories.booking_repository import BookingRepository
 from repositories.property_repository import PropertyRepository
 from exceptions.general import NotFoundException, ConflictException, BadRequestException, ForbiddenException
-from core.enums import UserRole
+from core.enums import UserRole, BookingStatus
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.config import settings
 import uuid
@@ -114,11 +114,35 @@ class BookingService:
             raise NotFoundException("Reserva no encontrada")
         return booking
 
-    async def cancel_booking(self, booking_id: uuid.UUID, current_user: UserModel) -> Booking:
-        """Cancel a booking (soft delete)."""
+    async def accept_booking(self, booking_id: uuid.UUID, current_user: UserModel) -> Booking:
+        """Accept a TENTATIVE booking, changing its status to CONFIRMED."""
         booking = await self.booking_repo.get_by_id(booking_id)
         if not booking:
             raise NotFoundException("Reserva no encontrada")
         await self._check_booking_access(booking, current_user)
+        if booking.status != BookingStatus.TENTATIVE:
+            raise BadRequestException("Solo se pueden aceptar reservas en estado Tentativo")
+        from schemas.booking import BookingUpdate
+        updated = await self.booking_repo.update(booking_id, BookingUpdate(status=BookingStatus.CONFIRMED))
+        return updated
+
+    async def cancel_booking(self, booking_id: uuid.UUID, current_user: UserModel) -> Booking:
+        """Cancel a booking (set status to CANCELLED)."""
+        booking = await self.booking_repo.get_by_id(booking_id)
+        if not booking:
+            raise NotFoundException("Reserva no encontrada")
+        await self._check_booking_access(booking, current_user)
+        if booking.status == BookingStatus.CANCELLED:
+            raise BadRequestException("La reserva ya está cancelada")
         booking = await self.booking_repo.delete(booking_id)
         return booking
+
+    async def delete_booking(self, booking_id: uuid.UUID, current_user: UserModel) -> None:
+        """Permanently delete a booking. Only allowed if status is CANCELLED."""
+        booking = await self.booking_repo.get_by_id(booking_id)
+        if not booking:
+            raise NotFoundException("Reserva no encontrada")
+        await self._check_booking_access(booking, current_user)
+        if booking.status != BookingStatus.CANCELLED:
+            raise BadRequestException("Solo se pueden eliminar reservas canceladas")
+        await self.booking_repo.hard_delete(booking_id)

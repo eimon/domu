@@ -6,8 +6,14 @@ import { Plus, X, Loader2 } from "lucide-react";
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 
-export default function AddPricingRuleDialog({ propertyId }: { propertyId: string }) {
+interface AddPricingRuleDialogProps {
+    propertyId: string;
+    basePrice: number;
+}
+
+export default function AddPricingRuleDialog({ propertyId, basePrice }: AddPricingRuleDialogProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const [profitability, setProfitability] = useState(100);
     const initialState: PricingRuleFormState = { error: "", success: false };
     const t = useTranslations("Common");
     const tProp = useTranslations("Properties");
@@ -18,8 +24,12 @@ export default function AddPricingRuleDialog({ propertyId }: { propertyId: strin
     useEffect(() => {
         if (state.success && isOpen) {
             setIsOpen(false);
+            setProfitability(100);
         }
     }, [state.success, isOpen]);
+
+    const sliderValue = Math.min(Math.max(profitability, 0), 100);
+    const estimatedPrice = (basePrice * profitability / 100).toFixed(2);
 
     return (
         <>
@@ -37,7 +47,7 @@ export default function AddPricingRuleDialog({ propertyId }: { propertyId: strin
                         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                             <h3 className="text-lg font-semibold text-gray-900">{t('add')} {tProp('rules')}</h3>
                             <button
-                                onClick={() => setIsOpen(false)}
+                                onClick={() => { setIsOpen(false); setProfitability(100); }}
                                 className="text-gray-400 hover:text-gray-500 transition-colors"
                             >
                                 <X size={20} />
@@ -52,10 +62,11 @@ export default function AddPricingRuleDialog({ propertyId }: { propertyId: strin
                             )}
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label htmlFor="add_rule_name" className="block text-sm font-medium text-gray-700 mb-1">
                                     {t('name')}
                                 </label>
                                 <input
+                                    id="add_rule_name"
                                     name="name"
                                     type="text"
                                     required
@@ -66,8 +77,9 @@ export default function AddPricingRuleDialog({ propertyId }: { propertyId: strin
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                                    <label htmlFor="add_rule_start_date" className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
                                     <input
+                                        id="add_rule_start_date"
                                         name="start_date"
                                         type="date"
                                         required
@@ -75,8 +87,9 @@ export default function AddPricingRuleDialog({ propertyId }: { propertyId: strin
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                                    <label htmlFor="add_rule_end_date" className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
                                     <input
+                                        id="add_rule_end_date"
                                         name="end_date"
                                         type="date"
                                         required
@@ -85,42 +98,48 @@ export default function AddPricingRuleDialog({ propertyId }: { propertyId: strin
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <div>
+                                <div className="flex items-center justify-between mb-1">
+                                    <label htmlFor="add_rule_profitability_percent" className="block text-sm font-medium text-gray-700">
                                         Profitability %
                                     </label>
-                                    <input
-                                        name="profitability_percent"
-                                        type="number"
-                                        step="0.1"
-                                        min="0"
-                                        required
-                                        defaultValue="100"
-                                        placeholder="100"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
-                                    <p className="text-xs text-gray-500 mt-1">100 = base, 120 = +20%</p>
+                                    <span className="text-sm font-semibold text-blue-700">
+                                        ≈ ${estimatedPrice} / night
+                                    </span>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                                    <input
-                                        name="priority"
-                                        type="number"
-                                        min="0"
-                                        required
-                                        defaultValue="10"
-                                        placeholder="10"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
-                                    <p className="text-xs text-gray-500 mt-1">Higher = precedence</p>
+                                <input
+                                    id="add_rule_profitability_percent"
+                                    name="profitability_percent"
+                                    type="number"
+                                    step="0.1"
+                                    min="0"
+                                    required
+                                    value={profitability}
+                                    onChange={(e) => setProfitability(parseFloat(e.target.value) || 0)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none mb-3"
+                                />
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={100}
+                                    step={1}
+                                    value={sliderValue}
+                                    onChange={(e) => setProfitability(parseFloat(e.target.value))}
+                                    className="w-full h-2 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-blue-600 [&::-moz-range-thumb]:border-0"
+                                    style={{
+                                        background: `linear-gradient(to right, #2563eb 0%, #2563eb ${sliderValue}%, #e5e7eb ${sliderValue}%, #e5e7eb 100%)`
+                                    }}
+                                />
+                                <div className="flex justify-between text-xs text-gray-400 mt-1">
+                                    <span>0% (floor)</span>
+                                    <span>100% (base: ${basePrice})</span>
                                 </div>
                             </div>
 
                             <div className="pt-2 flex justify-end space-x-3">
                                 <button
                                     type="button"
-                                    onClick={() => setIsOpen(false)}
+                                    onClick={() => { setIsOpen(false); setProfitability(100); }}
                                     className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
                                 >
                                     {t('cancel')}

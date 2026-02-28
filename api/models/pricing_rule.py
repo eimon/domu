@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, DateTime, ForeignKey, Numeric, Integer, Date, CheckConstraint
+from sqlalchemy import Column, String, DateTime, ForeignKey, Numeric, Date, CheckConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -20,7 +20,6 @@ class PricingRule(Base):
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
     profitability_percent = Column(Numeric(5, 2), nullable=False)  # 0-100+
-    priority = Column(Integer, default=0, nullable=False)  # Higher wins
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

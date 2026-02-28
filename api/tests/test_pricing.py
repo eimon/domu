@@ -12,7 +12,6 @@ def _rule_payload(**overrides):
         "start_date": "2026-06-01",
         "end_date": "2026-08-31",
         "profitability_percent": "80.00",
-        "priority": 1,
     }
     payload.update(overrides)
     return payload

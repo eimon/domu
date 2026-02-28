@@ -48,11 +48,6 @@ export interface Cost {
     updated_at?: string;
 }
 
-export interface CostModify {
-    value: number;
-    start_date: string; // YYYY-MM-DD
-}
-
 export interface PricingRule {
     id: string; // uuid
     property_id: string; // uuid
@@ -60,7 +55,6 @@ export interface PricingRule {
     start_date: string; // YYYY-MM-DD
     end_date: string; // YYYY-MM-DD
     profitability_percent: number;
-    priority: number;
     created_at?: string;
     updated_at?: string;
 }

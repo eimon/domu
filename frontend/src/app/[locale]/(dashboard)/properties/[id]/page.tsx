@@ -44,19 +44,24 @@ async function getBasePriceHistory(id: string): Promise<PropertyBasePrice[]> {
 }
 
 export default async function PropertyDetailsPage({ params, searchParams }: PageProps) {
-    const { id } = await params;
-    const { tab = "details" } = await searchParams;
-    const property = await getProperty(id);
-    const t = await getTranslations("Properties");
-    const tCommon = await getTranslations("Common");
+    const [{ id }, { tab: rawTab }, t, tCommon] = await Promise.all([
+        params,
+        searchParams,
+        getTranslations("Properties"),
+        getTranslations("Common"),
+    ]);
+    const tab = rawTab ?? "details";
+
+    const [property, costs, pricingRules, basePriceHistory] = await Promise.all([
+        getProperty(id),
+        getPropertyCosts(id),
+        getPropertyPricingRules(id),
+        getBasePriceHistory(id),
+    ]);
 
     if (!property) {
         notFound();
     }
-
-    const costs = await getPropertyCosts(id);
-    const pricingRules = await getPropertyPricingRules(id);
-    const basePriceHistory = await getBasePriceHistory(id);
     const currentBasePrice = basePriceHistory.at(-1) ?? null;
 
     return (
@@ -129,12 +134,12 @@ export default async function PropertyDetailsPage({ params, searchParams }: Page
                                 <h2 className="text-xl font-bold text-gray-900">{t('calendar')}</h2>
                                 <p className="text-sm text-gray-500">View bookings and daily prices on the calendar</p>
                             </div>
-                            <PropertyCalendar propertyId={property.id} />
+                            <PropertyCalendar propertyId={property.id} basePrice={property.base_price} />
                         </section>
 
                         {/* Pricing Rules Section */}
                         <section>
-                            <PricingRulesTable rules={pricingRules} propertyId={property.id} />
+                            <PricingRulesTable rules={pricingRules} propertyId={property.id} basePrice={property.base_price} />
                         </section>
                     </div>
                 )}

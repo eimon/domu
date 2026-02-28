@@ -10,10 +10,12 @@ import { useTranslations } from "next-intl";
 interface EditPricingRuleDialogProps {
     rule: PricingRule;
     propertyId: string;
+    basePrice: number;
     onClose: () => void;
 }
 
-export default function EditPricingRuleDialog({ rule, propertyId, onClose }: EditPricingRuleDialogProps) {
+export default function EditPricingRuleDialog({ rule, propertyId, basePrice, onClose }: EditPricingRuleDialogProps) {
+    const [profitability, setProfitability] = useState(Number(rule.profitability_percent));
     const initialState: PricingRuleFormState = { error: "", success: false };
     const t = useTranslations("Common");
     const tProp = useTranslations("Properties");
@@ -26,6 +28,9 @@ export default function EditPricingRuleDialog({ rule, propertyId, onClose }: Edi
             onClose();
         }
     }, [state.success, onClose]);
+
+    const sliderValue = Math.min(Math.max(profitability, 0), 100);
+    const estimatedPrice = (basePrice * profitability / 100).toFixed(2);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -48,10 +53,11 @@ export default function EditPricingRuleDialog({ rule, propertyId, onClose }: Edi
                     )}
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="edit_rule_name" className="block text-sm font-medium text-gray-700 mb-1">
                             {t('name')}
                         </label>
                         <input
+                            id="edit_rule_name"
                             name="name"
                             type="text"
                             required
@@ -62,8 +68,9 @@ export default function EditPricingRuleDialog({ rule, propertyId, onClose }: Edi
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                            <label htmlFor="edit_rule_start_date" className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
                             <input
+                                id="edit_rule_start_date"
                                 name="start_date"
                                 type="date"
                                 required
@@ -72,8 +79,9 @@ export default function EditPricingRuleDialog({ rule, propertyId, onClose }: Edi
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                            <label htmlFor="edit_rule_end_date" className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
                             <input
+                                id="edit_rule_end_date"
                                 name="end_date"
                                 type="date"
                                 required
@@ -83,31 +91,41 @@ export default function EditPricingRuleDialog({ rule, propertyId, onClose }: Edi
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <div>
+                        <div className="flex items-center justify-between mb-1">
+                            <label htmlFor="edit_rule_profitability_percent" className="block text-sm font-medium text-gray-700">
                                 Profitability %
                             </label>
-                            <input
-                                name="profitability_percent"
-                                type="number"
-                                step="0.1"
-                                min="0"
-                                required
-                                defaultValue={rule.profitability_percent}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
+                            <span className="text-sm font-semibold text-blue-700">
+                                ≈ ${estimatedPrice} / night
+                            </span>
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                            <input
-                                name="priority"
-                                type="number"
-                                min="0"
-                                required
-                                defaultValue={rule.priority}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
+                        <input
+                            id="edit_rule_profitability_percent"
+                            name="profitability_percent"
+                            type="number"
+                            step="0.1"
+                            min="0"
+                            required
+                            value={profitability}
+                            onChange={(e) => setProfitability(parseFloat(e.target.value) || 0)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none mb-3"
+                        />
+                        <input
+                            type="range"
+                            min={0}
+                            max={100}
+                            step={1}
+                            value={sliderValue}
+                            onChange={(e) => setProfitability(parseFloat(e.target.value))}
+                            className="w-full h-2 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-blue-600 [&::-moz-range-thumb]:border-0"
+                            style={{
+                                background: `linear-gradient(to right, #2563eb 0%, #2563eb ${sliderValue}%, #e5e7eb ${sliderValue}%, #e5e7eb 100%)`
+                            }}
+                        />
+                        <div className="flex justify-between text-xs text-gray-400 mt-1">
+                            <span>0% (floor)</span>
+                            <span>100% (base: ${basePrice})</span>
                         </div>
                     </div>
 

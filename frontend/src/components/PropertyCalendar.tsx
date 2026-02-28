@@ -1,91 +1,148 @@
 "use client";
 
-import { useState, useEffect, useActionState } from "react";
+import { useReducer, useEffect, useState } from "react";
 import { CalendarDay } from "@/types/api";
-import { ChevronLeft, ChevronRight, Loader2, X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { getCalendarData } from "@/actions/calendar";
 import { createPricingRule, type PricingRuleFormState } from "@/actions/pricing";
+import { useActionState } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import CalendarHeader from "@/components/CalendarHeader";
+import CalendarDayCell from "@/components/CalendarDayCell";
+
+// --- Selection state ---
+
+type SelectionState = {
+    currentDate: Date;
+    selectionStart: string | null;
+    selectionEnd: string | null;
+    hoverDate: string | null;
+};
+
+type SelectionAction =
+    | { type: 'PREV_MONTH' }
+    | { type: 'NEXT_MONTH' }
+    | { type: 'DAY_CLICK'; date: string }
+    | { type: 'SET_HOVER'; date: string | null }
+    | { type: 'RESET_SELECTION' };
+
+function selectionReducer(state: SelectionState, action: SelectionAction): SelectionState {
+    switch (action.type) {
+        case 'PREV_MONTH':
+            return { ...state, currentDate: new Date(state.currentDate.getFullYear(), state.currentDate.getMonth() - 1, 1) };
+        case 'NEXT_MONTH':
+            return { ...state, currentDate: new Date(state.currentDate.getFullYear(), state.currentDate.getMonth() + 1, 1) };
+        case 'DAY_CLICK': {
+            const { date } = action;
+            if (!state.selectionStart) {
+                return { ...state, selectionStart: date, selectionEnd: null };
+            }
+            if (!state.selectionEnd) {
+                if (date === state.selectionStart) {
+                    return { ...state, selectionStart: null };
+                }
+                if (date < state.selectionStart) {
+                    return { ...state, selectionStart: date, selectionEnd: state.selectionStart, hoverDate: null };
+                }
+                return { ...state, selectionEnd: date, hoverDate: null };
+            }
+            return { ...state, selectionStart: date, selectionEnd: null, hoverDate: null };
+        }
+        case 'SET_HOVER':
+            return { ...state, hoverDate: action.date };
+        case 'RESET_SELECTION':
+            return { ...state, selectionStart: null, selectionEnd: null, hoverDate: null };
+        default:
+            return state;
+    }
+}
+
+// --- Data state ---
+
+type DataState = {
+    calendarData: CalendarDay[];
+    isLoading: boolean;
+    refreshTrigger: number;
+};
+
+type DataAction =
+    | { type: 'FETCH_START' }
+    | { type: 'FETCH_SUCCESS'; data: CalendarDay[] }
+    | { type: 'TRIGGER_REFRESH' };
+
+function dataReducer(state: DataState, action: DataAction): DataState {
+    switch (action.type) {
+        case 'FETCH_START':
+            return { ...state, isLoading: true };
+        case 'FETCH_SUCCESS':
+            return { ...state, isLoading: false, calendarData: action.data };
+        case 'TRIGGER_REFRESH':
+            return { ...state, refreshTrigger: state.refreshTrigger + 1 };
+        default:
+            return state;
+    }
+}
+
+// --- Component ---
 
 interface PropertyCalendarProps {
     propertyId: string;
+    basePrice?: number;
+    // initialMonth is only used as the initial value (uncontrolled pattern)
     initialMonth?: Date;
 }
 
-export default function PropertyCalendar({ propertyId, initialMonth = new Date() }: PropertyCalendarProps) {
-    const [currentDate, setCurrentDate] = useState(initialMonth);
-    const [calendarData, setCalendarData] = useState<CalendarDay[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [selectionStart, setSelectionStart] = useState<string | null>(null);
-    const [selectionEnd, setSelectionEnd] = useState<string | null>(null);
-    const [hoverDate, setHoverDate] = useState<string | null>(null);
-    const [refreshTrigger, setRefreshTrigger] = useState(0);
+export default function PropertyCalendar({ propertyId, basePrice = 0, initialMonth = new Date() }: PropertyCalendarProps) {
+    const [selection, dispatchSelection] = useReducer(selectionReducer, {
+        currentDate: initialMonth,
+        selectionStart: null,
+        selectionEnd: null,
+        hoverDate: null,
+    });
+
+    const [data, dispatchData] = useReducer(dataReducer, {
+        calendarData: [],
+        isLoading: true,
+        refreshTrigger: 0,
+    });
+
+    const [calendarProfitability, setCalendarProfitability] = useState(100);
+
     const t = useTranslations("Calendar");
     const locale = useLocale();
 
+    // Wrap the server action to handle post-success side effects inline
     const createRuleWithId = createPricingRule.bind(null, propertyId);
+    const handleRuleAction = async (prevState: PricingRuleFormState, formData: FormData): Promise<PricingRuleFormState> => {
+        const result = await createRuleWithId(prevState, formData);
+        if (result.success) {
+            dispatchSelection({ type: 'RESET_SELECTION' });
+            dispatchData({ type: 'TRIGGER_REFRESH' });
+            setCalendarProfitability(100);
+        }
+        return result;
+    };
+
     const [ruleState, ruleFormAction, isRulePending] = useActionState<PricingRuleFormState, FormData>(
-        createRuleWithId,
+        handleRuleAction,
         { error: "", success: false }
     );
 
     useEffect(() => {
-        if (ruleState.success) {
-            setSelectionStart(null);
-            setSelectionEnd(null);
-            setRefreshTrigger(t => t + 1);
-        }
-    }, [ruleState.success]);
-
-    useEffect(() => {
-        fetchCalendarData();
-    }, [currentDate, propertyId, refreshTrigger]);
-
-    const fetchCalendarData = async () => {
-        setIsLoading(true);
-
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-
+        const year = selection.currentDate.getFullYear();
+        const month = selection.currentDate.getMonth();
         const startStr = `${year}-${String(month + 1).padStart(2, '0')}-01`;
         const lastDay = new Date(year, month + 1, 0).getDate();
         const endStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
 
-        const data = await getCalendarData(propertyId, startStr, endStr);
-        setCalendarData(data);
-        setIsLoading(false);
-    };
-
-    const prevMonth = () => {
-        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
-    };
-
-    const nextMonth = () => {
-        setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
-    };
-
-    const handleDayClick = (dateStr: string) => {
-        if (!selectionStart) {
-            setSelectionStart(dateStr);
-            setSelectionEnd(null);
-        } else if (!selectionEnd) {
-            if (dateStr === selectionStart) {
-                setSelectionStart(null);
-            } else if (dateStr < selectionStart) {
-                setSelectionEnd(selectionStart);
-                setSelectionStart(dateStr);
-            } else {
-                setSelectionEnd(dateStr);
-            }
-            setHoverDate(null);
-        } else {
-            setSelectionStart(dateStr);
-            setSelectionEnd(null);
-            setHoverDate(null);
-        }
-    };
+        dispatchData({ type: 'FETCH_START' });
+        getCalendarData(propertyId, startStr, endStr).then(d => {
+            dispatchData({ type: 'FETCH_SUCCESS', data: d });
+        });
+    }, [selection.currentDate, propertyId, data.refreshTrigger]);
 
     const getDaySelectionStyle = (dateStr: string): string | null => {
+        const { selectionStart, selectionEnd, hoverDate } = selection;
         const activeEnd = selectionEnd ?? (selectionStart ? hoverDate : null);
         const rangeStart = selectionStart && activeEnd
             ? (selectionStart <= activeEnd ? selectionStart : activeEnd)
@@ -104,22 +161,27 @@ export default function PropertyCalendar({ propertyId, initialMonth = new Date()
         return null;
     };
 
-    const getDaysInMonth = () => {
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
+    type CalendarDayCell = CalendarDay & { isPad?: true };
+
+    const getDaysInMonth = (): CalendarDayCell[] => {
+        const year = selection.currentDate.getFullYear();
+        const month = selection.currentDate.getMonth();
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
 
-        const days: (CalendarDay | null)[] = [];
+        const days: CalendarDayCell[] = [];
 
+        // Pad cells use the actual prev-month date as a stable unique key
         const firstDayOfWeek = firstDay.getDay();
         for (let i = 0; i < firstDayOfWeek; i++) {
-            days.push(null);
+            const d = new Date(year, month, i - firstDayOfWeek + 1);
+            const dateStr = `pad-${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            days.push({ date: dateStr, price: 0, status: "AVAILABLE", floor_price: 0, profitability_percent: 0, isPad: true });
         }
 
         for (let day = 1; day <= lastDay.getDate(); day++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const dayData = calendarData.find(d => d.date === dateStr);
+            const dayData = data.calendarData.find(d => d.date === dateStr);
             days.push(dayData || {
                 date: dateStr,
                 price: 0,
@@ -132,39 +194,22 @@ export default function PropertyCalendar({ propertyId, initialMonth = new Date()
         return days;
     };
 
-    const getMonthName = () => {
-        return new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(currentDate);
-    };
-
+    const monthName = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(selection.currentDate);
     const weekDays = Array.from({ length: 7 }, (_, i) => {
         const date = new Date(2024, 0, 7 + i);
         return new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(date);
     });
-
-    const monthName = getMonthName();
     const days = getDaysInMonth();
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
-                <button
-                    onClick={prevMonth}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                    <ChevronLeft size={20} />
-                </button>
-                <h3 className="text-lg font-semibold text-gray-900 capitalize">{monthName}</h3>
-                <button
-                    onClick={nextMonth}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                    <ChevronRight size={20} />
-                </button>
-            </div>
+            <CalendarHeader
+                monthName={monthName}
+                onPrevMonth={() => dispatchSelection({ type: 'PREV_MONTH' })}
+                onNextMonth={() => dispatchSelection({ type: 'NEXT_MONTH' })}
+            />
 
-            {/* Calendar Grid */}
-            {isLoading ? (
+            {data.isLoading ? (
                 <div className="flex items-center justify-center py-20">
                     <Loader2 className="animate-spin text-gray-400" size={32} />
                 </div>
@@ -179,60 +224,43 @@ export default function PropertyCalendar({ propertyId, initialMonth = new Date()
                         ))}
 
                         {/* Calendar days */}
-                        {days.map((day, index) => {
-                            if (day === null) {
+                        {days.map((day) => {
+                            if (day.isPad) {
                                 return (
                                     <div
-                                        key={index}
+                                        key={day.date}
                                         className="min-h-20 p-2 border rounded-lg bg-gray-50 border-transparent"
                                     />
                                 );
                             }
 
-                            const selectionStyle = getDaySelectionStyle(day.date);
-                            const isEndpointSelected = selectionStyle?.includes('bg-blue-500') || selectionStyle?.includes('bg-blue-400');
-                            const isInRangeSelected = selectionStyle !== null && !isEndpointSelected;
-                            const baseStyle = selectionStyle
-                                ? selectionStyle
-                                : day.status === 'RESERVED'
-                                    ? 'bg-red-50 border-red-200'
-                                    : 'bg-white border-gray-200 hover:border-blue-300';
-
                             return (
-                                <div
-                                    key={index}
-                                    className={`min-h-20 p-2 border rounded-lg cursor-pointer transition-colors ${baseStyle}`}
-                                    onClick={() => handleDayClick(day.date)}
-                                    onMouseEnter={() => selectionStart && !selectionEnd && setHoverDate(day.date)}
-                                    onMouseLeave={() => selectionStart && !selectionEnd && setHoverDate(null)}
-                                >
-                                    <div className={`text-sm font-medium ${isEndpointSelected ? 'text-white' : 'text-gray-900'}`}>
-                                        {day.date.split('-')[2].replace(/^0/, '')}
-                                    </div>
-                                    <div className={`text-xs mt-1 font-semibold ${
-                                        isEndpointSelected ? 'text-white'
-                                        : isInRangeSelected ? 'text-blue-700'
-                                        : day.status === 'RESERVED' ? 'text-red-600'
-                                        : 'text-green-600'
-                                    }`}>
-                                        ${Number(day.price).toFixed(0)}
-                                    </div>
-                                    {day.rule_name && (
-                                        <div className={`text-xs mt-0.5 truncate ${isEndpointSelected ? 'text-blue-100' : isInRangeSelected ? 'text-blue-500' : 'text-gray-500'}`} title={day.rule_name}>
-                                            {day.rule_name}
-                                        </div>
-                                    )}
-                                </div>
+                                <CalendarDayCell
+                                    key={day.date}
+                                    day={day}
+                                    selectionStyle={getDaySelectionStyle(day.date)}
+                                    onClick={() => dispatchSelection({ type: 'DAY_CLICK', date: day.date })}
+                                    onMouseEnter={() => {
+                                        if (selection.selectionStart && !selection.selectionEnd) {
+                                            dispatchSelection({ type: 'SET_HOVER', date: day.date });
+                                        }
+                                    }}
+                                    onMouseLeave={() => {
+                                        if (selection.selectionStart && !selection.selectionEnd) {
+                                            dispatchSelection({ type: 'SET_HOVER', date: null });
+                                        }
+                                    }}
+                                />
                             );
                         })}
                     </div>
 
                     {/* Selection in progress banner */}
-                    {selectionStart && !selectionEnd && (
+                    {selection.selectionStart && !selection.selectionEnd && (
                         <div className="mt-3 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-sm text-blue-700">
-                            <span>{t('selectingFrom', { date: selectionStart })}</span>
+                            <span>{t('selectingFrom', { date: selection.selectionStart })}</span>
                             <button
-                                onClick={() => { setSelectionStart(null); setHoverDate(null); }}
+                                onClick={() => dispatchSelection({ type: 'RESET_SELECTION' })}
                                 className="ml-2 p-1 hover:bg-blue-100 rounded transition-colors"
                                 title={t('cancelSelection')}
                             >
@@ -242,29 +270,30 @@ export default function PropertyCalendar({ propertyId, initialMonth = new Date()
                     )}
 
                     {/* Inline rule creation form */}
-                    {selectionStart && selectionEnd && (
+                    {selection.selectionStart && selection.selectionEnd && (
                         <div className="mt-4 border border-blue-200 rounded-xl p-4 bg-blue-50">
                             <div className="flex items-center justify-between mb-3">
                                 <h4 className="text-sm font-semibold text-blue-900">{t('newRule')}</h4>
                                 <button
-                                    onClick={() => { setSelectionStart(null); setSelectionEnd(null); }}
+                                    onClick={() => { dispatchSelection({ type: 'RESET_SELECTION' }); setCalendarProfitability(100); }}
                                     className="p-1 hover:bg-blue-100 rounded transition-colors text-blue-600"
                                 >
                                     <X size={14} />
                                 </button>
                             </div>
                             <p className="text-xs text-blue-700 mb-3">
-                                {t('selectedRange', { start: selectionStart, end: selectionEnd })}
+                                {t('selectedRange', { start: selection.selectionStart, end: selection.selectionEnd })}
                             </p>
                             <form action={ruleFormAction} className="space-y-3">
-                                <input type="hidden" name="start_date" value={selectionStart} />
-                                <input type="hidden" name="end_date" value={selectionEnd} />
+                                <input type="hidden" name="start_date" value={selection.selectionStart} />
+                                <input type="hidden" name="end_date" value={selection.selectionEnd} />
 
                                 <div>
-                                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                                    <label htmlFor="calendar_rule_name" className="block text-xs font-medium text-gray-700 mb-1">
                                         {t('ruleName')}
                                     </label>
                                     <input
+                                        id="calendar_rule_name"
                                         type="text"
                                         name="name"
                                         required
@@ -273,36 +302,47 @@ export default function PropertyCalendar({ propertyId, initialMonth = new Date()
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                                <div>
+                                    <div className="flex items-center justify-between mb-1">
+                                        <label htmlFor="calendar_rule_profitability" className="block text-xs font-medium text-gray-700">
                                             {t('profitabilityPercent')}
                                         </label>
-                                        <input
-                                            type="number"
-                                            name="profitability_percent"
-                                            defaultValue={100}
-                                            min={0}
-                                            step={0.01}
-                                            required
-                                            className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                                        />
-                                        <p className="text-xs text-gray-500 mt-0.5">{t('profitabilityHint')}</p>
+                                        {(() => {
+                                            const floorPrice = data.calendarData.find(d => d.date === selection.selectionStart)?.floor_price ?? 0;
+                                            const price = floorPrice + (basePrice - floorPrice) * calendarProfitability / 100;
+                                            return (
+                                                <span className="text-xs font-semibold text-blue-700">
+                                                    ${price.toFixed(2)} / night
+                                                </span>
+                                            );
+                                        })()}
                                     </div>
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-700 mb-1">
-                                            {t('priority')}
-                                        </label>
-                                        <input
-                                            type="number"
-                                            name="priority"
-                                            defaultValue={10}
-                                            min={0}
-                                            step={1}
-                                            required
-                                            className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                                        />
-                                        <p className="text-xs text-gray-500 mt-0.5">{t('priorityHint')}</p>
+                                    <input
+                                        id="calendar_rule_profitability"
+                                        type="number"
+                                        name="profitability_percent"
+                                        value={calendarProfitability}
+                                        onChange={(e) => setCalendarProfitability(parseFloat(e.target.value) || 0)}
+                                        min={0}
+                                        step={0.1}
+                                        required
+                                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white mb-2"
+                                    />
+                                    <input
+                                        type="range"
+                                        min={0}
+                                        max={100}
+                                        step={1}
+                                        value={Math.min(Math.max(calendarProfitability, 0), 100)}
+                                        onChange={(e) => setCalendarProfitability(parseFloat(e.target.value))}
+                                        className="w-full h-1.5 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-blue-600 [&::-moz-range-thumb]:border-0"
+                                        style={{
+                                            background: `linear-gradient(to right, #2563eb 0%, #2563eb ${Math.min(Math.max(calendarProfitability, 0), 100)}%, #e5e7eb ${Math.min(Math.max(calendarProfitability, 0), 100)}%, #e5e7eb 100%)`
+                                        }}
+                                    />
+                                    <div className="flex justify-between text-xs text-gray-400 mt-0.5">
+                                        <span>0%</span>
+                                        <span>100% = ${basePrice}</span>
                                     </div>
                                 </div>
 
@@ -315,7 +355,7 @@ export default function PropertyCalendar({ propertyId, initialMonth = new Date()
                                 <div className="flex gap-2 justify-end">
                                     <button
                                         type="button"
-                                        onClick={() => { setSelectionStart(null); setSelectionEnd(null); }}
+                                        onClick={() => { dispatchSelection({ type: 'RESET_SELECTION' }); setCalendarProfitability(100); }}
                                         className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                                     >
                                         {t('cancelSelection')}

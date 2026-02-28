@@ -9,7 +9,6 @@ class PricingRuleBase(BaseModel):
     start_date: date
     end_date: date
     profitability_percent: Decimal = Field(..., ge=0, description="Percentage adjustment. 0=Floor, 100=Base")
-    priority: int = 0
 
     @field_validator('end_date')
     @classmethod
@@ -28,7 +27,6 @@ class PricingRuleUpdate(BaseModel):
     start_date: Optional[date] = None
     end_date: Optional[date] = None
     profitability_percent: Optional[Decimal] = None
-    priority: Optional[int] = None
 
 
 class PricingRuleResponse(PricingRuleBase):
