@@ -46,14 +46,14 @@ export default function PricingRulesTable({ rules, propertyId, basePrice }: Pric
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="text-lg font-semibold text-gray-900">{t('rules')}</h3>
-                    <p className="text-sm text-gray-500">Manage seasonal and special pricing periods</p>
+                    <p className="text-sm text-gray-500">{t('rulesDescription')}</p>
                 </div>
                 <AddPricingRuleDialog propertyId={propertyId} basePrice={basePrice} />
             </div>
 
             {rules.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-200">
-                    <p className="text-gray-500 text-sm">No pricing rules added yet.</p>
+                    <p className="text-gray-500 text-sm">{t('noRules')}</p>
                 </div>
             ) : (
                 <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -65,13 +65,13 @@ export default function PricingRulesTable({ rules, propertyId, basePrice }: Pric
                                         {tCommon('name')}
                                     </th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Period
+                                        {t('rulePeriod')}
                                     </th>
                                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Profitability
+                                        {t('ruleProfitability')}
                                     </th>
                                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Actions
+                                        {tCommon('actions')}
                                     </th>
                                 </tr>
                             </thead>

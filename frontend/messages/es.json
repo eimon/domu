@@ -7,7 +7,8 @@
         "profile": "Perfil",
         "guests": "Huéspedes",
         "bookings": "Reservas",
-        "users": "Usuarios"
+        "users": "Usuarios",
+        "closeSidebar": "Cerrar menú"
     },
     "Guests": {
         "title": "Huéspedes",
@@ -55,7 +56,14 @@
         "guest": "Huésped",
         "bookings": "Reservas",
         "guests": "Huéspedes",
-        "actions": "Acciones"
+        "actions": "Acciones",
+        "anonymous": "Anónimo",
+        "selectProperty": "Seleccionar propiedad...",
+        "noCosts": "No hay costos agregados aún.",
+        "dateFrom": "Fecha de inicio",
+        "dateTo": "Fecha de fin",
+        "profitabilityPercent": "Rentabilidad %",
+        "optional": "Opcional"
     },
     "Properties": {
         "title": "Propiedades",
@@ -66,15 +74,6 @@
         "calendar": "Disponibilidad y Precios",
         "rules": "Reglas de Precios",
         "noProperties": "No se encontraron propiedades",
-        "create": {
-            "title": "Agregar Nueva Propiedad",
-            "name": "Nombre de la Propiedad",
-            "address": "Dirección",
-            "description": "Descripción",
-            "basePrice": "Precio Base",
-            "avgStay": "Estadía Promedio (días)",
-            "submit": "Crear Propiedad"
-        },
         "tabs": {
             "details": "Detalles y Costos",
             "calendar": "Calendario",
@@ -90,7 +89,28 @@
         "basePriceDescription": "Precio bruto por noche utilizado como techo para los cálculos de rentabilidad.",
         "revertCost": "Revertir al valor anterior",
         "revertBasePrice": "Revertir",
-        "confirmRevert": "Se deshará el último cambio y se restaurará el valor anterior. ¿Continuar?"
+        "confirmRevert": "Se deshará el último cambio y se restaurará el valor anterior. ¿Continuar?",
+        "costsDescription": "Gestionar costos recurrentes y fijos para esta propiedad.",
+        "calendarDescription": "Ver reservas y precios diarios en el calendario",
+        "rulesDescription": "Gestionar períodos de precios estacionales y especiales",
+        "noRules": "No hay reglas de precios agregadas aún.",
+        "rulePeriod": "Período",
+        "ruleProfitability": "Rentabilidad",
+        "estimatedPrice": "≈ {price} / noche",
+        "pricingFloorLabel": "0% (piso)",
+        "pricingBaseLabel": "100% (base: {price})",
+        "create": {
+            "title": "Agregar Nueva Propiedad",
+            "name": "Nombre de la Propiedad",
+            "address": "Dirección",
+            "description": "Descripción",
+            "basePrice": "Precio Base",
+            "avgStay": "Estadía Promedio (días)",
+            "submit": "Crear Propiedad",
+            "subtitle": "Ingresá los detalles de la propiedad que querés gestionar.",
+            "basePriceHint": "Precio bruto que pagan los huéspedes al 100% de rentabilidad",
+            "avgStayHint": "Para cálculos de costos"
+        }
     },
     "Calendar": {
         "available": "Disponible",
@@ -104,7 +124,9 @@
         "ruleNamePlaceholder": "Ej: Temporada alta",
         "profitabilityPercent": "Rentabilidad %",
         "profitabilityHint": "100 = precio base, 120 = +20%",
-        "saveRule": "Guardar regla"
+        "saveRule": "Guardar regla",
+        "pricePerNight": "{price} / noche",
+        "basePriceScale": "100% = {price}"
     },
     "Auth": {
         "loginTitle": "Bienvenido de nuevo",

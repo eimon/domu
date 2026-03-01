@@ -101,7 +101,7 @@ export default function AddBookingDialog() {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                                 >
                                     <option value="">
-                                        {isLoadingData ? t("loading") : "Select property..."}
+                                        {isLoadingData ? t("loading") : t("selectProperty")}
                                     </option>
                                     {properties.map((p) => (
                                         <option key={p.id} value={p.id}>{p.name}</option>
@@ -212,7 +212,7 @@ export default function AddBookingDialog() {
                                                     name="guest_id"
                                                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                                                 >
-                                                    <option value="">Anonymous</option>
+                                                    <option value="">{t("anonymous")}</option>
                                                     {guests.map((g) => (
                                                         <option key={g.id} value={g.id}>
                                                             {g.full_name} ({g.email})

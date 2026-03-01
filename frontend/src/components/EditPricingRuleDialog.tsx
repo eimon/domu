@@ -68,7 +68,7 @@ export default function EditPricingRuleDialog({ rule, propertyId, basePrice, onC
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label htmlFor="edit_rule_start_date" className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                            <label htmlFor="edit_rule_start_date" className="block text-sm font-medium text-gray-700 mb-1">{t('dateFrom')}</label>
                             <input
                                 id="edit_rule_start_date"
                                 name="start_date"
@@ -79,7 +79,7 @@ export default function EditPricingRuleDialog({ rule, propertyId, basePrice, onC
                             />
                         </div>
                         <div>
-                            <label htmlFor="edit_rule_end_date" className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                            <label htmlFor="edit_rule_end_date" className="block text-sm font-medium text-gray-700 mb-1">{t('dateTo')}</label>
                             <input
                                 id="edit_rule_end_date"
                                 name="end_date"
@@ -94,10 +94,10 @@ export default function EditPricingRuleDialog({ rule, propertyId, basePrice, onC
                     <div>
                         <div className="flex items-center justify-between mb-1">
                             <label htmlFor="edit_rule_profitability_percent" className="block text-sm font-medium text-gray-700">
-                                Profitability %
+                                {t('profitabilityPercent')}
                             </label>
                             <span className="text-sm font-semibold text-blue-700">
-                                ≈ ${estimatedPrice} / night
+                                {tProp('estimatedPrice', { price: estimatedPrice })}
                             </span>
                         </div>
                         <input
@@ -124,8 +124,8 @@ export default function EditPricingRuleDialog({ rule, propertyId, basePrice, onC
                             }}
                         />
                         <div className="flex justify-between text-xs text-gray-400 mt-1">
-                            <span>0% (floor)</span>
-                            <span>100% (base: ${basePrice})</span>
+                            <span>{tProp('pricingFloorLabel')}</span>
+                            <span>{tProp('pricingBaseLabel', { price: basePrice })}</span>
                         </div>
                     </div>
 

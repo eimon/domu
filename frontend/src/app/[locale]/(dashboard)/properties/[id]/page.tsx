@@ -116,7 +116,7 @@ export default async function PropertyDetailsPage({ params, searchParams }: Page
                             <div className="flex items-center justify-between mb-4">
                                 <div>
                                     <h2 className="text-xl font-bold text-gray-900">{t('costs')}</h2>
-                                    <p className="text-sm text-gray-500">Manage recurring and fixed costs for this property.</p>
+                                    <p className="text-sm text-gray-500">{t('costsDescription')}</p>
                                 </div>
                                 <AddCostDialog propertyId={property.id} />
                             </div>
@@ -132,7 +132,7 @@ export default async function PropertyDetailsPage({ params, searchParams }: Page
                         <section>
                             <div className="mb-4">
                                 <h2 className="text-xl font-bold text-gray-900">{t('calendar')}</h2>
-                                <p className="text-sm text-gray-500">View bookings and daily prices on the calendar</p>
+                                <p className="text-sm text-gray-500">{t('calendarDescription')}</p>
                             </div>
                             <PropertyCalendar propertyId={property.id} basePrice={property.base_price} />
                         </section>

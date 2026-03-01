@@ -324,7 +324,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                             const price = floorPrice + (basePrice - floorPrice) * calendarProfitability / 100;
                                             return (
                                                 <span className="text-xs font-semibold text-blue-700">
-                                                    ${price.toFixed(2)} / night
+                                                    {t('pricePerNight', { price: price.toFixed(2) })}
                                                 </span>
                                             );
                                         })()}
@@ -354,7 +354,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                     />
                                     <div className="flex justify-between text-xs text-gray-400 mt-0.5">
                                         <span>0%</span>
-                                        <span>100% = ${basePrice}</span>
+                                        <span>{t('basePriceScale', { price: basePrice })}</span>
                                     </div>
                                 </div>
 

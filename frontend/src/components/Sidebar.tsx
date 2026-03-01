@@ -25,7 +25,7 @@ export default function Sidebar({ userRole }: { userRole: string | null }) {
             {isOpen && (
                 <button
                     type="button"
-                    aria-label="Cerrar menú"
+                    aria-label={t('closeSidebar')}
                     className="fixed inset-0 z-40 w-full bg-gray-600 bg-opacity-75 lg:hidden transition-opacity cursor-default"
                     onClick={close}
                 />
@@ -43,7 +43,7 @@ export default function Sidebar({ userRole }: { userRole: string | null }) {
                         className="ml-auto flex-shrink-0 p-1 text-gray-400 rounded-md hover:text-gray-500 lg:hidden"
                         onClick={close}
                     >
-                        <span className="sr-only">Close sidebar</span>
+                        <span className="sr-only">{t('closeSidebar')}</span>
                         <X size={24} />
                     </button>
                 </div>

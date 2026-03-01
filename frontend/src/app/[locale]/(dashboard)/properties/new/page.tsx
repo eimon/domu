@@ -25,7 +25,7 @@ export default function NewPropertyPage() {
                     {tCommon('back')}
                 </Link>
                 <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-                <p className="text-gray-500">Enter the details of the property you want to manage.</p>
+                <p className="text-gray-500">{t('subtitle')}</p>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
@@ -68,7 +68,7 @@ export default function NewPropertyPage() {
 
                         <div>
                             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                                {t('description')} <span className="text-gray-400 font-normal">({tCommon('back')}...)</span>
+                                {t('description')} <span className="text-gray-400 font-normal">({tCommon('optional')})</span>
                             </label>
                             <textarea
                                 id="description"
@@ -94,7 +94,7 @@ export default function NewPropertyPage() {
                                     required
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">Gross price guests pay at 100% profitability</p>
+                                <p className="text-xs text-gray-500 mt-1">{t('basePriceHint')}</p>
                             </div>
 
                             <div>
@@ -110,7 +110,7 @@ export default function NewPropertyPage() {
                                     required
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                                 />
-                                <p className="text-xs text-gray-500 mt-1">For cost calculations</p>
+                                <p className="text-xs text-gray-500 mt-1">{t('avgStayHint')}</p>
                             </div>
                         </div>
                     </div>

@@ -7,7 +7,8 @@
         "profile": "Profile",
         "guests": "Guests",
         "bookings": "Bookings",
-        "users": "Users"
+        "users": "Users",
+        "closeSidebar": "Close sidebar"
     },
     "Guests": {
         "title": "Guests",
@@ -55,7 +56,14 @@
         "guest": "Guest",
         "bookings": "Bookings",
         "guests": "Guests",
-        "actions": "Actions"
+        "actions": "Actions",
+        "anonymous": "Anonymous",
+        "selectProperty": "Select property...",
+        "noCosts": "No costs added yet.",
+        "dateFrom": "Start Date",
+        "dateTo": "End Date",
+        "profitabilityPercent": "Profitability %",
+        "optional": "Optional"
     },
     "Properties": {
         "title": "Properties",
@@ -66,15 +74,6 @@
         "calendar": "Availability & Pricing",
         "rules": "Pricing Rules",
         "noProperties": "No properties found",
-        "create": {
-            "title": "Add New Property",
-            "name": "Property Name",
-            "address": "Address",
-            "description": "Description",
-            "basePrice": "Base Price",
-            "avgStay": "Avg Stay Days",
-            "submit": "Create Property"
-        },
         "tabs": {
             "details": "Details & Costs",
             "calendar": "Calendar",
@@ -90,7 +89,28 @@
         "basePriceDescription": "Gross price per night used as the ceiling for profitability calculations.",
         "revertCost": "Revert to previous value",
         "revertBasePrice": "Revert",
-        "confirmRevert": "This will undo the last change and restore the previous value. Continue?"
+        "confirmRevert": "This will undo the last change and restore the previous value. Continue?",
+        "costsDescription": "Manage recurring and fixed costs for this property.",
+        "calendarDescription": "View bookings and daily prices on the calendar",
+        "rulesDescription": "Manage seasonal and special pricing periods",
+        "noRules": "No pricing rules added yet.",
+        "rulePeriod": "Period",
+        "ruleProfitability": "Profitability",
+        "estimatedPrice": "≈ {price} / night",
+        "pricingFloorLabel": "0% (floor)",
+        "pricingBaseLabel": "100% (base: {price})",
+        "create": {
+            "title": "Add New Property",
+            "name": "Property Name",
+            "address": "Address",
+            "description": "Description",
+            "basePrice": "Base Price",
+            "avgStay": "Avg Stay Days",
+            "submit": "Create Property",
+            "subtitle": "Enter the details of the property you want to manage.",
+            "basePriceHint": "Gross price guests pay at 100% profitability",
+            "avgStayHint": "For cost calculations"
+        }
     },
     "Calendar": {
         "available": "Available",
@@ -104,7 +124,9 @@
         "ruleNamePlaceholder": "E.g. High season",
         "profitabilityPercent": "Profitability %",
         "profitabilityHint": "100 = base price, 120 = +20%",
-        "saveRule": "Save rule"
+        "saveRule": "Save rule",
+        "pricePerNight": "{price} / night",
+        "basePriceScale": "100% = {price}"
     },
     "Auth": {
         "loginTitle": "Welcome back",

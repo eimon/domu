@@ -43,7 +43,7 @@ export default function CostsTable({ costs, propertyId }: CostsTableProps) {
     if (costs.length === 0) {
         return (
             <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-200">
-                <p className="text-gray-500 text-sm">No costs added yet.</p>
+                <p className="text-gray-500 text-sm">{tCommon('noCosts')}</p>
             </div>
         );
     }
@@ -56,19 +56,19 @@ export default function CostsTable({ costs, propertyId }: CostsTableProps) {
                         <thead className="bg-gray-50">
                             <tr>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Name
+                                    {tCommon('name')}
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Category
+                                    {tCommon('category')}
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Type
+                                    {tCommon('type')}
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Value
+                                    {tCommon('value')}
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions
+                                    {tCommon('actions')}
                                 </th>
                             </tr>
                         </thead>

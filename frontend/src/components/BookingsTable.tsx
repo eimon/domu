@@ -25,7 +25,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
     const getPropertyName = (id: string) => properties.find(p => p.id === id)?.name || id.substring(0, 8);
     const getGuestName = (id: string | undefined) => {
         if (!id) return "—";
-        return guests.find(g => g.id === id)?.full_name || "Anonymous";
+        return guests.find(g => g.id === id)?.full_name || t('anonymous');
     };
 
     const handleAccept = async (booking: Booking) => {
