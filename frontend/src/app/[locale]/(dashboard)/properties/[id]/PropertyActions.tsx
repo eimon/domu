@@ -6,6 +6,8 @@ import { Pencil, Trash2 } from "lucide-react";
 import { deleteProperty } from "@/actions/properties";
 import { useRouter } from "next/navigation";
 import EditPropertyDialog from "@/components/EditPropertyDialog";
+import { useToast } from "@/context/ToastContext";
+import { useConfirm } from "@/context/ConfirmContext";
 
 interface PropertyActionsProps {
     property: Property;
@@ -18,21 +20,19 @@ export default function PropertyActions({ property }: PropertyActionsProps) {
     const [isDeleting, setIsDeleting] = useState(false);
     const router = useRouter();
     const t = useTranslations("Common");
-    const tProps = useTranslations("Properties.create"); // For reuse or create specific keys later, using Common for now for Edit/Delete
+    const { showError } = useToast();
+    const { confirm } = useConfirm();
 
     const handleDelete = async () => {
-        if (!confirm(t('confirmDelete'))) {
-            return;
-        }
+        if (!await confirm(t('confirmDelete'))) return;
 
         setIsDeleting(true);
         const result = await deleteProperty(property.id);
 
         if (result.error) {
-            alert(result.error);
+            showError(result.error);
             setIsDeleting(false);
         } else {
-            // Redirect to properties list on success
             router.push("/properties");
         }
     };

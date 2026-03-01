@@ -7,6 +7,8 @@ import { deletePricingRule } from "@/actions/pricing";
 import AddPricingRuleDialog from "./AddPricingRuleDialog";
 import EditPricingRuleDialog from "./EditPricingRuleDialog";
 import { useTranslations } from "next-intl";
+import { useToast } from "@/context/ToastContext";
+import { useConfirm } from "@/context/ConfirmContext";
 
 interface PricingRulesTableProps {
     rules: PricingRule[];
@@ -19,25 +21,21 @@ export default function PricingRulesTable({ rules, propertyId, basePrice }: Pric
     const [editingRule, setEditingRule] = useState<PricingRule | null>(null);
     const t = useTranslations("Properties");
     const tCommon = useTranslations("Common");
+    const { showError } = useToast();
+    const { confirm } = useConfirm();
 
     const formatDate = (dateStr: string) => {
-        // Fix for timezone shift: parse as local date by appending time if missing, 
-        // or just split and use components to avoid Date constructor UTC assumptions.
         const [year, month, day] = dateStr.split('-');
         return `${year}-${month}-${day}`;
     };
 
     const handleDelete = async (rule: PricingRule) => {
-        if (!confirm(tCommon('confirmDelete'))) {
-            return;
-        }
+        if (!await confirm(tCommon('confirmDelete'))) return;
 
         setIsDeleting(rule.id);
         const result = await deletePricingRule(rule.id, propertyId);
 
-        if (result.error) {
-            alert(result.error);
-        }
+        if (result.error) showError(result.error);
         setIsDeleting(null);
     };
 

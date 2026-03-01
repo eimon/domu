@@ -5,6 +5,8 @@ import { Guest } from "@/types/api";
 import { Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { deleteGuest } from "@/actions/guests";
+import { useToast } from "@/context/ToastContext";
+import { useConfirm } from "@/context/ConfirmContext";
 
 interface GuestsTableProps {
     guests: Guest[];
@@ -15,18 +17,16 @@ export default function GuestsTable({ guests }: GuestsTableProps) {
     const t = useTranslations("Common");
     const tGuest = useTranslations("Guests");
     const tEnums = useTranslations("Enums");
+    const { showError } = useToast();
+    const { confirm } = useConfirm();
 
     const handleDelete = async (guest: Guest) => {
-        if (!confirm(t('confirmDelete'))) {
-            return;
-        }
+        if (!await confirm(t('confirmDelete'))) return;
 
         setIsDeleting(guest.id);
         const result = await deleteGuest(guest.id);
 
-        if (result.error) {
-            alert(result.error);
-        }
+        if (result.error) showError(result.error);
         setIsDeleting(null);
     };
 

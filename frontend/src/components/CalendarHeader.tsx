@@ -13,14 +13,14 @@ export default function CalendarHeader({ monthName, onPrevMonth, onNextMonth }: 
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
             <button
                 onClick={onPrevMonth}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors"
             >
                 <ChevronLeft size={20} />
             </button>
             <h3 className="text-lg font-semibold text-gray-900 capitalize">{monthName}</h3>
             <button
                 onClick={onNextMonth}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors"
             >
                 <ChevronRight size={20} />
             </button>

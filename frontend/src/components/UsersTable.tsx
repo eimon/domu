@@ -6,6 +6,8 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { deleteUser } from "@/actions/users";
 import EditUserDialog from "@/components/EditUserDialog";
+import { useToast } from "@/context/ToastContext";
+import { useConfirm } from "@/context/ConfirmContext";
 
 interface UsersTableProps {
     users: User[];
@@ -23,16 +25,16 @@ export default function UsersTable({ users }: UsersTableProps) {
     const t = useTranslations("Common");
     const tUsers = useTranslations("Users");
     const tEnums = useTranslations("Enums");
+    const { showError } = useToast();
+    const { confirm } = useConfirm();
 
     const handleDelete = async (user: User) => {
-        if (!confirm(tUsers("deleteConfirm"))) return;
+        if (!await confirm(tUsers("deleteConfirm"))) return;
 
         setIsDeleting(user.id);
         const result = await deleteUser(user.id);
 
-        if (result.error) {
-            alert(result.error);
-        }
+        if (result.error) showError(result.error);
         setIsDeleting(null);
     };
 

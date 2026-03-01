@@ -7,6 +7,8 @@ import EditCostDialog from "./EditCostDialog";
 import ModifyCostDialog from "./ModifyCostDialog";
 import { deleteCost, revertCost } from "@/actions/costs";
 import { useTranslations } from "next-intl";
+import { useToast } from "@/context/ToastContext";
+import { useConfirm } from "@/context/ConfirmContext";
 
 interface CostsTableProps {
     costs: Cost[];
@@ -21,22 +23,24 @@ export default function CostsTable({ costs, propertyId }: CostsTableProps) {
     const t = useTranslations("Properties");
     const tCommon = useTranslations("Common");
     const tEnums = useTranslations("Enums");
+    const { showError } = useToast();
+    const { confirm } = useConfirm();
 
     const handleDelete = async (cost: Cost) => {
-        if (!confirm(tCommon('confirmDelete'))) return;
+        if (!await confirm(tCommon('confirmDelete'))) return;
 
         setIsDeleting(cost.id);
         const result = await deleteCost(cost.id, propertyId);
-        if (result.error) alert(result.error);
+        if (result.error) showError(result.error);
         setIsDeleting(null);
     };
 
     const handleRevert = async (cost: Cost) => {
-        if (!confirm(t('confirmRevert'))) return;
+        if (!await confirm(t('confirmRevert'))) return;
 
         setIsReverting(cost.id);
         const result = await revertCost(cost.id, propertyId);
-        if (result.error) alert(result.error);
+        if (result.error) showError(result.error);
         setIsReverting(null);
     };
 

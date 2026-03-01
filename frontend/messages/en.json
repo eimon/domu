@@ -63,7 +63,8 @@
         "dateFrom": "Start Date",
         "dateTo": "End Date",
         "profitabilityPercent": "Profitability %",
-        "optional": "Optional"
+        "optional": "Optional",
+        "confirm": "Confirm"
     },
     "Properties": {
         "title": "Properties",

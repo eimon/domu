@@ -6,6 +6,8 @@ import { Trash2, ExternalLink, Check, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { acceptBooking, cancelBooking, deleteBooking } from "@/actions/bookings";
 import { Link } from "@/i18n/routing";
+import { useToast } from "@/context/ToastContext";
+import { useConfirm } from "@/context/ConfirmContext";
 
 const EMPTY_PROPERTIES: Property[] = [];
 const EMPTY_GUESTS: Guest[] = [];
@@ -21,6 +23,8 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
     const t = useTranslations("Common");
     const tBooking = useTranslations("Bookings");
     const tEnums = useTranslations("Enums");
+    const { showError } = useToast();
+    const { confirm } = useConfirm();
 
     const getPropertyName = (id: string) => properties.find(p => p.id === id)?.name || id.substring(0, 8);
     const getGuestName = (id: string | undefined) => {
@@ -31,23 +35,23 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
     const handleAccept = async (booking: Booking) => {
         setLoadingId(booking.id);
         const result = await acceptBooking(booking.id);
-        if (result.error) alert(result.error);
+        if (result.error) showError(result.error);
         setLoadingId(null);
     };
 
     const handleCancel = async (booking: Booking) => {
-        if (!confirm(tBooking('confirmCancel'))) return;
+        if (!await confirm(tBooking('confirmCancel'))) return;
         setLoadingId(booking.id);
         const result = await cancelBooking(booking.id);
-        if (result.error) alert(result.error);
+        if (result.error) showError(result.error);
         setLoadingId(null);
     };
 
     const handleDelete = async (booking: Booking) => {
-        if (!confirm(t('confirmDelete'))) return;
+        if (!await confirm(t('confirmDelete'))) return;
         setLoadingId(booking.id);
         const result = await deleteBooking(booking.id);
-        if (result.error) alert(result.error);
+        if (result.error) showError(result.error);
         setLoadingId(null);
     };
 

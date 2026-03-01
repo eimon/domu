@@ -6,6 +6,8 @@ import { X, Loader2, TrendingUp, RotateCcw } from "lucide-react";
 import { useActionState } from "react";
 import { Property, PropertyBasePrice } from "@/types/api";
 import { useTranslations } from "next-intl";
+import { useToast } from "@/context/ToastContext";
+import { useConfirm } from "@/context/ConfirmContext";
 
 interface BasePriceCardProps {
     property: Property;
@@ -119,13 +121,15 @@ export default function BasePriceCard({ property, currentBasePrice }: BasePriceC
     const [isModifyOpen, setIsModifyOpen] = useState(false);
     const [isReverting, setIsReverting] = useState(false);
     const tProp = useTranslations("Properties");
+    const { showError } = useToast();
+    const { confirm } = useConfirm();
 
     const handleRevert = async () => {
-        if (!confirm(tProp("confirmRevert"))) return;
+        if (!await confirm(tProp("confirmRevert"))) return;
 
         setIsReverting(true);
         const result = await revertBasePrice(property.id);
-        if (result.error) alert(result.error);
+        if (result.error) showError(result.error);
         setIsReverting(false);
     };
 
