@@ -24,8 +24,3 @@ class User(Base):
     owned_properties = relationship("Property", foreign_keys="Property.owner_id", back_populates="owner")
     refresh_tokens = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")
 
-
-# Imported after User class definition to ensure RefreshToken is registered in
-# SQLAlchemy's mapper registry whenever User is imported, regardless of import order.
-from models.refresh_token import RefreshToken  # noqa: F401, E402
-from models.property import Property  # noqa: F401, E402
