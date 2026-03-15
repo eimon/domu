@@ -35,7 +35,7 @@ services:
       # - /app/.next
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8000
-      - INTERNAL_API_URL=http://web:8000
+      - INTERNAL_API_URL=http://domu_api:8000
       - JWT_SECRET_KEY=${SECRET_KEY:-supersecretkey}
       - ALGORITHM=${ALGORITHM:-HS256}
     depends_on:

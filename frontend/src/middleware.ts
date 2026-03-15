@@ -52,8 +52,9 @@ export async function middleware(request: NextRequest) {
 
     const redirectToLogin = (locale: string) => {
         const res = NextResponse.redirect(new URL(`/${locale}/auth/login`, request.url));
-        // Persist the detected locale so the login page and post-login redirect use it
         res.cookies.set("NEXT_LOCALE", locale, { path: "/", sameSite: "lax", maxAge: 60 * 60 * 24 * 365 });
+        res.cookies.delete("access_token");
+        res.cookies.delete("refresh_token");
         return res;
     };
 

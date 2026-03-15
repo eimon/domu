@@ -30,10 +30,10 @@ services:
         NEXT_PUBLIC_API_URL: ${API_HOST:-https://api.domu.ar}
     container_name: domu_frontend
     environment:
-      - INTERNAL_API_URL=http://web:8000
+      - INTERNAL_API_URL=http://domu_api:8000
       - JWT_SECRET_KEY=${SECRET_KEY:-supersecretkey}
       - VIRTUAL_HOST=${HOST:-localhost}
-      - VIRTUAL_PORT=8000
+      - VIRTUAL_PORT=3000
       - LETSENCRYPT_HOST=${HOST:-localhost}
     depends_on:
       - web
@@ -58,3 +58,8 @@ services:
 
 volumes:
   postgres_data_prod:
+
+networks:
+  default:
+    external:
+      name: ${RED}

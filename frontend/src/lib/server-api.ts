@@ -11,6 +11,11 @@ type FetchOptions = RequestInit & {
     params?: Record<string, string>;
 };
 
+// Deduplicates concurrent refresh attempts: if multiple Server Components render
+// in parallel and all receive 401, only one refresh call is made to the backend.
+// The same Promise is shared so the second caller doesn't use the already-rotated token.
+const refreshInFlight = new Map<string, Promise<{ access_token: string; refresh_token: string } | null>>();
+
 function buildUrl(endpoint: string, options: FetchOptions): string {
     let url = `${SERVER_API_URL}${endpoint}`;
     if (options.params) {
@@ -42,6 +47,7 @@ export async function serverApi(endpoint: string, options: FetchOptions = {}) {
 
     const response = await fetch(buildUrl(endpoint, options), {
         ...options,
+        cache: "no-store",
         headers: buildHeaders(token, options),
     });
 
@@ -55,14 +61,29 @@ export async function serverApi(endpoint: string, options: FetchOptions = {}) {
         return response;
     }
 
-    try {
-        const refreshRes = await fetch(`${SERVER_API_URL}/auth/refresh`, {
+    // Deduplicate: if a refresh is already in flight for this token, reuse it.
+    let pending = refreshInFlight.get(refreshToken);
+    if (!pending) {
+        pending = fetch(`${SERVER_API_URL}/auth/refresh`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ refresh_token: refreshToken }),
-        });
+        })
+            .then(async (refreshRes) => {
+                if (!refreshRes.ok) return null;
+                return refreshRes.json() as Promise<{ access_token: string; refresh_token: string }>;
+            })
+            .catch(() => null)
+            .finally(() => {
+                refreshInFlight.delete(refreshToken);
+            });
+        refreshInFlight.set(refreshToken, pending);
+    }
 
-        if (!refreshRes.ok) {
+    try {
+        const newTokens = await pending;
+
+        if (!newTokens) {
             // Refresh failed: clear cookies when possible (Server Action context)
             try {
                 cookieStore.delete("access_token");
@@ -73,10 +94,11 @@ export async function serverApi(endpoint: string, options: FetchOptions = {}) {
             return response;
         }
 
-        const { access_token, refresh_token } = await refreshRes.json();
+        const { access_token, refresh_token } = newTokens;
 
         // Update cookies — only works in Server Actions and Route Handlers,
-        // not in Server Components (throws). If it throws, return original 401.
+        // not in Server Components (throws). Best-effort: always retry with
+        // the new access token regardless of whether the cookie write succeeded.
         try {
             cookieStore.set("access_token", access_token, {
                 ...cookieBase,
@@ -89,12 +111,13 @@ export async function serverApi(endpoint: string, options: FetchOptions = {}) {
                 maxAge: 60 * 60 * 24 * 60,
             });
         } catch {
-            return response;
+            // Server Component context: cannot write cookies — proceed anyway
         }
 
         // Retry original request with the new access token
         return fetch(buildUrl(endpoint, options), {
             ...options,
+            cache: "no-store",
             headers: buildHeaders(access_token, options),
         });
     } catch {
