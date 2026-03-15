@@ -1,9 +1,8 @@
-import Link from "next/link"; // Keep original Link for logo if desired, or switch to routed Link
 import { Link as LocalizedLink } from "@/i18n/routing";
 import SidebarTrigger from "@/components/SidebarTrigger";
 import { serverApi } from "@/lib/server-api";
 import { User } from "@/types/api";
-import { Menu, User as UserIcon, LogOut, ChevronDown } from "lucide-react";
+import { User as UserIcon, LogOut, ChevronDown } from "lucide-react";
 import { logout } from "@/actions/auth";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { getTranslations } from "next-intl/server";
@@ -22,50 +21,50 @@ export default async function Navbar() {
     }
 
     return (
-        <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <nav className="bg-[#06090f]/80 backdrop-blur-2xl border-b border-white/[0.08] sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
 
-                    {/* Left Side: Hamburger & Logo */}
+                    {/* Left: Hamburger & Logo */}
                     <div className="flex items-center">
                         <SidebarTrigger />
                         <div className="flex-shrink-0 flex items-center ml-4 lg:ml-0">
-                            <LocalizedLink href="/" className="text-xl font-bold text-blue-600 tracking-tight">
+                            <LocalizedLink href="/" className="text-xl font-bold text-domu-primary tracking-tight">
                                 DOMU
                             </LocalizedLink>
                         </div>
                     </div>
 
-                    {/* Right Side: User Profile & Actions */}
+                    {/* Right: User Profile & Actions */}
                     <div className="flex items-center space-x-4">
                         <LanguageSwitcher />
 
-                        <div className="h-6 w-px bg-gray-200" aria-hidden="true" />
+                        <div className="h-5 w-px bg-white/10" aria-hidden="true" />
 
                         {user ? (
-                            <div className="relative flex items-center space-x-4">
-                                <div className="hidden md:flex flex-col items-end mr-2">
-                                    <span className="text-sm font-medium text-gray-900">{user.full_name}</span>
-                                    <span className="text-xs text-gray-500 capitalize">{user.role.toLowerCase()}</span>
+                            <div className="relative flex items-center space-x-3">
+                                <div className="hidden md:flex flex-col items-end">
+                                    <span className="text-sm font-medium text-white/85">{user.full_name}</span>
+                                    <span className="text-xs text-white/40 capitalize">{user.role.toLowerCase()}</span>
                                 </div>
 
                                 <div className="relative group">
-                                    <button className="flex items-center space-x-2 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
-                                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                                            <UserIcon size={18} />
+                                    <button className="flex items-center space-x-2 p-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.10] transition-colors">
+                                        <div className="h-8 w-8 rounded-lg bg-domu-primary/15 flex items-center justify-center text-domu-primary">
+                                            <UserIcon size={16} />
                                         </div>
-                                        <ChevronDown size={14} className="text-gray-500" />
+                                        <ChevronDown size={13} className="text-white/40" />
                                     </button>
 
-                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 origin-top-right transform">
-                                        <div className="px-4 py-3 border-b border-gray-100 md:hidden">
-                                            <p className="text-sm font-medium text-gray-900">{user.full_name}</p>
-                                            <p className="text-xs text-gray-500">{user.email}</p>
+                                    <div className="absolute right-0 mt-2 w-48 glass-modal rounded-xl shadow-2xl py-1 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-200 origin-top-right">
+                                        <div className="px-4 py-3 border-b border-white/[0.08] md:hidden">
+                                            <p className="text-sm font-medium text-white/85">{user.full_name}</p>
+                                            <p className="text-xs text-white/40">{user.email}</p>
                                         </div>
 
                                         <LocalizedLink
                                             href="/api/auth/perfil"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            className="block px-4 py-2 text-sm text-white/65 hover:bg-white/[0.06] hover:text-white/90 transition-colors"
                                         >
                                             {t('profile')}
                                         </LocalizedLink>
@@ -73,9 +72,9 @@ export default async function Navbar() {
                                         <form action={logout} className="w-full">
                                             <button
                                                 type="submit"
-                                                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 flex items-center"
+                                                className="w-full text-left px-4 py-2 text-sm text-domu-danger/75 hover:bg-domu-danger/[0.08] hover:text-domu-danger flex items-center transition-colors"
                                             >
-                                                <LogOut size={16} className="mr-2" />
+                                                <LogOut size={14} className="mr-2" />
                                                 {t('logout')}
                                             </button>
                                         </form>
@@ -83,7 +82,7 @@ export default async function Navbar() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="text-sm text-gray-500">{t('login')}</div>
+                            <div className="text-sm text-white/40">{t('login')}</div>
                         )}
                     </div>
 

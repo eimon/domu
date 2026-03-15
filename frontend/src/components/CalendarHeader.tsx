@@ -10,19 +10,19 @@ interface CalendarHeaderProps {
 
 export default function CalendarHeader({ monthName, onPrevMonth, onNextMonth }: CalendarHeaderProps) {
     return (
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08] bg-white/[0.03]">
             <button
                 onClick={onPrevMonth}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors"
+                className="p-2 text-white/45 hover:text-white/80 hover:bg-white/[0.06] rounded-lg transition-colors"
             >
-                <ChevronLeft size={20} />
+                <ChevronLeft size={18} />
             </button>
-            <h3 className="text-lg font-semibold text-gray-900 capitalize">{monthName}</h3>
+            <h3 className="text-sm font-semibold text-white/80 capitalize">{monthName}</h3>
             <button
                 onClick={onNextMonth}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors"
+                className="p-2 text-white/45 hover:text-white/80 hover:bg-white/[0.06] rounded-lg transition-colors"
             >
-                <ChevronRight size={20} />
+                <ChevronRight size={18} />
             </button>
         </div>
     );

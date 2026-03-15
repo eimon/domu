@@ -11,8 +11,8 @@ export default async function GuestsPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
-                    <p className="text-gray-500 mt-1">Manage your guests and their contact information.</p>
+                    <h1 className="text-2xl font-bold text-white/90">{t('title')}</h1>
+                    <p className="text-white/40 mt-1 text-sm">Manage your guests and their contact information.</p>
                 </div>
                 <AddGuestDialog />
             </div>

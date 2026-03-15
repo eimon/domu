@@ -18,34 +18,34 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     return (
         <Link
             href={`/properties/${property.id}`}
-            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-200 flex flex-col h-full cursor-pointer"
+            className="glass rounded-xl overflow-hidden hover:bg-white/[0.07] hover:shadow-[0_8px_32px_rgb(99_102_241_/_0.12)] transition-all duration-200 flex flex-col h-full cursor-pointer group"
         >
-            <div className="h-48 relative">
+            <div className="h-44 relative overflow-hidden">
                 {hasCoords ? (
                     <MapThumbnail lat={property.latitude!} lon={property.longitude!} />
                 ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white">
-                        <Home size={48} className="opacity-50" />
+                    <div className="w-full h-full bg-gradient-to-br from-indigo-500/60 to-violet-600/60 flex items-center justify-center">
+                        <Home size={44} className="text-white/30 group-hover:text-white/40 transition-colors" />
                     </div>
                 )}
             </div>
 
             <div className="p-5 flex-1 flex flex-col">
                 <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">{property.name}</h3>
-                    <div className="flex items-start text-gray-500 mb-4">
-                        <MapPin size={16} className="mr-1 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm line-clamp-2">{property.address}</span>
+                    <h3 className="text-base font-semibold text-white/90 mb-1 leading-snug">{property.name}</h3>
+                    <div className="flex items-start text-white/45 mb-3">
+                        <MapPin size={13} className="mr-1 mt-0.5 flex-shrink-0" />
+                        <span className="text-xs line-clamp-2">{property.address}</span>
                     </div>
                     {property.description && (
-                        <p className="text-sm text-gray-600 line-clamp-3 mb-4">
+                        <p className="text-xs text-white/40 line-clamp-3 mb-3">
                             {property.description}
                         </p>
                     )}
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-gray-50">
-                    <span className="text-xs font-medium px-2 py-1 bg-green-50 text-green-700 rounded-full">
+                <div className="mt-3 pt-3 border-t border-white/[0.06]">
+                    <span className="text-xs font-medium px-2 py-1 bg-domu-success/10 text-domu-success rounded-full">
                         {tCommon('active')}
                     </span>
                 </div>

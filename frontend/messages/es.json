@@ -33,7 +33,14 @@
         "confirmCancel": "¿Estás seguro de que quieres cancelar esta reserva?",
         "next": "Siguiente",
         "selectDatesHint": "Seleccioná un rango de fechas en el calendario para definir check-in y check-out",
-        "bookingDetails": "Detalles de la reserva"
+        "bookingDetails": "Detalles de la reserva",
+        "nights": "noches",
+        "contactInfo": "Datos de Contacto",
+        "noGuest": "Sin huésped asignado",
+        "description": "Descripción",
+        "viewDetails": "Ver detalles",
+        "assignGuest": "Asignar Huésped",
+        "selectGuest": "Seleccionar huésped..."
     },
     "Common": {
         "save": "Guardar",
@@ -140,16 +147,24 @@
         "contactAdmin": "Contactar al Administrador"
     },
     "Home": {
-        "heroTitle": "Domu Frontend",
-        "heroSubtitle": "Bienvenido al nuevo frontend de la API de Domu. Este proyecto está construido con Next.js 16, TypeScript y Tailwind CSS.",
-        "feature1Title": "Stack Moderno",
-        "feature1Desc": "Impulsado por Next.js 16 (App Router), React 19 y Tailwind CSS v4.",
-        "feature2Title": "Listo para API",
-        "feature2Desc": "Cliente Axios preconfigurado e interfaces de TypeScript para tus endpoints de API.",
-        "feature3Title": "Tipado Seguro",
-        "feature3Desc": "Seguridad de tipos de extremo a extremo usando TypeScript y respuestas de API estrictamente tipadas.",
-        "cta": "Comenzar a Construir",
-        "devServerNote": "Revisa los logs de la consola para verificar la operación del servidor de desarrollo."
+        "welcome": "Bienvenido, {name}",
+        "welcomeGeneric": "Bienvenido",
+        "subtitle": "Resumen del mes de {month}",
+        "totalProperties": "Propiedades",
+        "monthlyIncome": "Ingresos del mes",
+        "netProfit": "Ganancia neta",
+        "avgOccupancy": "Ocupación promedio",
+        "propertySummary": "Tus propiedades",
+        "noProperties": "Aún no tenés propiedades administradas.",
+        "addFirstProperty": "Agregar primera propiedad",
+        "upcomingCheckIns": "Próximos check-ins",
+        "noUpcoming": "Sin check-ins en los próximos 7 días",
+        "viewAll": "Ver todo",
+        "nights": "noches",
+        "occupancy": "Ocupación",
+        "income": "Ingresos",
+        "profit": "Ganancia",
+        "checkIn": "Check-in"
     },
     "Reports": {
         "title": "Reporte Financiero",
@@ -163,7 +178,7 @@
         "totalBookings": "Reservas Totales",
         "netProfit": "Ganancia Neta",
         "fixedMonthly": "Costos Fijos Mensuales",
-        "fixedDaily": "Costos Fijos Diarios",
+        "fixedDaily": "Por Día (Reserva)",
         "variableCosts": "Costos Variables (Reserva)",
         "commissions": "Comisiones",
         "breakdown": "Desglose de Costos",
@@ -188,7 +203,7 @@
     "Enums": {
         "CostCategory": {
             "RECURRING_MONTHLY": "Recurrente Mensual",
-            "RECURRING_DAILY": "Recurrente Diario",
+            "PER_DAY_RESERVATION": "Por Día (Reserva)",
             "PER_RESERVATION": "Por Reserva"
         },
         "CostCalculationType": {

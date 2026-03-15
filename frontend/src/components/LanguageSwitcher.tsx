@@ -15,15 +15,15 @@ export default function LanguageSwitcher() {
     };
 
     return (
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <Globe size={16} />
+        <div className="flex items-center space-x-1.5 text-sm text-white/45">
+            <Globe size={14} />
             <select
                 value={locale}
                 onChange={handleChange}
-                className="bg-transparent border-none focus:ring-0 cursor-pointer font-medium text-gray-700 outline-none"
+                className="bg-transparent border-none focus:ring-0 cursor-pointer font-medium text-white/50 outline-none hover:text-white/75 transition-colors"
             >
-                <option value="en">English</option>
-                <option value="es">Español</option>
+                <option value="en">EN</option>
+                <option value="es">ES</option>
             </select>
         </div>
     );

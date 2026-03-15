@@ -93,7 +93,7 @@ class PricingService:
         """
         Calculate the 'zero profit' floor price per day from a pre-filtered cost list.
         Formula:
-          (Monthly Fixed / 30) + (Daily Fixed) + (Per Reservation Fixed / avg_stay)
+          (Monthly Fixed / 30) + (Per Day Reservation) + (Per Reservation Fixed / avg_stay)
         Percentage costs are treated as markups applied separately.
         """
         floor = Decimal(0)
@@ -101,7 +101,7 @@ class PricingService:
             if cost.calculation_type == CostCalculationType.FIXED_AMOUNT:
                 if cost.category == CostCategory.RECURRING_MONTHLY:
                     floor += cost.value / Decimal(30)
-                elif cost.category == CostCategory.RECURRING_DAILY:
+                elif cost.category == CostCategory.PER_DAY_RESERVATION:
                     floor += cost.value
                 elif cost.category == CostCategory.PER_RESERVATION:
                     if avg_stay > 0:
@@ -229,7 +229,7 @@ class PricingService:
                 for cost in day_costs:
                     if (
                         cost.calculation_type == CostCalculationType.FIXED_AMOUNT
-                        and cost.category == CostCategory.RECURRING_DAILY
+                        and cost.category == CostCategory.PER_DAY_RESERVATION
                     ):
                         total_fixed_daily += cost.value
 

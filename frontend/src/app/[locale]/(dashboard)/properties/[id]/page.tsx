@@ -70,17 +70,17 @@ export default async function PropertyDetailsPage({ params, searchParams }: Page
             <div>
                 <Link
                     href="/properties"
-                    className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 mb-4"
+                    className="inline-flex items-center text-sm text-white/40 hover:text-white/70 mb-4 transition-colors"
                 >
-                    <ArrowLeft size={16} className="mr-1" />
+                    <ArrowLeft size={15} className="mr-1" />
                     {tCommon('back')}
                 </Link>
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">{property.name}</h1>
-                        <div className="flex items-center text-gray-500 mt-2">
-                            <MapPin size={18} className="mr-1" />
-                            <span>{property.address}</span>
+                        <h1 className="text-3xl font-bold text-white/90">{property.name}</h1>
+                        <div className="flex items-center text-white/45 mt-2">
+                            <MapPin size={16} className="mr-1.5" />
+                            <span className="text-sm">{property.address}</span>
                         </div>
                     </div>
                     <PropertyActions property={property} />
@@ -96,17 +96,17 @@ export default async function PropertyDetailsPage({ params, searchParams }: Page
                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
                         {/* Description */}
                         {property.description && (
-                            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('create.description')}</h3>
-                                <p className="text-gray-600 leading-relaxed">{property.description}</p>
+                            <div className="glass p-6 rounded-xl">
+                                <h3 className="text-sm font-semibold text-white/70 mb-2 uppercase tracking-wider">{t('create.description')}</h3>
+                                <p className="text-white/60 leading-relaxed text-sm">{property.description}</p>
                             </div>
                         )}
 
                         {/* Base Price Section */}
                         <section>
                             <div className="mb-3">
-                                <h2 className="text-xl font-bold text-gray-900">{t('basePriceLabel')}</h2>
-                                <p className="text-sm text-gray-500">{t('basePriceDescription')}</p>
+                                <h2 className="text-lg font-bold text-white/85">{t('basePriceLabel')}</h2>
+                                <p className="text-sm text-white/40">{t('basePriceDescription')}</p>
                             </div>
                             <BasePriceCard property={property} currentBasePrice={currentBasePrice} />
                         </section>
@@ -115,12 +115,11 @@ export default async function PropertyDetailsPage({ params, searchParams }: Page
                         <section>
                             <div className="flex items-center justify-between mb-4">
                                 <div>
-                                    <h2 className="text-xl font-bold text-gray-900">{t('costs')}</h2>
-                                    <p className="text-sm text-gray-500">{t('costsDescription')}</p>
+                                    <h2 className="text-lg font-bold text-white/85">{t('costs')}</h2>
+                                    <p className="text-sm text-white/40">{t('costsDescription')}</p>
                                 </div>
                                 <AddCostDialog propertyId={property.id} />
                             </div>
-
                             <CostsTable costs={costs} propertyId={property.id} />
                         </section>
                     </div>
@@ -131,8 +130,8 @@ export default async function PropertyDetailsPage({ params, searchParams }: Page
                         {/* Calendar Section */}
                         <section>
                             <div className="mb-4">
-                                <h2 className="text-xl font-bold text-gray-900">{t('calendar')}</h2>
-                                <p className="text-sm text-gray-500">{t('calendarDescription')}</p>
+                                <h2 className="text-lg font-bold text-white/85">{t('calendar')}</h2>
+                                <p className="text-sm text-white/40">{t('calendarDescription')}</p>
                             </div>
                             <PropertyCalendar propertyId={property.id} basePrice={property.base_price} />
                         </section>

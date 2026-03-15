@@ -107,7 +107,7 @@ export default function AddressAutocomplete({
             <div className="relative">
                 <MapPin
                     size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none"
                 />
                 <input
                     name={name}
@@ -123,13 +123,13 @@ export default function AddressAutocomplete({
                 {isLoading && (
                     <Loader2
                         size={16}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 animate-spin"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 animate-spin"
                     />
                 )}
             </div>
 
             {isOpen && suggestions.length > 0 && (
-                <ul className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden max-h-64 overflow-y-auto">
+                <ul className="absolute z-50 w-full mt-1 glass-modal rounded-xl border border-white/[0.10] shadow-2xl overflow-hidden max-h-64 overflow-y-auto">
                     {suggestions.map((s) => (
                         <li
                             key={s.place_id}
@@ -138,10 +138,10 @@ export default function AddressAutocomplete({
                                 e.preventDefault();
                                 handleSelect(s);
                             }}
-                            className="px-3 py-2.5 text-sm cursor-pointer hover:bg-blue-50 flex items-start gap-2 border-b border-gray-100 last:border-0"
+                            className="px-3 py-2.5 text-sm cursor-pointer hover:bg-domu-primary/10 flex items-start gap-2 border-b border-white/[0.06] last:border-0 transition-colors"
                         >
-                            <MapPin size={14} className="mt-0.5 flex-shrink-0 text-gray-400" />
-                            <span className="text-gray-700">{s.display_name}</span>
+                            <MapPin size={14} className="mt-0.5 flex-shrink-0 text-white/30" />
+                            <span className="text-white/70">{s.display_name}</span>
                         </li>
                     ))}
                 </ul>

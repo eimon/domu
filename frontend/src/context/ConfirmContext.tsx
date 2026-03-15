@@ -44,26 +44,26 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
         <ConfirmContext.Provider value={{ confirm }}>
             {children}
             {dialog && (
-                <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+                    <div className="glass-modal rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
                         <div className="p-6">
                             <div className="flex items-start gap-4">
-                                <div className="p-2 bg-red-50 rounded-lg shrink-0">
-                                    <AlertTriangle size={20} className="text-red-600" />
+                                <div className="p-2 bg-domu-danger/10 rounded-lg shrink-0">
+                                    <AlertTriangle size={18} className="text-domu-danger" />
                                 </div>
-                                <p className="text-sm text-gray-700 pt-1.5">{dialog.message}</p>
+                                <p className="text-sm text-white/70 pt-1">{dialog.message}</p>
                             </div>
                         </div>
                         <div className="flex items-center justify-end gap-3 px-6 pb-6">
                             <button
                                 onClick={handleCancel}
-                                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+                                className="px-4 py-2 text-sm font-medium text-white/55 hover:bg-white/[0.05] hover:text-white/75 rounded-lg transition-colors"
                             >
                                 {t("cancel")}
                             </button>
                             <button
                                 onClick={handleConfirm}
-                                className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+                                className="px-4 py-2 bg-domu-danger hover:bg-domu-danger/80 text-white text-sm font-medium rounded-lg transition-colors"
                             >
                                 {dialog.confirmLabel ?? t("confirm")}
                             </button>

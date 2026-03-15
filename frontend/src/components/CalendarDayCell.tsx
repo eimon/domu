@@ -1,6 +1,7 @@
 "use client";
 
 import { CalendarDay } from "@/types/api";
+import { formatPrice } from "@/lib/utils";
 
 interface CalendarDayCellProps {
     day: CalendarDay;
@@ -17,13 +18,15 @@ export default function CalendarDayCell({
     onMouseEnter,
     onMouseLeave,
 }: CalendarDayCellProps) {
-    const isEndpointSelected = selectionStyle?.includes('bg-blue-500') || selectionStyle?.includes('bg-blue-400');
+    // Endpoint styles contain 'text-white'; range styles don't
+    const isEndpointSelected = selectionStyle?.includes('text-white') ?? false;
     const isInRangeSelected = selectionStyle !== null && !isEndpointSelected;
+
     const baseStyle = selectionStyle
         ? selectionStyle
         : day.status === 'RESERVED'
-            ? 'bg-red-50 border-red-200'
-            : 'bg-white border-gray-200 hover:border-blue-300';
+            ? 'bg-domu-danger/8 border-domu-danger/20'
+            : 'bg-white/[0.03] border-white/[0.08] hover:border-domu-primary/40';
 
     return (
         <button
@@ -33,20 +36,20 @@ export default function CalendarDayCell({
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
         >
-            <div className={`text-sm font-medium ${isEndpointSelected ? 'text-white' : 'text-gray-900'}`}>
+            <div className={`text-sm font-medium ${isEndpointSelected ? 'text-white' : 'text-white/75'}`}>
                 {day.date.split('-')[2].replace(/^0/, '')}
             </div>
             <div className={`text-xs mt-1 font-semibold ${
                 isEndpointSelected ? 'text-white'
-                : isInRangeSelected ? 'text-blue-700'
-                : day.status === 'RESERVED' ? 'text-red-600'
-                : 'text-green-600'
+                : isInRangeSelected ? 'text-domu-primary/80'
+                : day.status === 'RESERVED' ? 'text-domu-danger/70'
+                : 'text-domu-success/80'
             }`}>
-                ${Number(day.price).toFixed(0)}
+                ${formatPrice(day.price)}
             </div>
             {day.rule_name && (
                 <div
-                    className={`text-xs mt-0.5 truncate ${isEndpointSelected ? 'text-blue-100' : isInRangeSelected ? 'text-blue-500' : 'text-gray-500'}`}
+                    className={`text-xs mt-0.5 truncate ${isEndpointSelected ? 'text-white/70' : isInRangeSelected ? 'text-domu-primary/50' : 'text-white/30'}`}
                     title={day.rule_name}
                 >
                     {day.rule_name}

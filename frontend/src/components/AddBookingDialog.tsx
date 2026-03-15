@@ -71,34 +71,34 @@ export default function AddBookingDialog() {
         <>
             <button
                 onClick={handleOpen}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                className="inline-flex items-center px-4 py-2 bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg transition-colors text-sm font-medium"
             >
-                <Plus size={16} className="mr-2" />
+                <Plus size={15} className="mr-2" />
                 {t("add")} {t("bookings")}
             </button>
 
             {/* ── Step 1: property selector ── */}
             {isOpen && step === "property" && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                            <h3 className="text-lg font-semibold text-gray-900">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+                    <div className="glass-modal rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08]">
+                            <h3 className="text-base font-semibold text-white/90">
                                 {t("add")} {t("bookings")}
                             </h3>
-                            <button onClick={handleClose} className="text-gray-400 hover:text-gray-500 transition-colors">
-                                <X size={20} />
+                            <button onClick={handleClose} className="text-white/40 hover:text-white/70 transition-colors">
+                                <X size={18} />
                             </button>
                         </div>
                         <div className="p-6 space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wider">
                                     {t("property")}
                                 </label>
                                 <select
                                     value={selectedPropertyId}
                                     onChange={(e) => setSelectedPropertyId(e.target.value)}
                                     disabled={isLoadingData}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                    className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none text-sm transition-all"
                                 >
                                     <option value="">
                                         {isLoadingData ? t("loading") : t("selectProperty")}
@@ -108,11 +108,11 @@ export default function AddBookingDialog() {
                                     ))}
                                 </select>
                             </div>
-                            <div className="flex justify-end space-x-3 pt-2">
+                            <div className="flex justify-end space-x-3 pt-1">
                                 <button
                                     type="button"
                                     onClick={handleClose}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
+                                    className="px-4 py-2 text-sm font-medium text-white/55 hover:bg-white/[0.05] hover:text-white/75 rounded-lg transition-colors"
                                 >
                                     {t("cancel")}
                                 </button>
@@ -120,7 +120,7 @@ export default function AddBookingDialog() {
                                     type="button"
                                     onClick={handleContinue}
                                     disabled={!selectedPropertyId || isLoadingData}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium"
+                                    className="px-4 py-2 bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg disabled:opacity-40 text-sm font-medium transition-colors"
                                 >
                                     {tBookings("next")} →
                                 </button>
@@ -132,35 +132,35 @@ export default function AddBookingDialog() {
 
             {/* ── Step 2: calendar + booking form ── */}
             {isOpen && step === "calendar" && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-5xl max-h-[92vh] flex flex-col animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+                    <div className="glass-modal rounded-2xl shadow-2xl w-full max-w-5xl max-h-[92vh] flex flex-col animate-in fade-in zoom-in duration-200">
                         {/* Header */}
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08] shrink-0">
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => setStep("property")}
-                                    className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                                    className="p-1.5 text-white/40 hover:text-white/70 hover:bg-white/[0.06] rounded-lg transition-colors"
                                 >
-                                    <ChevronLeft size={20} />
+                                    <ChevronLeft size={18} />
                                 </button>
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-900">
+                                    <h3 className="text-base font-semibold text-white/90">
                                         {t("add")} {t("bookings")}
                                     </h3>
                                     {selectedProperty && (
-                                        <p className="text-sm text-gray-500">{selectedProperty.name}</p>
+                                        <p className="text-xs text-white/40">{selectedProperty.name}</p>
                                     )}
                                 </div>
                             </div>
-                            <button onClick={handleClose} className="text-gray-400 hover:text-gray-500 transition-colors">
-                                <X size={20} />
+                            <button onClick={handleClose} className="text-white/40 hover:text-white/70 transition-colors">
+                                <X size={18} />
                             </button>
                         </div>
 
                         {/* Body */}
                         <div className="flex flex-col lg:flex-row gap-0 overflow-hidden flex-1 min-h-0">
                             {/* Calendar panel */}
-                            <div className="flex-1 min-w-0 overflow-y-auto p-6 border-b lg:border-b-0 lg:border-r border-gray-100">
+                            <div className="flex-1 min-w-0 overflow-y-auto p-6 border-b border-white/[0.07] lg:border-b-0 lg:border-r">
                                 <PropertyCalendar
                                     propertyId={selectedPropertyId}
                                     basePrice={selectedProperty?.base_price ?? 0}
@@ -171,25 +171,25 @@ export default function AddBookingDialog() {
                             {/* Booking form panel */}
                             <div className="w-full lg:w-80 shrink-0 overflow-y-auto p-6">
                                 {!selectedDates ? (
-                                    <div className="flex flex-col items-center justify-center h-full min-h-48 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl p-6 gap-3">
-                                        <CalendarDays size={32} className="text-gray-300" />
+                                    <div className="flex flex-col items-center justify-center h-full min-h-48 text-center text-white/30 border-2 border-dashed border-white/[0.07] rounded-xl p-6 gap-3">
+                                        <CalendarDays size={28} className="text-white/20" />
                                         <p className="text-sm">{tBookings("selectDatesHint")}</p>
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
-                                        <h4 className="text-sm font-semibold text-gray-700">{tBookings("bookingDetails")}</h4>
+                                        <h4 className="text-xs font-semibold text-white/55 uppercase tracking-wider">{tBookings("bookingDetails")}</h4>
 
                                         {/* Selected date range */}
                                         <div className="grid grid-cols-2 gap-3">
                                             <div>
-                                                <p className="text-xs font-medium text-gray-500 mb-1">{tBookings("checkIn")}</p>
-                                                <p className="text-sm font-semibold text-gray-900 bg-blue-50 rounded-lg px-3 py-2 font-mono">
+                                                <p className="text-xs font-medium text-white/40 mb-1">{tBookings("checkIn")}</p>
+                                                <p className="text-sm font-semibold text-white/80 bg-domu-primary/10 rounded-lg px-3 py-2 font-mono">
                                                     {selectedDates.start}
                                                 </p>
                                             </div>
                                             <div>
-                                                <p className="text-xs font-medium text-gray-500 mb-1">{tBookings("checkOut")}</p>
-                                                <p className="text-sm font-semibold text-gray-900 bg-blue-50 rounded-lg px-3 py-2 font-mono">
+                                                <p className="text-xs font-medium text-white/40 mb-1">{tBookings("checkOut")}</p>
+                                                <p className="text-sm font-semibold text-white/80 bg-domu-primary/10 rounded-lg px-3 py-2 font-mono">
                                                     {selectedDates.end}
                                                 </p>
                                             </div>
@@ -201,16 +201,16 @@ export default function AddBookingDialog() {
                                             <input type="hidden" name="check_out" value={selectedDates.end} />
 
                                             {state?.error && (
-                                                <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+                                                <div className="bg-domu-danger/10 border border-domu-danger/20 text-domu-danger/90 p-3 rounded-lg text-sm">
                                                     {state.error}
                                                 </div>
                                             )}
 
                                             <div>
-                                                <label className="block text-xs font-medium text-gray-700 mb-1">{t("guest")}</label>
+                                                <label className="block text-xs font-medium text-white/50 mb-1 uppercase tracking-wider">{t("guest")}</label>
                                                 <select
                                                     name="guest_id"
-                                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all"
                                                 >
                                                     <option value="">{t("anonymous")}</option>
                                                     {guests.map((g) => (
@@ -222,23 +222,23 @@ export default function AddBookingDialog() {
                                             </div>
 
                                             <div>
-                                                <label className="block text-xs font-medium text-gray-700 mb-1">{tBookings("summary")}</label>
+                                                <label className="block text-xs font-medium text-white/50 mb-1 uppercase tracking-wider">{tBookings("summary")}</label>
                                                 <input
                                                     name="summary"
                                                     type="text"
                                                     required
                                                     placeholder="e.g. Family Vacation"
-                                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all"
                                                 />
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div>
-                                                    <label className="block text-xs font-medium text-gray-700 mb-1">{tBookings("status")}</label>
+                                                    <label className="block text-xs font-medium text-white/50 mb-1 uppercase tracking-wider">{tBookings("status")}</label>
                                                     <select
                                                         name="status"
                                                         defaultValue={BookingStatus.CONFIRMED}
-                                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all"
                                                     >
                                                         {[BookingStatus.CONFIRMED, BookingStatus.TENTATIVE].map((s) => (
                                                             <option key={s} value={s}>{tEnums(`BookingStatus.${s}`)}</option>
@@ -246,11 +246,11 @@ export default function AddBookingDialog() {
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-xs font-medium text-gray-700 mb-1">{tBookings("source")}</label>
+                                                    <label className="block text-xs font-medium text-white/50 mb-1 uppercase tracking-wider">{tBookings("source")}</label>
                                                     <select
                                                         name="source"
                                                         defaultValue={BookingSource.MANUAL}
-                                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                                        className="w-full px-3 py-2 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all"
                                                     >
                                                         {Object.values(BookingSource).map((s) => (
                                                             <option key={s} value={s}>{tEnums(`BookingSource.${s}`)}</option>
@@ -262,9 +262,9 @@ export default function AddBookingDialog() {
                                             <button
                                                 type="submit"
                                                 disabled={isPending}
-                                                className="w-full py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-70 flex items-center justify-center text-sm font-medium transition-colors"
+                                                className="w-full py-2.5 bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg disabled:opacity-60 flex items-center justify-center text-sm font-medium transition-colors"
                                             >
-                                                {isPending ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
+                                                {isPending ? <Loader2 className="animate-spin mr-2" size={15} /> : null}
                                                 {t("save")}
                                             </button>
                                         </form>

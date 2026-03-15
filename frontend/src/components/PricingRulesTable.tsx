@@ -43,64 +43,64 @@ export default function PricingRulesTable({ rules, propertyId, basePrice }: Pric
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{t('rules')}</h3>
-                    <p className="text-sm text-gray-500">{t('rulesDescription')}</p>
+                    <h3 className="text-lg font-bold text-white/85">{t('rules')}</h3>
+                    <p className="text-sm text-white/40">{t('rulesDescription')}</p>
                 </div>
                 <AddPricingRuleDialog propertyId={propertyId} basePrice={basePrice} />
             </div>
 
             {rules.length === 0 ? (
-                <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-200">
-                    <p className="text-gray-500 text-sm">{t('noRules')}</p>
+                <div className="text-center py-12 glass rounded-xl border-dashed border border-white/[0.08]">
+                    <p className="text-white/35 text-sm">{t('noRules')}</p>
                 </div>
             ) : (
-                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div className="glass rounded-xl overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                        <table className="min-w-full divide-y divide-white/[0.06]">
+                            <thead className="bg-white/[0.03]">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white/35 uppercase tracking-wider">
                                         {tCommon('name')}
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white/35 uppercase tracking-wider">
                                         {t('rulePeriod')}
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-white/35 uppercase tracking-wider">
                                         {t('ruleProfitability')}
                                     </th>
-                                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-white/35 uppercase tracking-wider">
                                         {tCommon('actions')}
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody className="divide-y divide-white/[0.05]">
                                 {rules.map((rule) => (
-                                    <tr key={rule.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <tr key={rule.id} className="hover:bg-white/[0.03] transition-colors">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white/80">
                                             {rule.name}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                                            {formatDate(rule.start_date)} - {formatDate(rule.end_date)}
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50 font-mono">
+                                            {formatDate(rule.start_date)} — {formatDate(rule.end_date)}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-mono">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white/80 text-right font-mono">
                                             {Number(rule.profitability_percent).toFixed(1)}%
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
-                                            <div className="flex items-center justify-end space-x-2">
+                                            <div className="flex items-center justify-end space-x-1">
                                                 <button
                                                     onClick={() => setEditingRule(rule)}
-                                                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                                    className="p-1.5 text-domu-primary/70 hover:bg-domu-primary/10 hover:text-domu-primary rounded-lg transition-colors"
                                                     title={tCommon('edit')}
                                                 >
-                                                    <Pencil size={16} />
+                                                    <Pencil size={15} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(rule)}
                                                     disabled={isDeleting === rule.id}
-                                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                                                    className="p-1.5 text-domu-danger/70 hover:bg-domu-danger/10 hover:text-domu-danger rounded-lg transition-colors disabled:opacity-40"
                                                     title={tCommon('delete')}
                                                 >
-                                                    <Trash2 size={16} />
+                                                    <Trash2 size={15} />
                                                 </button>
                                             </div>
                                         </td>

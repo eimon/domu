@@ -12,10 +12,10 @@ export default function SidebarTrigger() {
         <button
             type="button"
             onClick={toggle}
-            className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 lg:hidden"
+            className="p-2 rounded-lg text-white/40 hover:text-white/70 hover:bg-white/[0.06] focus:outline-none focus:ring-2 focus:ring-domu-primary/30 transition-colors lg:hidden"
         >
             <span className="sr-only">{t('openSidebar')}</span>
-            <Menu size={24} />
+            <Menu size={22} />
         </button>
     );
 }

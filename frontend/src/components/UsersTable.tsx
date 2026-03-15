@@ -14,9 +14,9 @@ interface UsersTableProps {
 }
 
 const roleBadgeClass: Record<string, string> = {
-    [UserRole.ADMIN]: "bg-red-100 text-red-700",
-    [UserRole.MANAGER]: "bg-blue-100 text-blue-700",
-    [UserRole.OWNER]: "bg-green-100 text-green-700",
+    [UserRole.ADMIN]:   "bg-domu-danger/12 text-domu-danger",
+    [UserRole.MANAGER]: "bg-domu-primary/12 text-domu-primary",
+    [UserRole.OWNER]:   "bg-domu-success/12 text-domu-success",
 };
 
 export default function UsersTable({ users }: UsersTableProps) {
@@ -40,77 +40,81 @@ export default function UsersTable({ users }: UsersTableProps) {
 
     if (users.length === 0) {
         return (
-            <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-200">
-                <p className="text-gray-500 text-sm">{tUsers("noUsers")}</p>
+            <div className="text-center py-12 glass rounded-xl border-dashed border border-white/[0.08]">
+                <p className="text-white/35 text-sm">{tUsers("noUsers")}</p>
             </div>
         );
     }
 
     return (
         <>
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="glass rounded-xl overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                    <table className="min-w-full divide-y divide-white/[0.06]">
+                        <thead className="bg-white/[0.03]">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white/35 uppercase tracking-wider">
                                     {tUsers("fullName")}
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white/35 uppercase tracking-wider">
                                     {tUsers("email")}
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white/35 uppercase tracking-wider">
                                     {tUsers("username")}
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white/35 uppercase tracking-wider">
                                     {tUsers("role")}
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white/35 uppercase tracking-wider">
                                     {tUsers("status")}
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-white/35 uppercase tracking-wider">
                                     {t("actions")}
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="divide-y divide-white/[0.05]">
                             {users.map((user) => (
-                                <tr key={user.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <tr key={user.id} className="hover:bg-white/[0.03] transition-colors">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white/80">
                                         {user.full_name || "—"}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                                         {user.email}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50 font-mono">
                                         {user.username}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleBadgeClass[user.role] ?? "bg-gray-100 text-gray-700"}`}>
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleBadgeClass[user.role] ?? "bg-white/[0.06] text-white/45"}`}>
                                             {tEnums(`UserRole.${user.role}`)}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.is_active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                            user.is_active
+                                                ? "bg-domu-success/12 text-domu-success"
+                                                : "bg-white/[0.05] text-white/35"
+                                        }`}>
                                             {user.is_active ? tUsers("active") : tUsers("inactive")}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
-                                        <div className="flex items-center justify-end space-x-2">
+                                        <div className="flex items-center justify-end space-x-1">
                                             <button
                                                 onClick={() => setEditingUser(user)}
-                                                className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                                className="p-1.5 text-domu-primary/70 hover:bg-domu-primary/10 hover:text-domu-primary rounded-lg transition-colors"
                                                 title={t("edit")}
                                             >
-                                                <Pencil size={16} />
+                                                <Pencil size={15} />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(user)}
                                                 disabled={isDeleting === user.id}
-                                                className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                                                className="p-1.5 text-domu-danger/70 hover:bg-domu-danger/10 hover:text-domu-danger rounded-lg transition-colors disabled:opacity-40"
                                                 title={t("delete")}
                                             >
-                                                <Trash2 size={16} />
+                                                <Trash2 size={15} />
                                             </button>
                                         </div>
                                     </td>

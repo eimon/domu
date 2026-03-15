@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 
 const costSchema = z.object({
     name: z.string().min(1, "Name is required"),
-    category: z.enum(["RECURRING_MONTHLY", "PER_RESERVATION"]),
+    category: z.enum(["RECURRING_MONTHLY", "PER_RESERVATION", "PER_DAY_RESERVATION"]),
     calculation_type: z.enum(["FIXED_AMOUNT", "PERCENTAGE"]),
     value: z.coerce.number().min(0, "Value must be positive"),
 });

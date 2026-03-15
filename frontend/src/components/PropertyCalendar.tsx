@@ -9,6 +9,7 @@ import { useActionState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import CalendarHeader from "@/components/CalendarHeader";
 import CalendarDayCell from "@/components/CalendarDayCell";
+import { formatPrice } from "@/lib/utils";
 
 // --- Selection state ---
 
@@ -168,8 +169,12 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
         const inRange = rangeStart && rangeEnd && dateStr > rangeStart && dateStr < rangeEnd;
         const isConfirmed = selectionEnd !== null;
 
-        if (isStart || isEnd) return isConfirmed ? 'bg-blue-500 border-blue-500 text-white' : 'bg-blue-400 border-blue-400 text-white';
-        if (inRange) return isConfirmed ? 'bg-blue-100 border-blue-200' : 'bg-blue-50 border-blue-100';
+        if (isStart || isEnd) return isConfirmed
+            ? 'bg-domu-primary border-domu-primary text-white'
+            : 'bg-domu-primary/70 border-domu-primary/70 text-white';
+        if (inRange) return isConfirmed
+            ? 'bg-domu-primary/12 border-domu-primary/20'
+            : 'bg-domu-primary/8 border-domu-primary/15';
         return null;
     };
 
@@ -214,7 +219,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
     const days = getDaysInMonth();
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="glass rounded-xl overflow-hidden">
             <CalendarHeader
                 monthName={monthName}
                 onPrevMonth={() => dispatchSelection({ type: 'PREV_MONTH' })}
@@ -223,14 +228,14 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
 
             {data.isLoading ? (
                 <div className="flex items-center justify-center py-20">
-                    <Loader2 className="animate-spin text-gray-400" size={32} />
+                    <Loader2 className="animate-spin text-white/30" size={28} />
                 </div>
             ) : (
                 <div className="p-4">
                     <div className="grid grid-cols-7 gap-1">
                         {/* Week day headers */}
                         {weekDays.map(day => (
-                            <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+                            <div key={day} className="text-center text-xs font-medium text-white/30 py-2">
                                 {day}
                             </div>
                         ))}
@@ -241,7 +246,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                 return (
                                     <div
                                         key={day.date}
-                                        className="min-h-20 p-2 border rounded-lg bg-gray-50 border-transparent"
+                                        className="min-h-20 p-2 border rounded-lg bg-white/[0.01] border-transparent"
                                     />
                                 );
                             }
@@ -269,31 +274,31 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
 
                     {/* Selection in progress banner */}
                     {selection.selectionStart && !selection.selectionEnd && (
-                        <div className="mt-3 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-sm text-blue-700">
+                        <div className="mt-3 flex items-center justify-between bg-domu-primary/10 border border-domu-primary/20 rounded-lg px-4 py-2 text-sm text-domu-primary/90">
                             <span>{t('selectingFrom', { date: selection.selectionStart })}</span>
                             <button
                                 onClick={() => dispatchSelection({ type: 'RESET_SELECTION' })}
-                                className="ml-2 p-1 hover:bg-blue-100 rounded transition-colors"
+                                className="ml-2 p-1 hover:bg-domu-primary/15 rounded transition-colors"
                                 title={t('cancelSelection')}
                             >
-                                <X size={14} />
+                                <X size={13} />
                             </button>
                         </div>
                     )}
 
                     {/* Inline rule creation form — hidden in booking mode */}
                     {selection.selectionStart && selection.selectionEnd && !onRangeSelected && (
-                        <div className="mt-4 border border-blue-200 rounded-xl p-4 bg-blue-50">
+                        <div className="mt-4 border border-domu-primary/20 rounded-xl p-4 bg-domu-primary/5">
                             <div className="flex items-center justify-between mb-3">
-                                <h4 className="text-sm font-semibold text-blue-900">{t('newRule')}</h4>
+                                <h4 className="text-sm font-semibold text-white/80">{t('newRule')}</h4>
                                 <button
                                     onClick={() => { dispatchSelection({ type: 'RESET_SELECTION' }); setCalendarProfitability(100); }}
-                                    className="p-1 hover:bg-blue-100 rounded transition-colors text-blue-600"
+                                    className="p-1 hover:bg-white/[0.06] rounded transition-colors text-white/45 hover:text-white/70"
                                 >
-                                    <X size={14} />
+                                    <X size={13} />
                                 </button>
                             </div>
-                            <p className="text-xs text-blue-700 mb-3">
+                            <p className="text-xs text-white/45 mb-3">
                                 {t('selectedRange', { start: selection.selectionStart, end: selection.selectionEnd })}
                             </p>
                             <form action={ruleFormAction} className="space-y-3">
@@ -301,7 +306,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                 <input type="hidden" name="end_date" value={selection.selectionEnd} />
 
                                 <div>
-                                    <label htmlFor="calendar_rule_name" className="block text-xs font-medium text-gray-700 mb-1">
+                                    <label htmlFor="calendar_rule_name" className="block text-xs font-medium text-white/50 mb-1 uppercase tracking-wider">
                                         {t('ruleName')}
                                     </label>
                                     <input
@@ -309,22 +314,22 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                         type="text"
                                         name="name"
                                         required
-                                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                        className="w-full px-3 py-1.5 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all"
                                         placeholder={t('ruleNamePlaceholder')}
                                     />
                                 </div>
 
                                 <div>
                                     <div className="flex items-center justify-between mb-1">
-                                        <label htmlFor="calendar_rule_profitability" className="block text-xs font-medium text-gray-700">
+                                        <label htmlFor="calendar_rule_profitability" className="block text-xs font-medium text-white/50 uppercase tracking-wider">
                                             {t('profitabilityPercent')}
                                         </label>
                                         {(() => {
                                             const floorPrice = data.calendarData.find(d => d.date === selection.selectionStart)?.floor_price ?? 0;
                                             const price = floorPrice + (basePrice - floorPrice) * calendarProfitability / 100;
                                             return (
-                                                <span className="text-xs font-semibold text-blue-700">
-                                                    {t('pricePerNight', { price: price.toFixed(2) })}
+                                                <span className="text-xs font-semibold text-domu-primary/80">
+                                                    {t('pricePerNight', { price: formatPrice(price) })}
                                                 </span>
                                             );
                                         })()}
@@ -338,7 +343,7 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                         min={0}
                                         step={0.1}
                                         required
-                                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white mb-2"
+                                        className="w-full px-3 py-1.5 text-sm rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all mb-2"
                                     />
                                     <input
                                         type="range"
@@ -347,19 +352,19 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                         step={1}
                                         value={Math.min(Math.max(calendarProfitability, 0), 100)}
                                         onChange={(e) => setCalendarProfitability(parseFloat(e.target.value))}
-                                        className="w-full h-1.5 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-blue-600 [&::-moz-range-thumb]:border-0"
+                                        className="w-full h-1.5 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-domu-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-domu-primary [&::-moz-range-thumb]:border-0"
                                         style={{
-                                            background: `linear-gradient(to right, #2563eb 0%, #2563eb ${Math.min(Math.max(calendarProfitability, 0), 100)}%, #e5e7eb ${Math.min(Math.max(calendarProfitability, 0), 100)}%, #e5e7eb 100%)`
+                                            background: `linear-gradient(to right, #818cf8 0%, #818cf8 ${Math.min(Math.max(calendarProfitability, 0), 100)}%, rgba(255,255,255,0.10) ${Math.min(Math.max(calendarProfitability, 0), 100)}%, rgba(255,255,255,0.10) 100%)`
                                         }}
                                     />
-                                    <div className="flex justify-between text-xs text-gray-400 mt-0.5">
+                                    <div className="flex justify-between text-xs text-white/25 mt-0.5">
                                         <span>0%</span>
-                                        <span>{t('basePriceScale', { price: basePrice })}</span>
+                                        <span>{t('basePriceScale', { price: formatPrice(basePrice) })}</span>
                                     </div>
                                 </div>
 
                                 {ruleState.error && (
-                                    <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-1.5">
+                                    <p className="text-xs text-domu-danger/90 bg-domu-danger/10 border border-domu-danger/20 rounded px-3 py-1.5">
                                         {ruleState.error}
                                     </p>
                                 )}
@@ -368,14 +373,14 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                                     <button
                                         type="button"
                                         onClick={() => { dispatchSelection({ type: 'RESET_SELECTION' }); setCalendarProfitability(100); }}
-                                        className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                        className="px-3 py-1.5 text-sm text-white/50 hover:bg-white/[0.05] hover:text-white/75 rounded-lg transition-colors"
                                     >
                                         {t('cancelSelection')}
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={isRulePending}
-                                        className="px-4 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
+                                        className="px-4 py-1.5 text-sm bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
                                     >
                                         {isRulePending && <Loader2 size={13} className="animate-spin" />}
                                         {t('saveRule')}
@@ -386,18 +391,18 @@ export default function PropertyCalendar({ propertyId, basePrice = 0, onRangeSel
                     )}
 
                     {/* Legend */}
-                    <div className="flex items-center gap-4 mt-4 pt-4 border-t text-sm">
+                    <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/[0.07] text-xs">
                         <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 bg-white border border-gray-200 rounded"></div>
-                            <span className="text-gray-600">{t('available')}</span>
+                            <div className="w-3.5 h-3.5 bg-white/[0.03] border border-white/[0.08] rounded"></div>
+                            <span className="text-white/40">{t('available')}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 bg-red-50 border border-red-200 rounded"></div>
-                            <span className="text-gray-600">{t('reserved')}</span>
+                            <div className="w-3.5 h-3.5 bg-domu-danger/8 border border-domu-danger/20 rounded"></div>
+                            <span className="text-white/40">{t('reserved')}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 bg-blue-500 border border-blue-500 rounded"></div>
-                            <span className="text-gray-600">{t('selected')}</span>
+                            <div className="w-3.5 h-3.5 bg-domu-primary border border-domu-primary rounded"></div>
+                            <span className="text-white/40">{t('selected')}</span>
                         </div>
                     </div>
                 </div>

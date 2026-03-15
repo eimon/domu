@@ -158,6 +158,31 @@ export async function cancelBooking(bookingId: string): Promise<{ success?: bool
     return { success: true };
 }
 
+export async function assignGuest(
+    bookingId: string,
+    prevState: BookingFormState,
+    formData: FormData
+): Promise<BookingFormState> {
+    const guestId = formData.get("guest_id") as string;
+    if (!guestId) return { error: "Seleccioná un huésped" };
+
+    try {
+        const res = await serverApi(`/bookings/${bookingId}`, {
+            method: "PUT",
+            body: JSON.stringify({ guest_id: guestId }),
+        });
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            return { error: errorData.detail || "No se pudo asignar el huésped" };
+        }
+    } catch {
+        return { error: "Something went wrong" };
+    }
+
+    revalidatePath("/bookings");
+    return { success: true };
+}
+
 export async function deleteBooking(bookingId: string): Promise<{ success?: boolean; error?: string }> {
     try {
         const res = await serverApi(`/bookings/${bookingId}`, { method: "DELETE" });

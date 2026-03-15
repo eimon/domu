@@ -6,6 +6,7 @@ import { X, Loader2, TrendingUp, RotateCcw } from "lucide-react";
 import { useActionState } from "react";
 import { Property, PropertyBasePrice } from "@/types/api";
 import { useTranslations } from "next-intl";
+import { formatPrice } from "@/lib/utils";
 import { useToast } from "@/context/ToastContext";
 import { useConfirm } from "@/context/ConfirmContext";
 
@@ -43,32 +44,32 @@ function ModifyBasePriceDialog({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                    <h3 className="text-lg font-semibold text-gray-900">{tProp("modifyBasePrice")}</h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-500 transition-colors">
-                        <X size={20} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <div className="glass-modal rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08]">
+                    <h3 className="text-base font-semibold text-white/90">{tProp("modifyBasePrice")}</h3>
+                    <button onClick={onClose} className="text-white/40 hover:text-white/70 transition-colors">
+                        <X size={18} />
                     </button>
                 </div>
 
                 <form action={formAction} className="p-6 space-y-4">
                     {state?.error && (
-                        <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">{state.error}</div>
+                        <div className="bg-domu-danger/10 border border-domu-danger/20 text-domu-danger/90 p-3 rounded-lg text-sm">{state.error}</div>
                     )}
 
-                    <div className="bg-gray-50 rounded-lg px-4 py-3 text-sm">
-                        <span className="text-gray-500">{tProp("currentValue")}: </span>
-                        <span className="font-semibold text-gray-900">
-                            ${Number(property.base_price).toFixed(2)}
+                    <div className="bg-white/[0.05] rounded-lg px-4 py-3 text-sm border border-white/[0.07]">
+                        <span className="text-white/40">{tProp("currentValue")}: </span>
+                        <span className="font-semibold text-white/85">
+                            ${formatPrice(property.base_price)}
                         </span>
-                        <span className="text-gray-400 ml-1">/ noche</span>
+                        <span className="text-white/30 ml-1">/ noche</span>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{tProp("newValue")}</label>
+                        <label className="block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wider">{tProp("newValue")}</label>
                         <div className="relative">
-                            <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 text-sm">$</span>
+                            <span className="absolute inset-y-0 left-3 flex items-center text-white/35 text-sm">$</span>
                             <input
                                 name="value"
                                 type="number"
@@ -76,38 +77,38 @@ function ModifyBasePriceDialog({
                                 min="0.01"
                                 required
                                 placeholder="0.00"
-                                className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                className="w-full pl-7 pr-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">{t("startDate")}</label>
+                        <label className="block text-xs font-medium text-white/55 mb-1.5 uppercase tracking-wider">{t("startDate")}</label>
                         <input
                             name="start_date"
                             type="date"
                             required
                             defaultValue={tomorrowStr}
                             min={tomorrowStr}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm"
                         />
-                        <p className="text-xs text-gray-400 mt-1">{tProp("modifyDateHint")}</p>
+                        <p className="text-xs text-white/30 mt-1">{tProp("modifyDateHint")}</p>
                     </div>
 
                     <div className="pt-2 flex justify-end space-x-3">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg"
+                            className="px-4 py-2 text-sm font-medium text-white/55 hover:bg-white/[0.05] hover:text-white/75 rounded-lg transition-colors"
                         >
                             {t("cancel")}
                         </button>
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-70 flex items-center text-sm font-medium"
+                            className="px-4 py-2 bg-domu-primary hover:bg-domu-primary/80 text-white rounded-lg disabled:opacity-60 flex items-center text-sm font-medium transition-colors"
                         >
-                            {isPending ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
+                            {isPending ? <Loader2 className="animate-spin mr-2" size={15} /> : null}
                             {tProp("applyChange")}
                         </button>
                     </div>
@@ -135,19 +136,19 @@ export default function BasePriceCard({ property, currentBasePrice }: BasePriceC
 
     return (
         <>
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <div className="flex items-center justify-between px-6 py-4">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-50 rounded-lg">
-                            <TrendingUp size={18} className="text-blue-600" />
+            <div className="glass rounded-xl overflow-hidden">
+                <div className="flex items-center justify-between px-6 py-5">
+                    <div className="flex items-center gap-4">
+                        <div className="p-2.5 bg-domu-primary/10 rounded-xl">
+                            <TrendingUp size={18} className="text-domu-primary" />
                         </div>
                         <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                            <p className="text-xs text-white/40 uppercase tracking-wider font-medium mb-0.5">
                                 {tProp("basePriceLabel")}
                             </p>
-                            <p className="text-2xl font-bold text-gray-900">
-                                ${Number(property.base_price).toFixed(2)}
-                                <span className="text-sm font-normal text-gray-400 ml-1">/ noche</span>
+                            <p className="text-2xl font-bold text-white/90">
+                                ${formatPrice(property.base_price)}
+                                <span className="text-sm font-normal text-white/30 ml-1">/ noche</span>
                             </p>
                         </div>
                     </div>
@@ -156,16 +157,16 @@ export default function BasePriceCard({ property, currentBasePrice }: BasePriceC
                             <button
                                 onClick={handleRevert}
                                 disabled={isReverting}
-                                className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50 transition-colors disabled:opacity-50"
+                                className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-violet-400 border border-violet-400/25 rounded-lg hover:bg-violet-400/10 transition-colors disabled:opacity-40"
                                 title={tProp("revertBasePrice")}
                             >
-                                <RotateCcw size={14} className={`mr-1.5 ${isReverting ? "animate-spin" : ""}`} />
+                                <RotateCcw size={13} className={`mr-1.5 ${isReverting ? "animate-spin" : ""}`} />
                                 {tProp("revertBasePrice")}
                             </button>
                         )}
                         <button
                             onClick={() => setIsModifyOpen(true)}
-                            className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"
+                            className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-domu-primary/80 border border-domu-primary/25 rounded-lg hover:bg-domu-primary/10 transition-colors"
                         >
                             {tProp("modifyBasePrice")}
                         </button>

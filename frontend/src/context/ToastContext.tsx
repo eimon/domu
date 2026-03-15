@@ -43,21 +43,21 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                     {toasts.map((toast) => (
                         <div
                             key={toast.id}
-                            className={`flex items-start gap-3 px-4 py-3 rounded-lg shadow-lg border text-sm min-w-72 max-w-sm pointer-events-auto animate-in slide-in-from-bottom-2 duration-200 bg-white ${
+                            className={`flex items-start gap-3 px-4 py-3 rounded-xl shadow-2xl border text-sm min-w-72 max-w-sm pointer-events-auto animate-in slide-in-from-bottom-2 duration-200 backdrop-blur-xl ${
                                 toast.type === "error"
-                                    ? "border-red-200 text-red-800"
-                                    : "border-green-200 text-green-800"
+                                    ? "bg-domu-base/90 border-domu-danger/30 text-white/85"
+                                    : "bg-domu-base/90 border-domu-success/30 text-white/85"
                             }`}
                         >
                             {toast.type === "error" ? (
-                                <AlertCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
+                                <AlertCircle size={16} className="text-domu-danger mt-0.5 shrink-0" />
                             ) : (
-                                <CheckCircle size={16} className="text-green-500 mt-0.5 shrink-0" />
+                                <CheckCircle size={16} className="text-domu-success mt-0.5 shrink-0" />
                             )}
                             <span className="flex-1">{toast.message}</span>
                             <button
                                 onClick={() => dismiss(toast.id)}
-                                className="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+                                className="text-white/30 hover:text-white/60 transition-colors shrink-0"
                             >
                                 <X size={14} />
                             </button>

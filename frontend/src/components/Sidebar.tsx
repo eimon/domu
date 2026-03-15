@@ -26,41 +26,42 @@ export default function Sidebar({ userRole }: { userRole: string | null }) {
                 <button
                     type="button"
                     aria-label={t('closeSidebar')}
-                    className="fixed inset-0 z-40 w-full bg-gray-600 bg-opacity-75 lg:hidden transition-opacity cursor-default"
+                    className="fixed inset-0 z-40 w-full bg-black/70 backdrop-blur-sm lg:hidden transition-opacity cursor-default"
                     onClick={close}
                 />
             )}
 
             {/* Sidebar Panel */}
             <div
-                className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto lg:flex lg:flex-col lg:border-r lg:border-gray-200 lg:shadow-none ${isOpen ? "translate-x-0" : "-translate-x-full"
+                className={`fixed inset-y-0 left-0 z-50 w-64 glass-sidebar shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto lg:flex lg:flex-col lg:border-r lg:shadow-none ${isOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
             >
-                <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-                    <span className="text-xl font-bold text-blue-600">DOMU</span>
+                {/* Logo header */}
+                <div className="flex items-center justify-between h-16 px-5 border-b border-white/[0.07]">
+                    {/* <span className="text-xl font-bold text-domu-primary tracking-tight">DOMU</span> */}
                     <button
                         type="button"
-                        className="ml-auto flex-shrink-0 p-1 text-gray-400 rounded-md hover:text-gray-500 lg:hidden"
+                        className="ml-auto flex-shrink-0 p-1.5 text-white/40 rounded-md hover:text-white/70 hover:bg-white/[0.06] transition-colors lg:hidden"
                         onClick={close}
                     >
                         <span className="sr-only">{t('closeSidebar')}</span>
-                        <X size={24} />
+                        <X size={20} />
                     </button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto">
-                    <nav className="px-2 py-4 space-y-1">
-                        {/* Always show Dashboard/Home */}
+                    <nav className="px-3 py-4 space-y-0.5">
+                        {/* Dashboard / Home */}
                         <Link
                             href="/"
                             onClick={close}
-                            className={`group flex items-center px-2 py-2 text-base font-medium rounded-md transition-colors ${pathname === "/"
-                                ? "bg-blue-50 text-blue-600"
-                                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                            className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${pathname === "/"
+                                ? "bg-domu-primary/10 text-domu-primary"
+                                : "text-white/50 hover:bg-white/[0.05] hover:text-white/80"
                                 }`}
                         >
                             <Home
-                                className={`mr-4 flex-shrink-0 h-6 w-6 ${pathname === "/" ? "text-blue-600" : "text-gray-400 group-hover:text-gray-500"}`}
+                                className={`mr-3 flex-shrink-0 h-5 w-5 transition-colors ${pathname === "/" ? "text-domu-primary" : "text-white/35 group-hover:text-white/60"}`}
                             />
                             {t('dashboard')}
                         </Link>
@@ -72,13 +73,13 @@ export default function Sidebar({ userRole }: { userRole: string | null }) {
                                     key={item.name}
                                     href={item.href}
                                     onClick={close}
-                                    className={`group flex items-center px-2 py-2 text-base font-medium rounded-md transition-colors ${isActive
-                                        ? "bg-blue-50 text-blue-600"
-                                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                    className={`group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all ${isActive
+                                        ? "bg-domu-primary/10 text-domu-primary"
+                                        : "text-white/50 hover:bg-white/[0.05] hover:text-white/80"
                                         }`}
                                 >
                                     <item.icon
-                                        className={`mr-4 flex-shrink-0 h-6 w-6 ${isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-500"
+                                        className={`mr-3 flex-shrink-0 h-5 w-5 transition-colors ${isActive ? "text-domu-primary" : "text-white/35 group-hover:text-white/60"
                                             }`}
                                     />
                                     {t(item.name as any)}
@@ -88,13 +89,13 @@ export default function Sidebar({ userRole }: { userRole: string | null }) {
                     </nav>
                 </div>
 
-                <div className="border-t border-gray-200 p-4">
+                <div className="border-t border-white/[0.07] p-3">
                     <form action={logout}>
                         <button
                             type="submit"
-                            className="group flex w-full items-center px-2 py-2 text-base font-medium text-red-600 rounded-md hover:bg-red-50"
+                            className="group flex w-full items-center px-3 py-2.5 text-sm font-medium text-domu-danger/70 rounded-lg hover:bg-domu-danger/[0.08] hover:text-domu-danger transition-all"
                         >
-                            <LogOut className="mr-4 flex-shrink-0 h-6 w-6 text-red-600" />
+                            <LogOut className="mr-3 flex-shrink-0 h-5 w-5" />
                             {t('logout')}
                         </button>
                     </form>

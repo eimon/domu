@@ -33,7 +33,14 @@
         "confirmCancel": "Are you sure you want to cancel this booking?",
         "next": "Next",
         "selectDatesHint": "Select a date range on the calendar to set check-in and check-out",
-        "bookingDetails": "Booking details"
+        "bookingDetails": "Booking details",
+        "nights": "nights",
+        "contactInfo": "Contact Information",
+        "noGuest": "No guest assigned",
+        "description": "Description",
+        "viewDetails": "View details",
+        "assignGuest": "Assign Guest",
+        "selectGuest": "Select a guest..."
     },
     "Common": {
         "save": "Save",
@@ -140,16 +147,24 @@
         "contactAdmin": "Contact Admin"
     },
     "Home": {
-        "heroTitle": "Domu Frontend",
-        "heroSubtitle": "Welcome to the new frontend for the Domu API. This project is built with Next.js 16, TypeScript, and Tailwind CSS.",
-        "feature1Title": "Modern Stack",
-        "feature1Desc": "Powered by Next.js 16 (App Router), React 19, and Tailwind CSS v4.",
-        "feature2Title": "API Ready",
-        "feature2Desc": "Pre-configured Axios client and TypeScript interfaces for your API endpoints.",
-        "feature3Title": "Type Safe",
-        "feature3Desc": "End-to-end type safety using TypeScript and strictly typed API responses.",
-        "cta": "Start Building",
-        "devServerNote": "Check console logs to verify dev server operation."
+        "welcome": "Welcome, {name}",
+        "welcomeGeneric": "Welcome",
+        "subtitle": "Here is a summary for {month}",
+        "totalProperties": "Properties",
+        "monthlyIncome": "Monthly Income",
+        "netProfit": "Net Profit",
+        "avgOccupancy": "Avg. Occupancy",
+        "propertySummary": "Your properties",
+        "noProperties": "You have no managed properties yet.",
+        "addFirstProperty": "Add first property",
+        "upcomingCheckIns": "Upcoming check-ins",
+        "noUpcoming": "No check-ins in the next 7 days",
+        "viewAll": "View all",
+        "nights": "nights",
+        "occupancy": "Occupancy",
+        "income": "Income",
+        "profit": "Profit",
+        "checkIn": "Check-in"
     },
     "Reports": {
         "title": "Financial Report",
@@ -163,7 +178,7 @@
         "totalBookings": "Total Bookings",
         "netProfit": "Net Profit",
         "fixedMonthly": "Fixed Monthly Costs",
-        "fixedDaily": "Fixed Daily Costs",
+        "fixedDaily": "Per Day (Reservation)",
         "variableCosts": "Variable Costs (Reservation)",
         "commissions": "Commissions",
         "breakdown": "Cost Breakdown",
@@ -188,7 +203,7 @@
     "Enums": {
         "CostCategory": {
             "RECURRING_MONTHLY": "Recurring Monthly",
-            "RECURRING_DAILY": "Recurring Daily",
+            "PER_DAY_RESERVATION": "Per Day (Reservation)",
             "PER_RESERVATION": "Per Reservation"
         },
         "CostCalculationType": {

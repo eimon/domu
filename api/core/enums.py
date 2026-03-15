@@ -26,9 +26,9 @@ class DocumentType(str, enum.Enum):
 
 
 class CostCategory(str, enum.Enum):
-    RECURRING_MONTHLY = "RECURRING_MONTHLY"  # Applies once per month
-    RECURRING_DAILY = "RECURRING_DAILY"      # Applies every day
-    PER_RESERVATION = "PER_RESERVATION"    # Applies per reservation
+    RECURRING_MONTHLY = "RECURRING_MONTHLY"      # Applies once per month
+    PER_DAY_RESERVATION = "PER_DAY_RESERVATION"  # Applies per day of each reservation (e.g. breakfast)
+    PER_RESERVATION = "PER_RESERVATION"          # Applies once per reservation (e.g. cleaning)
 
 
 class CostCalculationType(str, enum.Enum):
