@@ -63,7 +63,7 @@ export default async function Navbar() {
                                         </div>
 
                                         <LocalizedLink
-                                            href="/api/auth/perfil"
+                                            href="/profile"
                                             className="block px-4 py-2 text-sm text-white/65 hover:bg-white/[0.06] hover:text-white/90 transition-colors"
                                         >
                                             {t('profile')}

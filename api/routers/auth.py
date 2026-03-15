@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from schemas.user import UserCreate, UserResponse, Token, RefreshRequest, LogoutRequest
+from schemas.user import UserCreate, UserResponse, Token, RefreshRequest, LogoutRequest, ChangePasswordRequest
 from services.auth_service import AuthService
 from services.refresh_token_service import RefreshTokenService
 from core.database import get_db
@@ -65,6 +65,18 @@ async def logout(
     """Revoke the provided refresh token. Idempotent."""
     await RefreshTokenService(db).revoke(body.refresh_token)
     return {"detail": "Sesión cerrada"}
+
+
+@router.put("/perfil", response_model=UserResponse)
+async def update_perfil(
+    body: ChangePasswordRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user),
+):
+    """Change current user's password."""
+    return await AuthService(db).change_password(
+        current_user.id, body.current_password, body.new_password
+    )
 
 
 @router.get("/perfil", response_model=UserResponse)

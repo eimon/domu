@@ -184,6 +184,21 @@
         "breakdown": "Desglose de Costos",
         "details": "Visualiza el resumen del rendimiento financiero de tu propiedad."
     },
+    "Profile": {
+        "title": "Mi Perfil",
+        "username": "Usuario",
+        "email": "Email",
+        "fullName": "Nombre Completo",
+        "role": "Rol",
+        "memberSince": "Miembro desde",
+        "changePassword": "Cambiar Contraseña",
+        "currentPassword": "Contraseña Actual",
+        "newPassword": "Nueva Contraseña",
+        "confirmPassword": "Confirmar Nueva Contraseña",
+        "passwordMismatch": "Las contraseñas no coinciden",
+        "passwordSuccess": "Contraseña cambiada correctamente",
+        "saving": "Guardando..."
+    },
     "Users": {
         "title": "Usuarios",
         "addNew": "Nuevo Usuario",

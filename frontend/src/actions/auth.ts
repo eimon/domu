@@ -3,7 +3,11 @@
 import { z } from "zod";
 import { cookies } from "next/headers";
 import { redirect } from "@/i18n/routing";
-import { API_URL } from "@/lib/api";
+
+const SERVER_API_URL =
+    process.env.INTERNAL_API_URL ??
+    process.env.NEXT_PUBLIC_API_URL ??
+    "http://localhost:8000";
 
 const loginSchema = z.object({
     username: z.string().min(1, "Username is required"),
@@ -35,7 +39,7 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
         backendFormData.append("username", username);
         backendFormData.append("password", password);
 
-        const res = await fetch(`${API_URL}/auth/login`, {
+        const res = await fetch(`${SERVER_API_URL}/auth/login`, {
             method: "POST",
             body: backendFormData,
         });
@@ -79,7 +83,7 @@ export async function logout() {
     // Revoke refresh token on the backend (best-effort)
     if (refreshToken && accessToken) {
         try {
-            await fetch(`${API_URL}/auth/logout`, {
+            await fetch(`${SERVER_API_URL}/auth/logout`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

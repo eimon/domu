@@ -2,14 +2,13 @@ services:
   web:
     build: .
     container_name: domu_api
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./api:/app
     environment:
       SECRET_KEY: ${SECRET_KEY:-supersecretkey}
       ALGORITHM: ${ALGORITHM:-HS256}
       DATABASE_URL: postgresql+asyncpg://postgres:${POSTGRES_PASSWORD:-password}@db:5432/domu_db
+      VIRTUAL_HOST: ${API_HOST:-localhost}
+      VIRTUAL_PORT: 8000
+      LETSENCRYPT_HOST: ${API_HOST:-localhost}
     depends_on:
       db:
         condition: service_healthy
@@ -20,24 +19,22 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
   frontend:
     build:
       context: ./frontend
-      target: dev
+      target: runner
+      args:
+        APP_ENV: production
+        NEXT_PUBLIC_API_URL: ${API_HOST:-https://api.domu.ar}
     container_name: domu_frontend
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      # - /app/.next
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
       - INTERNAL_API_URL=http://web:8000
       - JWT_SECRET_KEY=${SECRET_KEY:-supersecretkey}
-      - ALGORITHM=${ALGORITHM:-HS256}
+      - VIRTUAL_HOST=${HOST:-localhost}
+      - VIRTUAL_PORT=8000
+      - LETSENCRYPT_HOST=${HOST:-localhost}
     depends_on:
       - web
     restart: unless-stopped
@@ -45,15 +42,13 @@ services:
   db:
     image: postgres:16
     container_name: domu_db
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_DB: domu_db
       TZ: UTC
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_prod:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d domu_db"]
@@ -62,4 +57,4 @@ services:
       retries: 5
 
 volumes:
-  postgres_data:
+  postgres_data_prod:

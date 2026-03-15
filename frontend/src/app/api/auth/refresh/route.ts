@@ -1,6 +1,10 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { API_URL } from "@/lib/api";
+
+const SERVER_API_URL =
+    process.env.INTERNAL_API_URL ??
+    process.env.NEXT_PUBLIC_API_URL ??
+    "http://localhost:8000";
 
 const cookieBase = {
     secure: process.env.NODE_ENV === "production",
@@ -26,7 +30,7 @@ export async function POST() {
     }
 
     try {
-        const res = await fetch(`${API_URL}/auth/refresh`, {
+        const res = await fetch(`${SERVER_API_URL}/auth/refresh`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ refresh_token: refreshToken }),

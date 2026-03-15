@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from uuid import UUID
 from core.enums import UserRole
@@ -44,3 +44,7 @@ class RefreshRequest(BaseModel):
 
 class LogoutRequest(BaseModel):
     refresh_token: str
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str = Field(..., min_length=8)

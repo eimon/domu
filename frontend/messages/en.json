@@ -184,6 +184,21 @@
         "breakdown": "Cost Breakdown",
         "details": "View your property's financial performance overview."
     },
+    "Profile": {
+        "title": "My Profile",
+        "username": "Username",
+        "email": "Email",
+        "fullName": "Full Name",
+        "role": "Role",
+        "memberSince": "Member since",
+        "changePassword": "Change Password",
+        "currentPassword": "Current Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm New Password",
+        "passwordMismatch": "Passwords do not match",
+        "passwordSuccess": "Password changed successfully",
+        "saving": "Saving..."
+    },
     "Users": {
         "title": "Users",
         "addNew": "New User",

@@ -1,8 +1,9 @@
+import uuid
 from models.user import User
 from schemas.user import UserCreate, Token
 from repositories.user_repository import UserRepository
 from core.security import verify_password, get_password_hash
-from exceptions.general import ConflictException, UnauthorizedException
+from exceptions.general import ConflictException, UnauthorizedException, BadRequestException
 from services.refresh_token_service import RefreshTokenService
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -38,3 +39,16 @@ class AuthService:
             role=role,
             device_hint=device_hint,
         )
+
+    async def change_password(
+        self, user_id: uuid.UUID, current_password: str, new_password: str
+    ) -> User:
+        user = await self.user_repo.get_by_id(user_id)
+        if not user:
+            raise UnauthorizedException("Usuario no encontrado")
+        if not verify_password(current_password, user.hashed_password):
+            raise BadRequestException("Contraseña actual incorrecta")
+        user.hashed_password = get_password_hash(new_password)
+        await self.db.flush()
+        await self.db.refresh(user)
+        return user

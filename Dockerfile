@@ -17,6 +17,7 @@ RUN groupadd --system appgroup \
     && useradd --system --gid appgroup appuser
 
 WORKDIR /app
+COPY api/ /app/
 COPY api/entrypoint.sh /entrypoint.sh
 
 RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
