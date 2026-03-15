@@ -26,9 +26,14 @@ export default function ModifyCostDialog({ cost, propertyId, isOpen, onClose }: 
     const modifyCostWithIds = modifyCost.bind(null, cost.id, propertyId);
     const [state, formAction, isPending] = useActionState(modifyCostWithIds, initialState);
 
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split("T")[0];
+    const todayStr = new Date().toISOString().split("T")[0];
+    const minStr = (() => {
+        if (!cost.start_date) return undefined;
+        const d = new Date(cost.start_date);
+        d.setDate(d.getDate() + 1);
+        return d.toISOString().split("T")[0];
+    })();
+    const defaultDateStr = minStr && minStr > todayStr ? minStr : todayStr;
 
     useEffect(() => {
         if (state.success && isOpen) {
@@ -83,8 +88,8 @@ export default function ModifyCostDialog({ cost, propertyId, isOpen, onClose }: 
                             name="start_date"
                             type="date"
                             required
-                            defaultValue={tomorrowStr}
-                            min={tomorrowStr}
+                            defaultValue={defaultDateStr}
+                            min={minStr}
                             className={inputCls}
                         />
                         <p className="text-xs text-white/30 mt-1">{tProp("modifyDateHint")}</p>

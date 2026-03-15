@@ -17,10 +17,12 @@ interface BasePriceCardProps {
 
 function ModifyBasePriceDialog({
     property,
+    currentBasePrice,
     isOpen,
     onClose,
 }: {
     property: Property;
+    currentBasePrice: PropertyBasePrice | null;
     isOpen: boolean;
     onClose: () => void;
 }) {
@@ -31,9 +33,15 @@ function ModifyBasePriceDialog({
     const modifyWithId = modifyBasePrice.bind(null, property.id);
     const [state, formAction, isPending] = useActionState(modifyWithId, initialState);
 
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowStr = tomorrow.toISOString().split("T")[0];
+    const todayStr = new Date().toISOString().split("T")[0];
+    const minStr = (() => {
+        const start = currentBasePrice?.start_date;
+        if (!start) return undefined;
+        const d = new Date(start);
+        d.setDate(d.getDate() + 1);
+        return d.toISOString().split("T")[0];
+    })();
+    const defaultDateStr = minStr && minStr > todayStr ? minStr : todayStr;
 
     useEffect(() => {
         if (state.success && isOpen) {
@@ -88,8 +96,8 @@ function ModifyBasePriceDialog({
                             name="start_date"
                             type="date"
                             required
-                            defaultValue={tomorrowStr}
-                            min={tomorrowStr}
+                            defaultValue={defaultDateStr}
+                            min={minStr}
                             className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm"
                         />
                         <p className="text-xs text-white/30 mt-1">{tProp("modifyDateHint")}</p>
@@ -176,6 +184,7 @@ export default function BasePriceCard({ property, currentBasePrice }: BasePriceC
 
             <ModifyBasePriceDialog
                 property={property}
+                currentBasePrice={currentBasePrice}
                 isOpen={isModifyOpen}
                 onClose={() => setIsModifyOpen(false)}
             />
