@@ -234,7 +234,7 @@ app.include_router(nuevo_router.router)
 | `BookingStatus` | `CONFIRMED`, `TENTATIVE`, `CANCELLED` |
 | `BookingSource` | `AIRBNB`, `BOOKING`, `DOMU`, `MANUAL` |
 | `DocumentType` | `DU`, `EXTRANJERO` |
-| `CostCategory` | `RECURRING_MONTHLY`, `RECURRING_DAILY`, `PER_RESERVATION` |
+| `CostCategory` | `RECURRING_MONTHLY`, `PER_DAY_RESERVATION`, `PER_RESERVATION` |
 | `CostCalculationType` | `FIXED_AMOUNT`, `PERCENTAGE` |
 
 ## Permisos (core/roles.py)

@@ -1,8 +1,9 @@
 from models.user import User
 from schemas.user import UserCreate, Token
 from repositories.user_repository import UserRepository
-from core.security import verify_password, get_password_hash, create_access_token
+from core.security import verify_password, get_password_hash
 from exceptions.general import ConflictException, UnauthorizedException
+from services.refresh_token_service import RefreshTokenService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -19,8 +20,10 @@ class AuthService:
         hashed_password = get_password_hash(user_create.password)
         return await self.user_repo.create(user_create, hashed_password)
 
-    async def authenticate_user(self, username: str, password: str) -> Token:
-        """Authenticate user and return access token."""
+    async def authenticate_user(
+        self, username: str, password: str, device_hint: str | None = None
+    ) -> Token:
+        """Authenticate user and return access + refresh token pair."""
         user = await self.user_repo.get_by_username(username)
 
         if not user or not user.hashed_password:
@@ -29,10 +32,9 @@ class AuthService:
         if not verify_password(password, user.hashed_password):
             raise UnauthorizedException("Usuario o contraseña incorrectos")
 
-        return Token(
-            access_token=create_access_token(
-                subject=str(user.id),
-                claims={"role": user.role.value if hasattr(user.role, 'value') else user.role}
-            ),
-            token_type="bearer",
+        role = user.role.value if hasattr(user.role, "value") else user.role
+        return await RefreshTokenService(self.db).create_token_pair(
+            user_id=user.id,
+            role=role,
+            device_hint=device_hint,
         )

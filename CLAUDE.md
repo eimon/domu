@@ -55,7 +55,7 @@ api/
 
 - **Pricing model:** Property `base_price` is the gross price per night at 100% profitability. Floor price is calculated from costs. Profitability percentage scales between floor (0%) and base price (100%). PricingRules apply date-range overrides with priority-based resolution and overlap validation.
 - **Bookings** use iCal UIDs, date-only fields (no time component), and validate against date conflicts. Sources: AIRBNB, BOOKING, DOMU, MANUAL.
-- **Costs** are categorized as RECURRING_MONTHLY, RECURRING_DAILY, or PER_RESERVATION, each either FIXED_AMOUNT or PERCENTAGE.
+- **Costs** are categorized as RECURRING_MONTHLY, PER_DAY_RESERVATION, or PER_RESERVATION, each either FIXED_AMOUNT or PERCENTAGE.
 
 ## Conventions
 

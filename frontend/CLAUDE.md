@@ -251,7 +251,7 @@ Definidos en `src/types/api.ts`, espejo de los enums del backend:
 | `BookingSource` | `AIRBNB`, `BOOKING`, `DOMU`, `MANUAL` |
 | `DocumentType` | `DU`, `EXTRANJERO` |
 | `UserRole` | `ADMIN`, `MANAGER`, `OWNER` |
-| `CostCategory` | `RECURRING_MONTHLY`, `RECURRING_DAILY`, `PER_RESERVATION` |
+| `CostCategory` | `RECURRING_MONTHLY`, `PER_DAY_RESERVATION`, `PER_RESERVATION` |
 | `CostCalculationType` | `FIXED_AMOUNT`, `PERCENTAGE` |
 
 ## Comandos de Desarrollo

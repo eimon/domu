@@ -15,19 +15,22 @@ export type LoginState = {
     success?: boolean;
 };
 
+const cookieBase = {
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+};
+
 export async function login(prevState: LoginState, formData: FormData): Promise<LoginState> {
     const validatedFields = loginSchema.safeParse(Object.fromEntries(formData.entries()));
 
     if (!validatedFields.success) {
-        return {
-            error: "Invalid input fields",
-        };
+        return { error: "Invalid input fields" };
     }
 
     const { username, password } = validatedFields.data;
 
     try {
-        // Convert to FormData for the backend request since it expects form-data
         const backendFormData = new FormData();
         backendFormData.append("username", username);
         backendFormData.append("password", password);
@@ -39,31 +42,29 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
 
         if (!res.ok) {
             const data = await res.json().catch(() => null);
-            return {
-                error: data?.detail || "Authentication failed",
-            };
+            return { error: data?.detail || "Authentication failed" };
         }
 
         const data = await res.json();
-        const { access_token } = data;
-
-        // Set cookie
         const cookieStore = await cookies();
-        cookieStore.set("access_token", access_token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            maxAge: 60 * 60 * 24 * 7, // 1 week
-            path: "/",
+
+        // access_token: not httpOnly so axios (client-side) can read from document.cookie
+        cookieStore.set("access_token", data.access_token, {
+            ...cookieBase,
+            httpOnly: false,
+            maxAge: 30 * 60, // 30 min — matches JWT expiry
         });
 
+        // refresh_token: httpOnly, only the server can read it
+        cookieStore.set("refresh_token", data.refresh_token, {
+            ...cookieBase,
+            httpOnly: true,
+            maxAge: 60 * 60 * 24 * 60, // 60 days
+        });
     } catch (error) {
         console.error("Login Error:", error);
-        return {
-            error: "Something went wrong. Please try again.",
-        };
+        return { error: "Something went wrong. Please try again." };
     }
-
 
     redirect({ href: "/", locale: (await cookies()).get("NEXT_LOCALE")?.value || "en" });
     return { success: true };
@@ -72,6 +73,26 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
 export async function logout() {
     const cookieStore = await cookies();
     const locale = cookieStore.get("NEXT_LOCALE")?.value || "en";
+    const refreshToken = cookieStore.get("refresh_token")?.value;
+    const accessToken = cookieStore.get("access_token")?.value;
+
+    // Revoke refresh token on the backend (best-effort)
+    if (refreshToken && accessToken) {
+        try {
+            await fetch(`${API_URL}/auth/logout`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({ refresh_token: refreshToken }),
+            });
+        } catch {
+            // Backend unavailable — still clear the local session
+        }
+    }
+
     cookieStore.delete("access_token");
+    cookieStore.delete("refresh_token");
     redirect({ href: "/auth/login", locale });
 }

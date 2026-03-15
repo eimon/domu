@@ -19,6 +19,7 @@ from models.guest import Guest  # noqa: F401
 from models.pricing_rule import PricingRule  # noqa: F401
 from models.property_cost import PropertyCost  # noqa: F401
 from models.property_base_price import PropertyBasePrice  # noqa: F401
+from models.refresh_token import RefreshToken  # noqa: F401
 
 # ---------- Test database ----------
 
@@ -61,6 +62,7 @@ async def clean_tables():
         await conn.execute(text("DELETE FROM property_base_prices"))
         await conn.execute(text("DELETE FROM properties"))
         await conn.execute(text("DELETE FROM guests"))
+        await conn.execute(text("DELETE FROM refresh_tokens"))
         await conn.execute(text("DELETE FROM users"))
 
 

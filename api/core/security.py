@@ -1,3 +1,5 @@
+import hashlib
+import secrets
 from datetime import datetime, timedelta
 from typing import Any, Union
 from jose import jwt
@@ -26,6 +28,15 @@ def create_access_token(subject: Union[str, Any], expires_delta: timedelta = Non
         to_encode.update(claims)
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
+
+def generate_refresh_token() -> tuple[str, str]:
+    """Returns (raw_token, sha256_hash). Store only the hash in DB."""
+    token = secrets.token_urlsafe(48)  # 384 bits of entropy
+    token_hash = hashlib.sha256(token.encode()).hexdigest()
+    return token, token_hash
+
+def hash_refresh_token(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
 
 def decode_token(token: str) -> dict:
     try:
