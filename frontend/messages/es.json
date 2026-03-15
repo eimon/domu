@@ -40,7 +40,11 @@
         "description": "Descripción",
         "viewDetails": "Ver detalles",
         "assignGuest": "Asignar Huésped",
-        "selectGuest": "Seleccionar huésped..."
+        "selectGuest": "Seleccionar huésped...",
+        "markAsPaid": "Marcar como pagada",
+        "paidAt": "Fecha de pago",
+        "paymentMethod": "Medio de pago",
+        "confirmPayment": "Confirmar pago"
     },
     "Common": {
         "save": "Guardar",
@@ -69,9 +73,16 @@
         "noCosts": "No hay costos agregados aún.",
         "dateFrom": "Fecha de inicio",
         "dateTo": "Fecha de fin",
+        "endDate": "Hasta",
         "profitabilityPercent": "Rentabilidad %",
         "optional": "Opcional",
-        "confirm": "Confirmar"
+        "confirm": "Confirmar",
+        "select": "Seleccionar",
+        "from": "Desde",
+        "until": "Hasta",
+        "current": "Vigente",
+        "noData": "Sin historial.",
+        "history": "Ver historial"
     },
     "Properties": {
         "title": "Propiedades",
@@ -98,6 +109,13 @@
         "revertCost": "Revertir al valor anterior",
         "revertBasePrice": "Revertir",
         "confirmRevert": "Se deshará el último cambio y se restaurará el valor anterior. ¿Continuar?",
+        "finalizeCost": "Establecer fecha de finalización",
+        "finalizeHint": "Seleccioná el último día en que se cobrará este costo. A partir de esa fecha dejará de estar vigente.",
+        "finalizeEndDate": "Último día de cobro",
+        "finalizeConfirm": "Finalizar",
+        "finalized": "Finalizado",
+        "upcoming": "Próximo",
+        "showAllCosts": "Mostrar todos los costos",
         "costsDescription": "Gestionar costos recurrentes y fijos para esta propiedad.",
         "calendarDescription": "Ver reservas y precios diarios en el calendario",
         "rulesDescription": "Gestionar períodos de precios estacionales y especiales",
@@ -228,7 +246,14 @@
         "BookingStatus": {
             "CONFIRMED": "Confirmado",
             "TENTATIVE": "Tentativo",
-            "CANCELLED": "Cancelado"
+            "CANCELLED": "Cancelado",
+            "PAID": "Pagado"
+        },
+        "PaymentMethod": {
+            "CASH": "Efectivo",
+            "TRANSFER": "Transferencia",
+            "CARD": "Tarjeta",
+            "OTHER": "Otro"
         },
         "BookingSource": {
             "AIRBNB": "Airbnb",

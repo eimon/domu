@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 from uuid import UUID
 
-from schemas.property_cost import PropertyCostCreate, PropertyCostModify, PropertyCostUpdate, PropertyCostResponse
+from schemas.property_cost import PropertyCostCreate, PropertyCostFinalize, PropertyCostModify, PropertyCostUpdate, PropertyCostResponse
 from services.cost_service import CostService
 from core.database import get_db
 from dependencies.auth import get_current_user, has_role
@@ -34,11 +34,15 @@ async def create_cost(
 @router.get("/properties/{property_id}/costs", response_model=List[PropertyCostResponse])
 async def list_costs(
     property_id: UUID,
+    include_all: bool = Query(False, description="Incluir costos finalizados"),
     db: AsyncSession = Depends(get_db),
     current_user: Usuario = Depends(get_current_user)
 ):
     """List all costs for a property."""
-    return await CostService(db).list_costs(property_id)
+    service = CostService(db)
+    if include_all:
+        return await service.list_all_costs(property_id)
+    return await service.list_costs(property_id)
 
 
 @router.put("/costs/{cost_id}", response_model=PropertyCostResponse)
@@ -81,6 +85,17 @@ async def get_cost_history(
 ):
     """List all historical versions of a cost concept, ordered chronologically."""
     return await CostService(db).get_cost_history(cost_id)
+
+
+@router.post("/costs/{cost_id}/finalize", response_model=PropertyCostResponse)
+async def finalize_cost(
+    cost_id: UUID,
+    finalize_in: PropertyCostFinalize,
+    db: AsyncSession = Depends(get_db),
+    current_user: Usuario = Depends(has_role(Role.ROLE_PROPERTY_UPDATE))
+):
+    """Set the last billing date for a cost. Requires MANAGER/ADMIN role."""
+    return await CostService(db).finalize_cost(cost_id, finalize_in)
 
 
 @router.post("/costs/{cost_id}/revert", response_model=PropertyCostResponse)

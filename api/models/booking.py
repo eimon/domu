@@ -4,7 +4,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from core.database import Base
-from core.enums import BookingStatus, BookingSource
+from core.enums import BookingStatus, BookingSource, PaymentMethod
 
 
 class Booking(Base):
@@ -33,6 +33,10 @@ class Booking(Base):
     description = Column(Text, nullable=True)  # DESCRIPTION
     status = Column(Enum(BookingStatus), default=BookingStatus.CONFIRMED, nullable=False)
     source = Column(Enum(BookingSource), default=BookingSource.DOMU, nullable=False)
+
+    # Payment info
+    paid_at = Column(Date, nullable=True)
+    payment_method = Column(Enum(PaymentMethod), nullable=True)
 
     # External sync metadata
     external_id = Column(String, nullable=True)  # ID from Airbnb/Booking

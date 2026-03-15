@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { Booking, Property, Guest } from "@/types/api";
-import { Trash2, ExternalLink, Check, X, Eye } from "lucide-react";
+import { Trash2, ExternalLink, Check, X, Eye, BadgeDollarSign } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { acceptBooking, cancelBooking, deleteBooking } from "@/actions/bookings";
 import { Link } from "@/i18n/routing";
 import { useToast } from "@/context/ToastContext";
 import { useConfirm } from "@/context/ConfirmContext";
 import BookingDetailModal from "@/components/BookingDetailModal";
+import PayBookingDialog from "@/components/PayBookingDialog";
 
 const EMPTY_PROPERTIES: Property[] = [];
 const EMPTY_GUESTS: Guest[] = [];
@@ -22,6 +23,7 @@ interface BookingsTableProps {
 export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES, guests = EMPTY_GUESTS }: BookingsTableProps) {
     const [loadingId, setLoadingId] = useState<string | null>(null);
     const [detailBooking, setDetailBooking] = useState<Booking | null>(null);
+    const [payingBooking, setPayingBooking] = useState<Booking | null>(null);
     const t = useTranslations("Common");
     const tBooking = useTranslations("Bookings");
     const tEnums = useTranslations("Enums");
@@ -100,6 +102,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                             const isTentative = booking.status === 'TENTATIVE';
                             const isConfirmed = booking.status === 'CONFIRMED';
                             const isCancelled = booking.status === 'CANCELLED';
+                            const isPaid = booking.status === 'PAID';
 
                             return (
                                 <tr key={booking.id} className="hover:bg-white/[0.03] transition-colors">
@@ -120,6 +123,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                            isPaid ? 'bg-emerald-500/15 text-emerald-400' :
                                             isConfirmed ? 'bg-domu-success/12 text-domu-success' :
                                             isTentative ? 'bg-domu-warning/12 text-domu-warning' :
                                             'bg-domu-danger/12 text-domu-danger'
@@ -155,6 +159,16 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                                         <X size={15} />
                                                     </button>
                                                 </>
+                                            )}
+                                            {(isConfirmed || isTentative) && (
+                                                <button
+                                                    onClick={() => setPayingBooking(booking)}
+                                                    disabled={isLoading}
+                                                    className="p-1.5 text-emerald-400/70 hover:bg-emerald-400/10 hover:text-emerald-400 rounded-lg transition-colors disabled:opacity-40"
+                                                    title={tBooking('markAsPaid')}
+                                                >
+                                                    <BadgeDollarSign size={15} />
+                                                </button>
                                             )}
                                             {isConfirmed && (
                                                 <button
@@ -193,6 +207,14 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                 guest={getGuest(detailBooking.guest_id)}
                 guests={guests}
                 onClose={() => setDetailBooking(null)}
+            />
+        )}
+
+        {payingBooking && (
+            <PayBookingDialog
+                bookingId={payingBooking.id}
+                isOpen
+                onClose={() => setPayingBooking(null)}
             />
         )}
         </>

@@ -59,6 +59,10 @@ class PropertyCostModify(BaseModel):
         return v
 
 
+class PropertyCostFinalize(BaseModel):
+    end_date: date = Field(..., description="Último día en que aplica este costo.")
+
+
 class PropertyCostResponse(PropertyCostBase):
     id: UUID4
     property_id: UUID4

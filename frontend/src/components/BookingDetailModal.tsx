@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { Booking, Guest, Property, BookingStatus } from "@/types/api";
-import { X, Calendar, MapPin, User, Mail, Phone, CreditCard, Hash, Clock, Tag, UserPlus, Loader2 } from "lucide-react";
+import { X, Calendar, MapPin, User, Mail, Phone, CreditCard, Hash, Clock, Tag, UserPlus, Loader2, BadgeDollarSign } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { assignGuest, BookingFormState } from "@/actions/bookings";
 
@@ -18,6 +18,7 @@ const statusStyles: Record<string, string> = {
     [BookingStatus.CONFIRMED]: "bg-domu-success/12 text-domu-success border-domu-success/20",
     [BookingStatus.TENTATIVE]: "bg-domu-warning/12 text-domu-warning border-domu-warning/20",
     [BookingStatus.CANCELLED]: "bg-domu-danger/12 text-domu-danger border-domu-danger/20",
+    [BookingStatus.PAID]: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
 };
 
 const inputCls = "w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm";
@@ -110,6 +111,16 @@ export default function BookingDetailModal({ booking, property, guest, guests, o
                             )}
                             {booking.description && (
                                 <Row icon={Clock} label={t('description')} value={booking.description} />
+                            )}
+                            {booking.paid_at && (
+                                <Row icon={BadgeDollarSign} label={t('paidAt')} value={
+                                    <span className="font-mono">{booking.paid_at}</span>
+                                } />
+                            )}
+                            {booking.payment_method && (
+                                <Row icon={CreditCard} label={t('paymentMethod')} value={
+                                    tEnums(`PaymentMethod.${booking.payment_method}`)
+                                } />
                             )}
                         </div>
                     </div>

@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { serverApi } from "@/lib/server-api";
 import { revalidatePath } from "next/cache";
-import { Booking, BookingStatus, BookingSource } from "@/types/api";
+import { Booking, BookingStatus, BookingSource, PaymentMethod } from "@/types/api";
 
 const bookingSchema = z.object({
     property_id: z.string().uuid("Invalid property ID"),
@@ -176,6 +176,35 @@ export async function assignGuest(
             return { error: errorData.detail || "No se pudo asignar el huésped" };
         }
     } catch {
+        return { error: "Something went wrong" };
+    }
+
+    revalidatePath("/bookings");
+    return { success: true };
+}
+
+export async function payBooking(
+    bookingId: string,
+    prevState: BookingFormState,
+    formData: FormData
+): Promise<BookingFormState> {
+    const paid_at = formData.get("paid_at") as string;
+    const payment_method = formData.get("payment_method") as string;
+
+    if (!paid_at) return { error: "La fecha de pago es obligatoria" };
+    if (!payment_method) return { error: "El medio de pago es obligatorio" };
+
+    try {
+        const res = await serverApi(`/bookings/${bookingId}/pay`, {
+            method: "POST",
+            body: JSON.stringify({ paid_at, payment_method }),
+        });
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            return { error: errorData.detail || "No se pudo registrar el pago" };
+        }
+    } catch (error) {
+        console.error("Pay Booking Error:", error);
         return { error: "Something went wrong" };
     }
 

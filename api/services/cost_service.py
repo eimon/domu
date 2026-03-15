@@ -6,9 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.enums import CostCalculationType
 from exceptions.general import BadRequestException, NotFoundException
 from models.property_cost import PropertyCost
+from repositories.booking_repository import BookingRepository
 from repositories.cost_repository import CostRepository
 from repositories.property_repository import PropertyRepository
-from schemas.property_cost import PropertyCostCreate, PropertyCostModify, PropertyCostUpdate
+from schemas.property_cost import PropertyCostCreate, PropertyCostFinalize, PropertyCostModify, PropertyCostUpdate
 
 
 class CostService:
@@ -16,6 +17,7 @@ class CostService:
         self.db = db
         self.cost_repo = CostRepository(db)
         self.property_repo = PropertyRepository(db)
+        self.booking_repo = BookingRepository(db)
 
     async def create_cost(self, property_id: uuid.UUID, cost_in: PropertyCostCreate) -> PropertyCost:
         """Create a new property cost."""
@@ -69,6 +71,11 @@ class CostService:
         if current.calculation_type == CostCalculationType.PERCENTAGE and modify_in.value > 100:
             raise BadRequestException("El porcentaje no puede ser mayor al 100%")
 
+        if await self.booking_repo.exists_paid_booking_after(current.property_id, modify_in.start_date):
+            raise BadRequestException(
+                "No se puede modificar el costo: el nuevo período incluye fechas de reservas pagadas"
+            )
+
         return await self.cost_repo.modify_cost_value(current, modify_in.value, modify_in.start_date)
 
     async def revert_cost(self, cost_id: uuid.UUID) -> PropertyCost:
@@ -84,6 +91,33 @@ class CostService:
             raise BadRequestException("Este costo no tiene modificaciones que revertir")
 
         return restored
+
+    async def list_all_costs(self, property_id: uuid.UUID) -> list[PropertyCost]:
+        """List latest version of all cost concepts including finalized ones."""
+        prop = await self.property_repo.get_by_id(property_id)
+        if not prop:
+            raise NotFoundException("Propiedad no encontrada")
+
+        return await self.cost_repo.get_all_versions_for_property(property_id)
+
+    async def finalize_cost(self, cost_id: uuid.UUID, finalize_in: PropertyCostFinalize) -> PropertyCost:
+        """Sets end_date on the current version (last billing date)."""
+        current = await self.cost_repo.get_current_version(cost_id)
+        if not current:
+            raise NotFoundException("Costo no encontrado o ya eliminado")
+
+        if current.start_date and finalize_in.end_date < current.start_date:
+            raise BadRequestException(
+                "La fecha de finalización no puede ser anterior al inicio del período"
+            )
+
+        from datetime import timedelta
+        if await self.booking_repo.exists_paid_booking_after(current.property_id, finalize_in.end_date + timedelta(days=1)):
+            raise BadRequestException(
+                "No se puede finalizar el costo: existen reservas pagadas con fechas posteriores a la fecha de finalización"
+            )
+
+        return await self.cost_repo.finalize_cost(current, finalize_in.end_date)
 
     async def get_cost_history(self, cost_id: uuid.UUID) -> list[PropertyCost]:
         """Returns all historical versions of a cost concept, ordered chronologically."""

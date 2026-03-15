@@ -40,7 +40,11 @@
         "description": "Description",
         "viewDetails": "View details",
         "assignGuest": "Assign Guest",
-        "selectGuest": "Select a guest..."
+        "selectGuest": "Select a guest...",
+        "markAsPaid": "Mark as paid",
+        "paidAt": "Payment date",
+        "paymentMethod": "Payment method",
+        "confirmPayment": "Confirm payment"
     },
     "Common": {
         "save": "Save",
@@ -69,9 +73,16 @@
         "noCosts": "No costs added yet.",
         "dateFrom": "Start Date",
         "dateTo": "End Date",
+        "endDate": "Until",
         "profitabilityPercent": "Profitability %",
         "optional": "Optional",
-        "confirm": "Confirm"
+        "confirm": "Confirm",
+        "select": "Select",
+        "from": "From",
+        "until": "Until",
+        "current": "Current",
+        "noData": "No history.",
+        "history": "View history"
     },
     "Properties": {
         "title": "Properties",
@@ -98,6 +109,13 @@
         "revertCost": "Revert to previous value",
         "revertBasePrice": "Revert",
         "confirmRevert": "This will undo the last change and restore the previous value. Continue?",
+        "finalizeCost": "Set last billing date",
+        "finalizeHint": "Select the last day this cost will be charged. After this date it will no longer be active.",
+        "finalizeEndDate": "Last billing date",
+        "finalizeConfirm": "Finalize",
+        "finalized": "Finalized",
+        "upcoming": "Upcoming",
+        "showAllCosts": "Show all costs",
         "costsDescription": "Manage recurring and fixed costs for this property.",
         "calendarDescription": "View bookings and daily prices on the calendar",
         "rulesDescription": "Manage seasonal and special pricing periods",
@@ -228,7 +246,14 @@
         "BookingStatus": {
             "CONFIRMED": "Confirmed",
             "TENTATIVE": "Tentative",
-            "CANCELLED": "Cancelled"
+            "CANCELLED": "Cancelled",
+            "PAID": "Paid"
+        },
+        "PaymentMethod": {
+            "CASH": "Cash",
+            "TRANSFER": "Bank transfer",
+            "CARD": "Card",
+            "OTHER": "Other"
         },
         "BookingSource": {
             "AIRBNB": "Airbnb",

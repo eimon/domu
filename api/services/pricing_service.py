@@ -41,6 +41,11 @@ class PricingService:
         if await self.pricing_repo.check_overlap(property_id, rule_in.start_date, rule_in.end_date):
             raise BadRequestException("El período de la regla se solapa con una regla existente")
 
+        if await self.booking_repo.exists_paid_booking_overlap(property_id, rule_in.start_date, rule_in.end_date):
+            raise BadRequestException(
+                "No se puede crear la regla: el período incluye fechas de reservas pagadas"
+            )
+
         return await self.pricing_repo.create(property_id, rule_in)
 
     async def update_rule(self, rule_id: uuid.UUID, rule_in: PricingRuleUpdate) -> object:
@@ -56,6 +61,11 @@ class PricingService:
 
         if await self.pricing_repo.check_overlap(db_rule.property_id, start_date, end_date, exclude_id=rule_id):
             raise BadRequestException("El período de la regla se solapa con una regla existente")
+
+        if await self.booking_repo.exists_paid_booking_overlap(db_rule.property_id, start_date, end_date):
+            raise BadRequestException(
+                "No se puede modificar la regla: el período incluye fechas de reservas pagadas"
+            )
 
         return await self.pricing_repo.update(rule_id, rule_in)
 

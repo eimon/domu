@@ -46,12 +46,14 @@ class CostRepository:
         return result.scalars().first()
 
     async def get_by_property(self, property_id: uuid.UUID) -> list[PropertyCost]:
-        """Returns only the current active version for each cost concept."""
+        """Returns currently active costs: already started and not yet expired."""
+        today = date.today()
         result = await self.db.execute(
             select(PropertyCost).where(
                 PropertyCost.property_id == property_id,
                 PropertyCost.is_active == True,
-                PropertyCost.end_date == None,
+                or_(PropertyCost.start_date == None, PropertyCost.start_date <= today),
+                or_(PropertyCost.end_date == None, PropertyCost.end_date >= today),
             )
         )
         return list(result.scalars().all())
@@ -174,6 +176,25 @@ class CostRepository:
         await self.db.flush()
         await self.db.refresh(new_version)
         return new_version
+
+    async def get_all_versions_for_property(self, property_id: uuid.UUID) -> list[PropertyCost]:
+        """Returns all is_active=True cost records for the property (for 'show all' view)."""
+        result = await self.db.execute(
+            select(PropertyCost)
+            .where(
+                PropertyCost.property_id == property_id,
+                PropertyCost.is_active == True,
+            )
+            .order_by(PropertyCost.start_date.asc().nulls_first())
+        )
+        return list(result.scalars().all())
+
+    async def finalize_cost(self, current: PropertyCost, end_date: date) -> PropertyCost:
+        """Sets end_date on the current version (last billing date)."""
+        current.end_date = end_date
+        await self.db.flush()
+        await self.db.refresh(current)
+        return current
 
     async def revert_last_modification(self, cost_id: uuid.UUID) -> PropertyCost | None:
         """

@@ -4,7 +4,8 @@ from schemas.booking import BookingCreate, BookingUpdate
 from repositories.booking_repository import BookingRepository
 from repositories.property_repository import PropertyRepository
 from exceptions.general import NotFoundException, ConflictException, BadRequestException, ForbiddenException
-from core.enums import UserRole, BookingStatus
+from core.enums import UserRole, BookingStatus, PaymentMethod
+from schemas.booking import BookingPay
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.config import settings
 import uuid
@@ -135,6 +136,22 @@ class BookingService:
         if booking.status == BookingStatus.CANCELLED:
             raise BadRequestException("La reserva ya está cancelada")
         booking = await self.booking_repo.delete(booking_id)
+        return booking
+
+    async def mark_as_paid(self, booking_id: uuid.UUID, pay_in: BookingPay, current_user: UserModel) -> Booking:
+        """Mark a CONFIRMED or TENTATIVE booking as PAID, recording date and payment method."""
+        booking = await self.booking_repo.get_by_id(booking_id)
+        if not booking:
+            raise NotFoundException("Reserva no encontrada")
+        await self._check_booking_access(booking, current_user)
+        if booking.status not in (BookingStatus.CONFIRMED, BookingStatus.TENTATIVE):
+            raise BadRequestException("Solo se pueden marcar como pagadas reservas Confirmadas o Tentativas")
+
+        booking.status = BookingStatus.PAID
+        booking.paid_at = pay_in.paid_at
+        booking.payment_method = pay_in.payment_method
+        await self.db.flush()
+        await self.db.refresh(booking)
         return booking
 
     async def delete_booking(self, booking_id: uuid.UUID, current_user: UserModel) -> None:

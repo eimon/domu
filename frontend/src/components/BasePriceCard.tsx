@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { modifyBasePrice, revertBasePrice, BasePriceFormState } from "@/actions/base_price";
-import { X, Loader2, TrendingUp, RotateCcw } from "lucide-react";
+import { modifyBasePrice, revertBasePrice, getBasePriceHistory, BasePriceFormState } from "@/actions/base_price";
+import { X, Loader2, TrendingUp, RotateCcw, History } from "lucide-react";
 import { useActionState } from "react";
 import { Property, PropertyBasePrice } from "@/types/api";
 import { useTranslations } from "next-intl";
 import { formatPrice } from "@/lib/utils";
 import { useToast } from "@/context/ToastContext";
 import { useConfirm } from "@/context/ConfirmContext";
+import PriceHistoryDialog from "./PriceHistoryDialog";
 
 interface BasePriceCardProps {
     property: Property;
@@ -129,9 +130,16 @@ function ModifyBasePriceDialog({
 export default function BasePriceCard({ property, currentBasePrice }: BasePriceCardProps) {
     const [isModifyOpen, setIsModifyOpen] = useState(false);
     const [isReverting, setIsReverting] = useState(false);
+    const [historyEntries, setHistoryEntries] = useState<PropertyBasePrice[] | null>(null);
     const tProp = useTranslations("Properties");
+    const tCommon = useTranslations("Common");
     const { showError } = useToast();
     const { confirm } = useConfirm();
+
+    const handleHistory = async () => {
+        const entries = await getBasePriceHistory(property.id);
+        setHistoryEntries(entries);
+    };
 
     const handleRevert = async () => {
         if (!await confirm(tProp("confirmRevert"))) return;
@@ -158,9 +166,21 @@ export default function BasePriceCard({ property, currentBasePrice }: BasePriceC
                                 ${formatPrice(property.base_price)}
                                 <span className="text-sm font-normal text-white/30 ml-1">/ noche</span>
                             </p>
+                            {currentBasePrice?.start_date && (
+                                <p className="text-xs text-white/30 mt-0.5">
+                                    {new Date(currentBasePrice.start_date + "T00:00:00").toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+                                </p>
+                            )}
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleHistory}
+                            className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white/40 border border-white/[0.10] rounded-lg hover:bg-white/[0.05] hover:text-white/70 transition-colors"
+                        >
+                            <History size={13} className="mr-1.5" />
+                            {tCommon("history")}
+                        </button>
                         {currentBasePrice?.root_price_id && (
                             <button
                                 onClick={handleRevert}
@@ -188,6 +208,16 @@ export default function BasePriceCard({ property, currentBasePrice }: BasePriceC
                 isOpen={isModifyOpen}
                 onClose={() => setIsModifyOpen(false)}
             />
+
+            {historyEntries && (
+                <PriceHistoryDialog
+                    title={tProp("basePriceLabel")}
+                    history={historyEntries}
+                    formatValue={(v) => `$${formatPrice(v)}`}
+                    isOpen
+                    onClose={() => setHistoryEntries(null)}
+                />
+            )}
         </>
     );
 }

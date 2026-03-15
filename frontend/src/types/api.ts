@@ -2,6 +2,14 @@ export enum BookingStatus {
     CONFIRMED = "CONFIRMED",
     TENTATIVE = "TENTATIVE",
     CANCELLED = "CANCELLED",
+    PAID = "PAID",
+}
+
+export enum PaymentMethod {
+    CASH = "CASH",
+    TRANSFER = "TRANSFER",
+    CARD = "CARD",
+    OTHER = "OTHER",
 }
 
 export enum BookingSource {
@@ -134,6 +142,8 @@ export interface Booking {
     description?: string;
     status: string | BookingStatus;
     source: string | BookingSource;
+    paid_at?: string | null; // date YYYY-MM-DD
+    payment_method?: string | PaymentMethod | null;
     external_id?: string;
     ical_url?: string;
     last_synced_at?: string; // datetime

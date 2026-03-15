@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from exceptions.general import BadRequestException, NotFoundException
 from models.property_base_price import PropertyBasePrice
+from repositories.booking_repository import BookingRepository
 from repositories.property_base_price_repository import PropertyBasePriceRepository
 from repositories.property_repository import PropertyRepository
 from schemas.property_base_price import PropertyBasePriceModify
@@ -15,6 +16,7 @@ class PropertyBasePriceService:
         self.db = db
         self.repo = PropertyBasePriceRepository(db)
         self.property_repo = PropertyRepository(db)
+        self.booking_repo = BookingRepository(db)
 
     async def _get_property_or_404(self, property_id: uuid.UUID):
         prop = await self.property_repo.get_by_id(property_id)
@@ -41,6 +43,11 @@ class PropertyBasePriceService:
         if current_start is not None and modify_in.start_date <= current_start:
             raise BadRequestException(
                 "La fecha de inicio debe ser posterior al inicio del período actual"
+            )
+
+        if await self.booking_repo.exists_paid_booking_after(property_id, modify_in.start_date):
+            raise BadRequestException(
+                "No se puede modificar el precio base: el nuevo período incluye fechas de reservas pagadas"
             )
 
         new_version = await self.repo.modify_value(current, modify_in.value, modify_in.start_date)

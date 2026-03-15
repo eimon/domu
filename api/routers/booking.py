@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 from uuid import UUID
 
-from schemas.booking import BookingCreate, BookingUpdate, BookingResponse
+from schemas.booking import BookingCreate, BookingUpdate, BookingPay, BookingResponse
 from services.booking_service import BookingService
 from core.database import get_db
 from dependencies.auth import get_current_user, has_role
@@ -63,6 +63,17 @@ async def accept_booking(
 ):
     """Accept a TENTATIVE booking. Requires MANAGER or ADMIN role."""
     return await BookingService(db).accept_booking(booking_id, current_user)
+
+
+@router.post("/{booking_id}/pay", response_model=BookingResponse)
+async def pay_booking(
+    booking_id: UUID,
+    pay_in: BookingPay,
+    db: AsyncSession = Depends(get_db),
+    current_user: Usuario = Depends(has_role(Role.ROLE_BOOKING_UPDATE))
+):
+    """Mark a booking as PAID with payment date and method. Requires MANAGER or ADMIN role."""
+    return await BookingService(db).mark_as_paid(booking_id, pay_in, current_user)
 
 
 @router.post("/{booking_id}/cancel", response_model=BookingResponse)

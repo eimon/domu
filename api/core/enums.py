@@ -11,6 +11,14 @@ class BookingStatus(str, enum.Enum):
     CONFIRMED = "CONFIRMED"
     TENTATIVE = "TENTATIVE"
     CANCELLED = "CANCELLED"
+    PAID = "PAID"
+
+
+class PaymentMethod(str, enum.Enum):
+    CASH = "CASH"
+    TRANSFER = "TRANSFER"
+    CARD = "CARD"
+    OTHER = "OTHER"
 
 
 class BookingSource(str, enum.Enum):

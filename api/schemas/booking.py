@@ -1,7 +1,7 @@
 from pydantic import BaseModel, UUID4
 from datetime import datetime, date
 from typing import Optional
-from core.enums import BookingStatus, BookingSource
+from core.enums import BookingStatus, BookingSource, PaymentMethod
 
 
 class BookingBase(BaseModel):
@@ -28,11 +28,18 @@ class BookingUpdate(BaseModel):
     status: Optional[BookingStatus] = None
 
 
+class BookingPay(BaseModel):
+    paid_at: date
+    payment_method: PaymentMethod
+
+
 class BookingResponse(BookingBase):
     id: UUID4
     ical_uid: str
     status: BookingStatus
     source: BookingSource
+    paid_at: Optional[date] = None
+    payment_method: Optional[PaymentMethod] = None
     external_id: Optional[str]
     ical_url: Optional[str]
     last_synced_at: Optional[datetime]
