@@ -44,7 +44,14 @@
         "markAsPaid": "Mark as paid",
         "paidAt": "Payment date",
         "paymentMethod": "Payment method",
-        "confirmPayment": "Confirm payment"
+        "confirmPayment": "Confirm payment",
+        "totalAmount": "Total",
+        "paidAmount": "Amount paid",
+        "paidAmountHint": "leave blank to use calculated total",
+        "estimatedTotal": "Estimated total",
+        "payTotal": "Pay total:",
+        "revertPayment": "Revert payment",
+        "confirmRevertPayment": "This will remove the payment and return the booking to Confirmed. Continue?"
     },
     "Common": {
         "save": "Save",

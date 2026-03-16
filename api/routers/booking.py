@@ -76,6 +76,16 @@ async def pay_booking(
     return await BookingService(db).mark_as_paid(booking_id, pay_in, current_user)
 
 
+@router.post("/{booking_id}/revert-payment", response_model=BookingResponse)
+async def revert_payment(
+    booking_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: Usuario = Depends(has_role(Role.ROLE_BOOKING_UPDATE))
+):
+    """Revert a PAID booking to CONFIRMED, clearing payment fields. Requires MANAGER or ADMIN role."""
+    return await BookingService(db).revert_payment(booking_id, current_user)
+
+
 @router.post("/{booking_id}/cancel", response_model=BookingResponse)
 async def cancel_booking(
     booking_id: UUID,

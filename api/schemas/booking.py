@@ -1,6 +1,7 @@
 from pydantic import BaseModel, UUID4
 from datetime import datetime, date
 from typing import Optional
+from decimal import Decimal
 from core.enums import BookingStatus, BookingSource, PaymentMethod
 
 
@@ -31,6 +32,12 @@ class BookingUpdate(BaseModel):
 class BookingPay(BaseModel):
     paid_at: date
     payment_method: PaymentMethod
+    paid_amount: Optional[Decimal] = None
+
+
+class PriceQuoteResponse(BaseModel):
+    total_amount: Decimal
+    nights: int
 
 
 class BookingResponse(BookingBase):
@@ -38,6 +45,8 @@ class BookingResponse(BookingBase):
     ical_uid: str
     status: BookingStatus
     source: BookingSource
+    total_amount: Optional[Decimal] = None
+    paid_amount: Optional[Decimal] = None
     paid_at: Optional[date] = None
     payment_method: Optional[PaymentMethod] = None
     external_id: Optional[str]

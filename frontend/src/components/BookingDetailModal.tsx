@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { Booking, Guest, Property, BookingStatus } from "@/types/api";
-import { X, Calendar, MapPin, User, Mail, Phone, CreditCard, Hash, Clock, Tag, UserPlus, Loader2, BadgeDollarSign } from "lucide-react";
+import { X, Calendar, MapPin, User, Mail, Phone, CreditCard, Hash, Clock, Tag, UserPlus, Loader2, BadgeDollarSign, DollarSign } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { assignGuest, BookingFormState } from "@/actions/bookings";
 
@@ -112,6 +112,13 @@ export default function BookingDetailModal({ booking, property, guest, guests, o
                             {booking.description && (
                                 <Row icon={Clock} label={t('description')} value={booking.description} />
                             )}
+                            {booking.total_amount != null && (
+                                <Row icon={DollarSign} label={t('totalAmount')} value={
+                                    <span className="font-mono text-white/70">
+                                        ${Number(booking.total_amount).toLocaleString("es-AR", { maximumFractionDigits: 0 })}
+                                    </span>
+                                } />
+                            )}
                             {booking.paid_at && (
                                 <Row icon={BadgeDollarSign} label={t('paidAt')} value={
                                     <span className="font-mono">{booking.paid_at}</span>
@@ -120,6 +127,13 @@ export default function BookingDetailModal({ booking, property, guest, guests, o
                             {booking.payment_method && (
                                 <Row icon={CreditCard} label={t('paymentMethod')} value={
                                     tEnums(`PaymentMethod.${booking.payment_method}`)
+                                } />
+                            )}
+                            {booking.paid_amount != null && (
+                                <Row icon={BadgeDollarSign} label={t('paidAmount')} value={
+                                    <span className="font-mono font-semibold text-emerald-400">
+                                        ${Number(booking.paid_amount).toLocaleString("es-AR", { maximumFractionDigits: 0 })}
+                                    </span>
                                 } />
                             )}
                         </div>

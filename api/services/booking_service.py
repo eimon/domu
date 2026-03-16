@@ -55,8 +55,20 @@ class BookingService:
         booking_id = uuid.uuid4()
         ical_uid = self._generate_ical_uid(booking_id)
 
+        # Calculate total amount for this date range
+        from services.pricing_service import PricingService
+        total_amount = None
+        try:
+            total_amount = await PricingService(self.db).calculate_booking_total(
+                booking_create.property_id,
+                booking_create.check_in,
+                booking_create.check_out,
+            )
+        except Exception:
+            pass
+
         # Create booking
-        booking = await self.booking_repo.create(booking_create, ical_uid)
+        booking = await self.booking_repo.create(booking_create, ical_uid, total_amount=total_amount)
         return booking
 
     async def get_booking(self, booking_id: uuid.UUID, current_user: UserModel) -> Booking:
@@ -150,6 +162,25 @@ class BookingService:
         booking.status = BookingStatus.PAID
         booking.paid_at = pay_in.paid_at
         booking.payment_method = pay_in.payment_method
+        if pay_in.paid_amount is not None:
+            booking.paid_amount = pay_in.paid_amount
+        await self.db.flush()
+        await self.db.refresh(booking)
+        return booking
+
+    async def revert_payment(self, booking_id: uuid.UUID, current_user: UserModel) -> Booking:
+        """Revert a PAID booking back to CONFIRMED, clearing all payment fields."""
+        booking = await self.booking_repo.get_by_id(booking_id)
+        if not booking:
+            raise NotFoundException("Reserva no encontrada")
+        await self._check_booking_access(booking, current_user)
+        if booking.status != BookingStatus.PAID:
+            raise BadRequestException("Solo se puede revertir el pago de reservas en estado Pagado")
+
+        booking.status = BookingStatus.CONFIRMED
+        booking.paid_at = None
+        booking.payment_method = None
+        booking.paid_amount = None
         await self.db.flush()
         await self.db.refresh(booking)
         return booking

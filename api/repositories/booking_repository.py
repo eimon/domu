@@ -13,7 +13,7 @@ class BookingRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def create(self, booking_create: BookingCreate, ical_uid: str) -> Booking:
+    async def create(self, booking_create: BookingCreate, ical_uid: str, total_amount=None) -> Booking:
         """Create a booking with auto-generated ical_uid."""
         db_booking = Booking(
             ical_uid=ical_uid,
@@ -24,7 +24,8 @@ class BookingRepository:
             summary=booking_create.summary,
             description=booking_create.description,
             status=booking_create.status,
-            source=booking_create.source
+            source=booking_create.source,
+            total_amount=total_amount,
         )
         self.db.add(db_booking)
         await self.db.flush()

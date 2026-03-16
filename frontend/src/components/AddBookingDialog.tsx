@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { createBooking, BookingFormState } from "@/actions/bookings";
+import { createBooking, getPriceQuote, BookingFormState } from "@/actions/bookings";
 import { Plus, X, Loader2, ChevronLeft, CalendarDays } from "lucide-react";
 import { useActionState } from "react";
 import { BookingStatus, BookingSource, Property, Guest } from "@/types/api";
@@ -22,6 +22,7 @@ export default function AddBookingDialog() {
     const [isLoadingData, setIsLoadingData] = useState(false);
     const [selectedPropertyId, setSelectedPropertyId] = useState("");
     const [selectedDates, setSelectedDates] = useState<{ start: string; end: string } | null>(null);
+    const [priceQuote, setPriceQuote] = useState<{ total_amount: number; nights: number } | null>(null);
 
     const t = useTranslations("Common");
     const tEnums = useTranslations("Enums");
@@ -54,6 +55,7 @@ export default function AddBookingDialog() {
         setStep("property");
         setSelectedPropertyId("");
         setSelectedDates(null);
+        setPriceQuote(null);
     };
 
     const handleContinue = () => {
@@ -62,10 +64,17 @@ export default function AddBookingDialog() {
         setStep("calendar");
     };
 
-    const handleRangeSelected = useCallback((start: string | null, end: string | null) => {
-        if (start && end) setSelectedDates({ start, end });
-        else setSelectedDates(null);
-    }, []);
+    const handleRangeSelected = useCallback(async (start: string | null, end: string | null) => {
+        if (start && end) {
+            setSelectedDates({ start, end });
+            setPriceQuote(null);
+            const quote = await getPriceQuote(selectedPropertyId, start, end);
+            if (quote) setPriceQuote(quote);
+        } else {
+            setSelectedDates(null);
+            setPriceQuote(null);
+        }
+    }, [selectedPropertyId]);
 
     return (
         <>
@@ -193,6 +202,20 @@ export default function AddBookingDialog() {
                                                     {selectedDates.end}
                                                 </p>
                                             </div>
+                                        </div>
+
+                                        {/* Price estimate */}
+                                        <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-emerald-500/[0.08] border border-emerald-500/20">
+                                            <span className="text-xs font-medium text-white/50 uppercase tracking-wider">
+                                                {tBookings("estimatedTotal")}
+                                            </span>
+                                            {priceQuote ? (
+                                                <span className="text-sm font-bold text-emerald-400 font-mono">
+                                                    ${priceQuote.total_amount.toLocaleString("es-AR", { maximumFractionDigits: 0 })}
+                                                </span>
+                                            ) : (
+                                                <Loader2 size={13} className="animate-spin text-white/30" />
+                                            )}
                                         </div>
 
                                         <form action={formAction} className="space-y-3">

@@ -119,6 +119,38 @@ class PricingService:
         return floor
 
     # ------------------------------------------------------------------ #
+    # Price quote                                                          #
+    # ------------------------------------------------------------------ #
+
+    async def calculate_booking_total(
+        self, property_id: uuid.UUID, check_in: date, check_out: date
+    ) -> Decimal:
+        """Calculate total booking price summing daily prices from check_in to check_out (exclusive)."""
+        prop = await self.property_repo.get_by_id(property_id)
+        if not prop:
+            raise NotFoundException("Propiedad no encontrada")
+
+        all_costs = await self.cost_repo.get_costs_overlapping(property_id, check_in, check_out)
+        all_base_prices = await self.base_price_repo.get_overlapping(property_id, check_in, check_out)
+
+        total = Decimal(0)
+        current = check_in
+        while current < check_out:
+            day_costs = self._costs_for_date(all_costs, current)
+            floor_price = self._calculate_floor_price(day_costs, prop.avg_stay_days)
+
+            rules = await self.pricing_repo.get_active_rules_for_date(property_id, current)
+            active_rule = rules[0] if rules else None
+            percent = active_rule.profitability_percent if active_rule else Decimal(100)
+
+            day_base_price = self._base_price_for_date(all_base_prices, current) or prop.base_price
+            price = floor_price + (day_base_price - floor_price) * (percent / Decimal(100))
+            total += price
+            current += timedelta(days=1)
+
+        return round(total, 2)
+
+    # ------------------------------------------------------------------ #
     # Calendar                                                             #
     # ------------------------------------------------------------------ #
 
@@ -220,21 +252,26 @@ class PricingService:
                     total_variable_per_reservation += cost.value
 
             # Income and daily costs per occupied day
-            booking_income = Decimal(0)
+            # If PAID and paid_amount is recorded, use it as the actual income
+            use_paid_amount = booking.paid_amount is not None
+            booking_income = booking.paid_amount if use_paid_amount else Decimal(0)
+
             for day_offset in range(days):
                 day = booking_start + timedelta(days=day_offset)
                 occupied_days += 1
 
                 day_costs = self._costs_for_date(all_costs, day)
-                floor_price = self._calculate_floor_price(day_costs, prop.avg_stay_days)
 
-                rules = await self.pricing_repo.get_active_rules_for_date(property_id, day)
-                active_rule = rules[0] if rules else None
-                percent = active_rule.profitability_percent if active_rule else Decimal(100)
+                if not use_paid_amount:
+                    floor_price = self._calculate_floor_price(day_costs, prop.avg_stay_days)
 
-                day_base_price = self._base_price_for_date(all_base_prices, day) or prop.base_price
-                price = floor_price + (day_base_price - floor_price) * (percent / Decimal(100))
-                booking_income += price
+                    rules = await self.pricing_repo.get_active_rules_for_date(property_id, day)
+                    active_rule = rules[0] if rules else None
+                    percent = active_rule.profitability_percent if active_rule else Decimal(100)
+
+                    day_base_price = self._base_price_for_date(all_base_prices, day) or prop.base_price
+                    price = floor_price + (day_base_price - floor_price) * (percent / Decimal(100))
+                    booking_income += price
 
                 for cost in day_costs:
                     if (

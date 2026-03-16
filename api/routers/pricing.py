@@ -5,6 +5,7 @@ from uuid import UUID
 from datetime import date
 
 from schemas.pricing_rule import PricingRuleCreate, PricingRuleUpdate, PricingRuleResponse
+from schemas.booking import PriceQuoteResponse
 from services.pricing_service import PricingService
 from core.database import get_db
 from dependencies.auth import get_current_user, has_role
@@ -62,6 +63,22 @@ async def get_calendar(
 ):
     """Get calendar with calculated prices."""
     return await PricingService(db).get_calendar(property_id, start_date, end_date)
+
+@router.get("/properties/{property_id}/price-quote", response_model=PriceQuoteResponse)
+async def get_price_quote(
+    property_id: UUID,
+    check_in: date = Query(...),
+    check_out: date = Query(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user)
+):
+    """Get estimated total price for a booking date range."""
+    from exceptions.general import BadRequestException
+    if check_in >= check_out:
+        raise BadRequestException("check_out debe ser posterior a check_in")
+    total = await PricingService(db).calculate_booking_total(property_id, check_in, check_out)
+    return {"total_amount": total, "nights": (check_out - check_in).days}
+
 
 @router.get("/properties/{property_id}/financial-summary")
 async def get_financial_summary(

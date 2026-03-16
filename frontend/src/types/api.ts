@@ -142,6 +142,8 @@ export interface Booking {
     description?: string;
     status: string | BookingStatus;
     source: string | BookingSource;
+    total_amount?: number | null;  // Calculated at creation time
+    paid_amount?: number | null;   // Actual amount received (set when paid)
     paid_at?: string | null; // date YYYY-MM-DD
     payment_method?: string | PaymentMethod | null;
     external_id?: string;
@@ -149,6 +151,11 @@ export interface Booking {
     last_synced_at?: string; // datetime
     created_at: string; // datetime
     updated_at: string; // datetime
+}
+
+export interface PriceQuote {
+    total_amount: number;
+    nights: number;
 }
 
 export interface AuthResponse {

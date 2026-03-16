@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, Date, DateTime, ForeignKey, Text, Enum, CheckConstraint, Index
+from sqlalchemy import Column, String, Date, DateTime, ForeignKey, Text, Enum, CheckConstraint, Index, Numeric
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -33,6 +33,10 @@ class Booking(Base):
     description = Column(Text, nullable=True)  # DESCRIPTION
     status = Column(Enum(BookingStatus), default=BookingStatus.CONFIRMED, nullable=False)
     source = Column(Enum(BookingSource), default=BookingSource.DOMU, nullable=False)
+
+    # Amounts
+    total_amount = Column(Numeric(10, 2), nullable=True)  # Calculated at creation time
+    paid_amount = Column(Numeric(10, 2), nullable=True)   # Actual amount received (set when paid)
 
     # Payment info
     paid_at = Column(Date, nullable=True)

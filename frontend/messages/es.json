@@ -44,7 +44,14 @@
         "markAsPaid": "Marcar como pagada",
         "paidAt": "Fecha de pago",
         "paymentMethod": "Medio de pago",
-        "confirmPayment": "Confirmar pago"
+        "confirmPayment": "Confirmar pago",
+        "totalAmount": "Total",
+        "paidAmount": "Monto cobrado",
+        "paidAmountHint": "dejar vacío para usar el total calculado",
+        "estimatedTotal": "Total estimado",
+        "payTotal": "Pagar total:",
+        "revertPayment": "Revertir pago",
+        "confirmRevertPayment": "Se eliminará el pago y la reserva volverá a estado Confirmado. ¿Continuar?"
     },
     "Common": {
         "save": "Guardar",

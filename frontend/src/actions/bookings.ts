@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { serverApi } from "@/lib/server-api";
 import { revalidatePath } from "next/cache";
-import { Booking, BookingStatus, BookingSource, PaymentMethod } from "@/types/api";
+import { Booking, BookingStatus, BookingSource, PaymentMethod, PriceQuote } from "@/types/api";
 
 const bookingSchema = z.object({
     property_id: z.string().uuid("Invalid property ID"),
@@ -29,6 +29,22 @@ export async function getBookings(): Promise<Booking[]> {
     } catch (error) {
         console.error("Get Bookings Error:", error);
         return [];
+    }
+}
+
+export async function getPriceQuote(
+    propertyId: string,
+    checkIn: string,
+    checkOut: string
+): Promise<PriceQuote | null> {
+    try {
+        const res = await serverApi(`/properties/${propertyId}/price-quote`, {
+            params: { check_in: checkIn, check_out: checkOut },
+        });
+        if (!res.ok) return null;
+        return res.json();
+    } catch {
+        return null;
     }
 }
 
@@ -190,14 +206,17 @@ export async function payBooking(
 ): Promise<BookingFormState> {
     const paid_at = formData.get("paid_at") as string;
     const payment_method = formData.get("payment_method") as string;
+    const paid_amount_raw = formData.get("paid_amount") as string;
 
     if (!paid_at) return { error: "La fecha de pago es obligatoria" };
     if (!payment_method) return { error: "El medio de pago es obligatorio" };
 
+    const paid_amount = paid_amount_raw ? parseFloat(paid_amount_raw) : undefined;
+
     try {
         const res = await serverApi(`/bookings/${bookingId}/pay`, {
             method: "POST",
-            body: JSON.stringify({ paid_at, payment_method }),
+            body: JSON.stringify({ paid_at, payment_method, ...(paid_amount !== undefined && { paid_amount }) }),
         });
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
@@ -208,6 +227,21 @@ export async function payBooking(
         return { error: "Something went wrong" };
     }
 
+    revalidatePath("/bookings");
+    return { success: true };
+}
+
+export async function revertPayment(bookingId: string): Promise<{ success?: boolean; error?: string }> {
+    try {
+        const res = await serverApi(`/bookings/${bookingId}/revert-payment`, { method: "POST" });
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            return { error: errorData.detail || "No se pudo revertir el pago" };
+        }
+    } catch (error) {
+        console.error("Revert Payment Error:", error);
+        return { error: "Something went wrong" };
+    }
     revalidatePath("/bookings");
     return { success: true };
 }

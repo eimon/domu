@@ -5,7 +5,7 @@ services:
     environment:
       SECRET_KEY: ${SECRET_KEY:-supersecretkey}
       ALGORITHM: ${ALGORITHM:-HS256}
-      DATABASE_URL: postgresql+asyncpg://postgres:${POSTGRES_PASSWORD:-password}@db:5432/domu_db
+      DATABASE_URL: postgresql+asyncpg://postgres:${POSTGRES_PASSWORD:-password}@domu_db:5432/domu_db
       VIRTUAL_HOST: ${API_HOST:-localhost}
       VIRTUAL_PORT: 8000
       LETSENCRYPT_HOST: ${API_HOST:-localhost}

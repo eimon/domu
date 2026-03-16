@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Booking, Property, Guest } from "@/types/api";
-import { Trash2, ExternalLink, Check, X, Eye, BadgeDollarSign, MoreVertical, Loader2 } from "lucide-react";
+import { Trash2, ExternalLink, Check, X, Eye, BadgeDollarSign, MoreVertical, Loader2, Undo2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { acceptBooking, cancelBooking, deleteBooking } from "@/actions/bookings";
+import { acceptBooking, cancelBooking, deleteBooking, revertPayment } from "@/actions/bookings";
 import { Link } from "@/i18n/routing";
 import { useToast } from "@/context/ToastContext";
 import { useConfirm } from "@/context/ConfirmContext";
@@ -27,6 +27,7 @@ function BookingCardMenu({
     onAccept,
     onCancel,
     onPay,
+    onRevertPayment,
     onDelete,
 }: {
     booking: Booking;
@@ -35,6 +36,7 @@ function BookingCardMenu({
     onAccept: () => void;
     onCancel: () => void;
     onPay: () => void;
+    onRevertPayment: () => void;
     onDelete: () => void;
 }) {
     const [open, setOpen] = useState(false);
@@ -45,6 +47,7 @@ function BookingCardMenu({
     const isTentative = booking.status === "TENTATIVE";
     const isConfirmed = booking.status === "CONFIRMED";
     const isCancelled = booking.status === "CANCELLED";
+    const isPaid = booking.status === "PAID";
 
     useEffect(() => {
         if (!open) return;
@@ -79,6 +82,7 @@ function BookingCardMenu({
                     {item(tBooking("viewDetails"), onViewDetails, "text-white/60")}
                     {isTentative && item(tBooking("accept"), onAccept, "text-domu-success/80")}
                     {(isTentative || isConfirmed) && item(tBooking("markAsPaid"), onPay, "text-emerald-400/80")}
+                    {isPaid && item(tBooking("revertPayment"), onRevertPayment, "text-domu-warning/80")}
                     {(isTentative || isConfirmed) && item(t("cancel"), onCancel, "text-domu-danger/80")}
                     {isCancelled && item(t("delete"), onDelete, "text-domu-danger/80")}
                 </div>
@@ -128,6 +132,14 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
         setLoadingId(null);
     };
 
+    const handleRevertPayment = async (booking: Booking) => {
+        if (!await confirm(tBooking('confirmRevertPayment'))) return;
+        setLoadingId(booking.id);
+        const result = await revertPayment(booking.id);
+        if (result.error) showError(result.error);
+        setLoadingId(null);
+    };
+
     const statusBadgeClass = (status: string) => {
         if (status === 'PAID') return 'bg-emerald-500/15 text-emerald-400';
         if (status === 'CONFIRMED') return 'bg-domu-success/12 text-domu-success';
@@ -172,6 +184,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                     onAccept={() => handleAccept(booking)}
                                     onCancel={() => handleCancel(booking)}
                                     onPay={() => setPayingBooking(booking)}
+                                    onRevertPayment={() => handleRevertPayment(booking)}
                                     onDelete={() => handleDelete(booking)}
                                 />
                             </div>
@@ -181,17 +194,31 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                 {getGuestName(booking.guest_id)}
                             </div>
 
-                            {/* Row 3: dates */}
-                            <div className="flex items-center gap-3 text-xs text-white/40 font-mono">
-                                <span>
-                                    <span className="text-white/25 mr-1 font-sans">{tBooking("checkIn")}</span>
-                                    {booking.check_in}
-                                </span>
-                                <span className="text-white/20">→</span>
-                                <span>
-                                    <span className="text-white/25 mr-1 font-sans">{tBooking("checkOut")}</span>
-                                    {booking.check_out}
-                                </span>
+                            {/* Row 3: dates + amount */}
+                            <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3 text-xs text-white/40 font-mono">
+                                    <span>
+                                        <span className="text-white/25 mr-1 font-sans">{tBooking("checkIn")}</span>
+                                        {booking.check_in}
+                                    </span>
+                                    <span className="text-white/20">→</span>
+                                    <span>
+                                        <span className="text-white/25 mr-1 font-sans">{tBooking("checkOut")}</span>
+                                        {booking.check_out}
+                                    </span>
+                                </div>
+                                <div className="text-xs font-mono shrink-0 flex flex-col items-end gap-0.5">
+                                    {booking.total_amount != null && (
+                                        <span className="text-white/40">
+                                            ${Number(booking.total_amount).toLocaleString("es-AR", { minimumFractionDigits: 0 })}
+                                        </span>
+                                    )}
+                                    {booking.status === "PAID" && booking.paid_amount != null && (
+                                        <span className="text-emerald-400 font-semibold">
+                                            ${Number(booking.paid_amount).toLocaleString("es-AR", { minimumFractionDigits: 0 })}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     );
@@ -218,6 +245,9 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white/35 uppercase tracking-wider">
                                     {tBooking('status')}
+                                </th>
+                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-white/35 uppercase tracking-wider">
+                                    {tBooking('totalAmount')}
                                 </th>
                                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-white/35 uppercase tracking-wider">
                                     {t('actions')}
@@ -250,14 +280,29 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                             {booking.check_out}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                                isPaid ? 'bg-emerald-500/15 text-emerald-400' :
-                                                isConfirmed ? 'bg-domu-success/12 text-domu-success' :
-                                                isTentative ? 'bg-domu-warning/12 text-domu-warning' :
-                                                'bg-domu-danger/12 text-domu-danger'
-                                            }`}>
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${isPaid ? 'bg-emerald-500/15 text-emerald-400' :
+                                                    isConfirmed ? 'bg-domu-success/12 text-domu-success' :
+                                                        isTentative ? 'bg-domu-warning/12 text-domu-warning' :
+                                                            'bg-domu-danger/12 text-domu-danger'
+                                                }`}>
                                                 {tEnums(`BookingStatus.${booking.status}`)}
                                             </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-mono">
+                                            <div className="flex flex-col items-end gap-0.5">
+                                                {booking.total_amount != null ? (
+                                                    <span className="text-white/45">
+                                                        ${Number(booking.total_amount).toLocaleString("es-AR", { maximumFractionDigits: 0 })}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-white/20">—</span>
+                                                )}
+                                                {isPaid && booking.paid_amount != null && (
+                                                    <span className="text-emerald-400 font-semibold text-xs">
+                                                        ${Number(booking.paid_amount).toLocaleString("es-AR", { maximumFractionDigits: 0 })}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
                                             <div className="flex items-center justify-end space-x-1">
@@ -296,6 +341,16 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
                                                         title={tBooking('markAsPaid')}
                                                     >
                                                         <BadgeDollarSign size={15} />
+                                                    </button>
+                                                )}
+                                                {isPaid && (
+                                                    <button
+                                                        onClick={() => handleRevertPayment(booking)}
+                                                        disabled={isLoading}
+                                                        className="p-1.5 text-domu-warning/70 hover:bg-domu-warning/10 hover:text-domu-warning rounded-lg transition-colors disabled:opacity-40"
+                                                        title={tBooking('revertPayment')}
+                                                    >
+                                                        <Undo2 size={15} />
                                                     </button>
                                                 )}
                                                 {isConfirmed && (
@@ -341,6 +396,7 @@ export default function BookingsTable({ bookings, properties = EMPTY_PROPERTIES,
             {payingBooking && (
                 <PayBookingDialog
                     bookingId={payingBooking.id}
+                    totalAmount={payingBooking.total_amount}
                     isOpen
                     onClose={() => setPayingBooking(null)}
                 />

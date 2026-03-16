@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useActionState } from "react";
 import { X, Loader2 } from "lucide-react";
 import { payBooking, BookingFormState } from "@/actions/bookings";
@@ -8,11 +8,12 @@ import { useTranslations } from "next-intl";
 
 interface PayBookingDialogProps {
     bookingId: string;
+    totalAmount?: number | null;
     isOpen: boolean;
     onClose: () => void;
 }
 
-export default function PayBookingDialog({ bookingId, isOpen, onClose }: PayBookingDialogProps) {
+export default function PayBookingDialog({ bookingId, totalAmount, isOpen, onClose }: PayBookingDialogProps) {
     const initialState: BookingFormState = {};
     const t = useTranslations("Common");
     const tBooking = useTranslations("Bookings");
@@ -22,6 +23,7 @@ export default function PayBookingDialog({ bookingId, isOpen, onClose }: PayBook
     const [state, formAction, isPending] = useActionState(payWithId, initialState);
 
     const todayStr = new Date().toISOString().split("T")[0];
+    const [paidAmount, setPaidAmount] = useState(totalAmount != null ? String(totalAmount) : "");
 
     useEffect(() => {
         if (state.success && isOpen) {
@@ -73,6 +75,33 @@ export default function PayBookingDialog({ bookingId, isOpen, onClose }: PayBook
                                 <option key={m} value={m}>{tEnums(`PaymentMethod.${m}`)}</option>
                             ))}
                         </select>
+                    </div>
+
+                    <div>
+                        <div className="flex items-baseline justify-between mb-1.5">
+                            <label className="text-xs font-medium text-white/55 uppercase tracking-wider">
+                                {tBooking("paidAmount")}
+                            </label>
+                            {totalAmount != null && (
+                                <button
+                                    type="button"
+                                    onClick={() => setPaidAmount(String(totalAmount))}
+                                    className="text-xs text-domu-primary/70 hover:text-domu-primary transition-colors"
+                                >
+                                    {tBooking("payTotal")} ${Number(totalAmount).toLocaleString("es-AR", { maximumFractionDigits: 0 })}
+                                </button>
+                            )}
+                        </div>
+                        <input
+                            name="paid_amount"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={paidAmount}
+                            onChange={(e) => setPaidAmount(e.target.value)}
+                            placeholder="0.00"
+                            className="w-full px-3 py-2 rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/90 focus:border-domu-primary/60 focus:ring-2 focus:ring-domu-primary/15 outline-none transition-all text-sm"
+                        />
                     </div>
 
                     <div className="pt-2 flex justify-end space-x-3">
