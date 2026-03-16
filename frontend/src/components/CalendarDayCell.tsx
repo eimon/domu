@@ -1,7 +1,7 @@
 "use client";
 
 import { CalendarDay } from "@/types/api";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, formatPriceCompact } from "@/lib/utils";
 
 interface CalendarDayCellProps {
     day: CalendarDay;
@@ -45,7 +45,8 @@ export default function CalendarDayCell({
                 : day.status === 'RESERVED' ? 'text-domu-danger/70'
                 : 'text-domu-success/80'
             }`}>
-                ${formatPrice(day.price)}
+                <span className="md:hidden">${formatPriceCompact(day.price)}</span>
+                <span className="hidden md:inline">${formatPrice(day.price)}</span>
             </div>
             {day.rule_name && (
                 <div

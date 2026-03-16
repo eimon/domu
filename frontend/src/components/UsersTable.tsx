@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { User, UserRole } from "@/types/api";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, MoreVertical, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { deleteUser } from "@/actions/users";
 import EditUserDialog from "@/components/EditUserDialog";
@@ -18,6 +18,57 @@ const roleBadgeClass: Record<string, string> = {
     [UserRole.MANAGER]: "bg-domu-primary/12 text-domu-primary",
     [UserRole.OWNER]:   "bg-domu-success/12 text-domu-success",
 };
+
+function UserCardMenu({
+    isDeleting,
+    onEdit,
+    onDelete,
+}: {
+    isDeleting: boolean;
+    onEdit: () => void;
+    onDelete: () => void;
+}) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const t = useTranslations("Common");
+
+    useEffect(() => {
+        if (!open) return;
+        const handler = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, [open]);
+
+    const item = (label: string, onClick: () => void, className = "", disabled = false) => (
+        <button
+            onClick={() => { setOpen(false); onClick(); }}
+            disabled={disabled}
+            className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-left hover:bg-white/[0.06] transition-colors disabled:opacity-40 ${className}`}
+        >
+            {label}
+        </button>
+    );
+
+    return (
+        <div ref={ref} className="relative">
+            <button
+                onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
+                className="p-1.5 text-white/40 hover:text-white/70 hover:bg-white/[0.06] rounded-lg transition-colors"
+            >
+                {isDeleting ? <Loader2 size={16} className="animate-spin" /> : <MoreVertical size={16} />}
+            </button>
+
+            {open && (
+                <div className="absolute right-0 top-8 z-30 w-40 glass-modal rounded-xl shadow-2xl border border-white/[0.08] overflow-hidden py-1">
+                    {item(t("edit"), onEdit, "text-domu-primary/80")}
+                    {item(t("delete"), onDelete, "text-domu-danger/80", isDeleting)}
+                </div>
+            )}
+        </div>
+    );
+}
 
 export default function UsersTable({ users }: UsersTableProps) {
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
@@ -48,7 +99,44 @@ export default function UsersTable({ users }: UsersTableProps) {
 
     return (
         <>
-            <div className="glass rounded-xl overflow-hidden">
+            {/* ── Mobile: cards ── */}
+            <div className="flex flex-col gap-3 md:hidden">
+                {users.map((user) => (
+                    <div key={user.id} className="glass rounded-xl px-4 py-3.5">
+                        {/* Row 1: name + badges + menu */}
+                        <div className="flex items-start justify-between gap-2 mb-1.5">
+                            <div className="flex items-center flex-wrap gap-1.5 min-w-0">
+                                <span className="text-sm font-semibold text-white/85">{user.full_name || "—"}</span>
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${roleBadgeClass[user.role] ?? "bg-white/[0.06] text-white/45"}`}>
+                                    {tEnums(`UserRole.${user.role}`)}
+                                </span>
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                                    user.is_active
+                                        ? "bg-domu-success/12 text-domu-success"
+                                        : "bg-white/[0.05] text-white/35"
+                                }`}>
+                                    {user.is_active ? tUsers("active") : tUsers("inactive")}
+                                </span>
+                            </div>
+                            <UserCardMenu
+                                isDeleting={isDeleting === user.id}
+                                onEdit={() => setEditingUser(user)}
+                                onDelete={() => handleDelete(user)}
+                            />
+                        </div>
+
+                        {/* Row 2: email + username */}
+                        <div className="flex items-center gap-3 text-xs text-white/40">
+                            <span>{user.email}</span>
+                            <span className="text-white/20">·</span>
+                            <span className="font-mono text-white/35">{user.username}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* ── Desktop: table ── */}
+            <div className="hidden md:block glass rounded-xl overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-white/[0.06]">
                         <thead className="bg-white/[0.03]">
