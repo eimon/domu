@@ -1,78 +1,277 @@
-# Domu Frontend - Agents Summary
+# CLAUDE.md — Next.js Frontend Sub-Agent
 
-Este archivo contiene un resumen consolidado de las capacidades, arquitectura y características implementadas en el frontend de Domu hasta la fecha.
+Este archivo complementa el CLAUDE.md raíz. Contiene las convenciones exactas del código para trabajar dentro de `frontend/`.
 
-## 🛠 Stack Tecnológico
-- **Framework**: Next.js 16 (App Router)
-- **Lenguaje**: TypeScript (Strict Mode)
-- **Estilos**: Tailwind CSS v4
-- **Internacionalización**: `next-intl` (Soporte completo EN/ES)
-- **Autenticación**: JWT con `jose` (Validación en Middleware)
+**Referencia de features implementadas:** Consultar `README.md` en este directorio para el resumen completo de capacidades y módulos ya construidos.
 
-## 🎨 Design System — "Obsidian Glass"
+## Stack Tecnológico
 
-Sistema de diseño oscuro con glassmorphism. Documentado en `DESIGN_SYSTEM.md` y `globals.css`.
+- **Framework:** Next.js 16 (App Router)
+- **Lenguaje:** TypeScript (Strict Mode)
+- **Estilos:** Tailwind CSS v4
+- **Internacionalización:** `next-intl` (locales: `en`, `es`, default: `en`)
+- **Autenticación:** JWT con `jose` (validado en Middleware)
+- **Validación:** Zod
+- **HTTP (client-side):** axios (`src/lib/api.ts`)
+- **HTTP (server-side):** fetch nativo vía `serverApi` (`src/lib/server-api.ts`)
 
-- **Clases glass**: `.glass`, `.glass-elevated`, `.glass-modal`, `.glass-sidebar`
-- **Tokens de color**: `domu-primary` (#818cf8), `domu-success` (#34d399), `domu-warning` (#fbbf24), `domu-danger` (#f87171), `domu-base` (#0f1117)
-- **Todos los modales y diálogos** usan `glass-modal rounded-2xl shadow-2xl`
-- **Inputs**: constantes `inputCls` y `labelCls` definidas en cada componente de formulario
+## Estructura de Directorios
 
-## 🏗 Arquitectura y Core
+```
+frontend/src/
+├── app/
+│   └── [locale]/
+│       ├── (auth)/auth/login/page.tsx     # Página pública de login
+│       └── (dashboard)/                   # Rutas protegidas
+│           ├── layout.tsx                 # Layout con Sidebar + Navbar
+│           ├── page.tsx                   # Dashboard principal (propiedades)
+│           ├── properties/
+│           │   ├── page.tsx               # Listado de propiedades
+│           │   ├── new/page.tsx           # Crear propiedad
+│           │   └── [id]/page.tsx          # Detalle tabulado de propiedad
+│           ├── bookings/page.tsx
+│           └── guests/page.tsx
+├── actions/                               # Server Actions (lógica CRUD)
+│   ├── auth.ts
+│   ├── bookings.ts
+│   ├── calendar.ts
+│   ├── costs.ts
+│   ├── guests.ts
+│   ├── pricing.ts
+│   ├── properties.ts
+│   └── reports.ts
+├── components/                            # Componentes reutilizables (Client)
+├── context/                               # React Context (SidebarContext)
+├── i18n/
+│   ├── routing.ts                         # Definición de locales y navegación
+│   └── request.ts                         # Config de next-intl para RSC
+├── lib/
+│   ├── api.ts                             # axios client (browser, con token en localStorage)
+│   └── server-api.ts                      # fetch helper (server, con token en cookie)
+├── middleware.ts                           # JWT guard + i18n redirect
+└── types/
+    └── api.ts                             # Interfaces y Enums del dominio
+```
 
-- **Rutas Protegidas**: Middleware centralizado que valida el JWT y gestiona el redireccionamiento por idioma.
-- **Data Fetching**:
-    - `serverApi`: Helper para consumos seguros desde Server Components (lee cookie `access_token`).
-    - **Server Actions**: Lógica de negocio (CRUD) en el servidor para Auth, Propiedades, Huéspedes, Reservas y Costos.
-- **Persistencia de Estado**: URL Search Params para estado de pestañas y selecciones.
-- **Formato de precios**: `formatPrice()` en `src/lib/utils.ts` — enteros sin centavos, punto como separador de miles (`$1.500`).
+## Convenciones de Código
 
-## 🔔 Sistema Global de UI
+### Server Actions (`src/actions/`)
 
-- **Toast notifications**: `ToastContext` (`src/context/ToastContext.tsx`) — `showError(msg)` y `showSuccess(msg)`. Disponible vía `useToast()`.
-- **Diálogos de confirmación**: `ConfirmContext` (`src/context/ConfirmContext.tsx`) — `await confirm(mensaje)` devuelve `boolean`. Disponible vía `useConfirm()`.
-- Ambos contextos están registrados en el layout raíz y disponibles en cualquier Client Component.
+Todos los archivos de actions deben comenzar con `"use server"`. Son el lugar donde vive la lógica de negocio del frontend: llamadas a la API, validación con Zod, y revalidación del caché.
 
-## 🚀 Características Implementadas
+```typescript
+"use server";
 
-### 1. Dashboard (Home)
+import { z } from "zod";
+import { serverApi } from "@/lib/server-api";
+import { revalidatePath } from "next/cache";
 
-- **KPIs del mes**: total de propiedades, ingresos mensuales, ganancia neta y ocupación promedio agregados de todas las propiedades.
-- **Resumen de propiedades**: lista de propiedades con ocupación, ingresos y ganancia del mes actual.
-- **Próximos check-ins**: panel lateral con reservas en los próximos 7 días (no canceladas).
-- Datos obtenidos con `Promise.all` server-side para máximo paralelismo.
+// 1. Schema de validación con Zod
+const domainSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+});
 
-### 2. Gestión de Propiedades
+// 2. Tipo de estado para useActionState
+export type DomainFormState = {
+    error?: string;
+    success?: boolean;
+};
 
-- **Detalle Tabulado**: pestañas **Detalles y Costos**, **Calendario** y **Reportes**.
-- **CRUD Completo**: creación, edición y eliminación con validaciones de negocio.
-- **Autocompletado de dirección**: `AddressAutocomplete` con Nominatim (OpenStreetMap).
+// 3. Action que recibe (prevState, formData) → para useActionState
+export async function createDomain(
+    prevState: DomainFormState,
+    formData: FormData
+): Promise<DomainFormState> {
+    const validatedFields = domainSchema.safeParse({
+        name: formData.get("name"),
+    });
 
-### 3. Costos y Precios Dinámicos
+    if (!validatedFields.success) {
+        return { error: "Invalid fields" };
+    }
 
-- **Categorías de costos**: `RECURRING_MONTHLY` (mensual fijo), `PER_DAY_RESERVATION` (por día de reserva, ej. desayuno), `PER_RESERVATION` (por reserva).
-- **Versionado temporal**: costos y `base_price` tienen historial de cambios con `start_date`/`end_date`. Se puede modificar el valor con fecha de vigencia y revertir al anterior.
-- **Reglas de Precio**: períodos con rentabilidad % personalizada, visualizadas en el calendario.
-- **Calendario Interactivo**: visualización mensual de disponibilidad y precios calculados.
+    try {
+        const res = await serverApi("/domain-endpoint", {
+            method: "POST",
+            body: JSON.stringify(validatedFields.data),
+        });
 
-### 4. Huéspedes y Reservas
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            return { error: errorData.detail || "Failed to create" };
+        }
+    } catch {
+        return { error: "Something went wrong" };
+    }
 
-- **Huéspedes**: administración con tipos de documento (DU/Extranjero).
-- **Reservas**:
-    - Tabla con acciones por estado: confirmar (TENTATIVE), cancelar (TENTATIVE/CONFIRMED), eliminar (CANCELLED).
-    - **Modal de detalle**: al hacer click en el ojo (Eye) se abre `BookingDetailModal` con datos completos de la reserva, fechas, fuente y datos de contacto del huésped.
-    - **Asignación de huésped**: si la reserva no tiene huésped asignado, el modal muestra un formulario para asignar uno desde la lista existente.
+    revalidatePath("/domain-path");
+    return { success: true };
+}
 
-### 5. Inteligencia Financiera
+// 4. Actions de solo lectura (no usan prevState)
+export async function getDomains(): Promise<Domain[]> {
+    try {
+        const res = await serverApi("/domain-endpoint");
+        if (!res.ok) return [];
+        return res.json();
+    } catch {
+        return [];
+    }
+}
+```
 
-- **Reportes Mensuales**: resumen de ingresos, ocupación y rentabilidad con desglose de costos.
-- **Selector de Período**: navegación fluida por meses.
+**Reglas de actions:**
+- Siempre `"use server"` al inicio
+- Validar con Zod antes de llamar a la API
+- Usar `serverApi` (nunca axios) — lee el token desde la cookie `access_token`
+- Tras mutaciones: llamar `revalidatePath()` con las rutas afectadas
+- Devolver `{ error: string }` o `{ success: true }`, nunca lanzar excepciones al cliente
 
-## 🔧 Utilidades Clave
+### Helpers de API
 
-- **`formatPrice(value)`**: convierte montos a string con enteros y punto como separador de miles.
-- **Date Safety**: manejo de fechas en `YYYY-MM-DD` evitando desfases por zona horaria.
-- **`cn()`**: helper de `clsx` + `tailwind-merge` para clases condicionales.
+**`serverApi` (server-side):** Para Server Components y Server Actions. Lee el token de la cookie `access_token`.
 
----
-*Última actualización: Marzo 2026*
+```typescript
+// GET con params
+const res = await serverApi("/properties", { params: { skip: "0", limit: "100" } });
+
+// POST
+const res = await serverApi("/properties", {
+    method: "POST",
+    body: JSON.stringify(data),
+});
+
+// PUT / DELETE
+const res = await serverApi(`/properties/${id}`, { method: "DELETE" });
+```
+
+**`api` axios (client-side):** Solo para Client Components que necesiten interacción en tiempo real. Lee el token de `localStorage`.
+
+```typescript
+import api from "@/lib/api";
+const { data } = await api.get("/some-endpoint");
+```
+
+### Tipos (`src/types/api.ts`)
+
+Todos los tipos del dominio viven en un único archivo. Seguir el patrón existente:
+- Interfaces con `id: string` (UUID como string)
+- Fechas como `string` en formato `YYYY-MM-DD` o ISO datetime
+- Valores monetarios como `number`
+- Enums TypeScript que replican los enums del backend
+
+Agregar nuevos tipos al final del archivo. No crear archivos de tipos por dominio.
+
+### Componentes (`src/components/`)
+
+Los componentes de `src/components/` son Client Components (implícito o con `"use client"`).
+
+```typescript
+"use client";
+
+import { useActionState } from "react";
+import { createDomain, type DomainFormState } from "@/actions/domain";
+
+const initialState: DomainFormState = {};
+
+export function DomainForm() {
+    const [state, formAction, isPending] = useActionState(createDomain, initialState);
+
+    return (
+        <form action={formAction}>
+            {state.error && <p className="text-red-500 text-sm">{state.error}</p>}
+            <input name="name" required />
+            <button type="submit" disabled={isPending}>
+                {isPending ? "Guardando..." : "Guardar"}
+            </button>
+        </form>
+    );
+}
+```
+
+**Convenciones de componentes:**
+- Usar `useActionState` para forms conectados a Server Actions
+- `isPending` para deshabilitar botones y mostrar loading state
+- Iconos: `lucide-react`
+- Clases: Tailwind CSS v4, usar `clsx` + `tailwind-merge` (`src/lib/utils.ts`) para condicionales
+- Diálogos modales: patrón con `isOpen` / `onClose` props
+
+### Páginas (Server Components)
+
+Las páginas en `app/[locale]/` son Server Components por defecto. Obtienen datos directamente con `serverApi` o llaman a actions de solo lectura.
+
+```typescript
+import { getMyProperties } from "@/actions/properties";
+
+export default async function PropertiesPage() {
+    const properties = await getMyProperties();
+    return <PropertiesGrid properties={properties} />;
+}
+```
+
+**Estado de UI persistente:** Usar URL Search Params para tabs, filtros y selecciones. Evitar estado local en el servidor.
+
+### Internacionalización (i18n)
+
+- Textos de UI: usar `useTranslations` en Client Components, `getTranslations` en Server Components
+- Navegación: importar `Link`, `redirect`, `useRouter` desde `@/i18n/routing` (NO desde `next/navigation`)
+- Archivos de mensajes: `messages/en.json` y `messages/es.json`
+
+```typescript
+// Server Component
+import { getTranslations } from "next-intl/server";
+const t = await getTranslations("Properties");
+
+// Client Component
+import { useTranslations } from "next-intl";
+const t = useTranslations("Properties");
+```
+
+### Middleware (`src/middleware.ts`)
+
+- Valida el JWT (cookie `access_token`) con `jose`
+- Rutas públicas: `/auth/**` (con cualquier prefijo de locale)
+- Rutas protegidas: todo lo demás → redirige a `/{locale}/auth/login` si no hay token o es inválido
+- Variable de entorno requerida: `JWT_SECRET_KEY`
+
+## Autenticación
+
+- **Login:** Server Action `login()` en `actions/auth.ts` — obtiene el token del backend y lo guarda en cookie `httpOnly`
+- **Logout:** Server Action `logout()` — borra la cookie y redirige a login
+- **Token:** Cookie `access_token` (server) / `localStorage` `access_token` (client, para axios)
+- **Variable de entorno frontend:** `NEXT_PUBLIC_API_URL` (default: `http://localhost:8000/api/v1`), `JWT_SECRET_KEY`
+
+## Enums del Dominio
+
+Definidos en `src/types/api.ts`, espejo de los enums del backend:
+
+| Enum | Valores |
+|------|---------|
+| `BookingStatus` | `CONFIRMED`, `TENTATIVE`, `CANCELLED` |
+| `BookingSource` | `AIRBNB`, `BOOKING`, `DOMU`, `MANUAL` |
+| `DocumentType` | `DU`, `EXTRANJERO` |
+| `UserRole` | `ADMIN`, `MANAGER`, `OWNER` |
+| `CostCategory` | `RECURRING_MONTHLY`, `PER_DAY_RESERVATION`, `PER_RESERVATION` |
+| `CostCalculationType` | `FIXED_AMOUNT`, `PERCENTAGE` |
+
+## Comandos de Desarrollo
+
+```bash
+# Instalar dependencias
+cd frontend && npm install
+
+# Servidor de desarrollo (requiere API corriendo en :8000)
+npm run dev   # → http://localhost:3000
+
+# Build de producción
+npm run build
+
+# Lint
+npm run lint
+```
+
+## Idioma
+
+- Strings de UI en `messages/en.json` y `messages/es.json`
+- Nombres de código (clases, funciones, variables, archivos) en **inglés**
+- Mensajes de error del backend pueden estar en **español** (los muestra tal cual)

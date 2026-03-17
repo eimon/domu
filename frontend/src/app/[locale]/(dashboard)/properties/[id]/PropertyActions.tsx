@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Property } from "@/types/api";
 import { Pencil, Trash2 } from "lucide-react";
 import { deleteProperty } from "@/actions/properties";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import EditPropertyDialog from "@/components/EditPropertyDialog";
 import { useToast } from "@/context/ToastContext";
 import { useConfirm } from "@/context/ConfirmContext";
