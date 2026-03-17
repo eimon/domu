@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { serverApi } from "@/lib/server-api";
+import { PricingOptimizationResponse } from "@/types/pricing_analytics";
 
 const optimizationRequestSchema = z.object({
     property_id: z.string().uuid(),
@@ -11,10 +12,7 @@ const optimizationRequestSchema = z.object({
     date_range_end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 });
 
-export type OptimizationFormState = {
-    error?: string;
-    success?: boolean;
-};
+export type OptimizationFormState = { error?: string; success?: boolean } & Partial<PricingOptimizationResponse>;
 
 // Actions de solo lectura
 export async function getPricingAnalytics(propertyId: string, analysisDate?: string) {

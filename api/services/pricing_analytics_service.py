@@ -1,7 +1,6 @@
 import calendar
 import uuid
 from datetime import date, timedelta
-from decimal import Decimal
 from typing import List
 import random
 from math import sin, pi
@@ -50,7 +49,7 @@ class PricingAnalyticsService:
 
         # Get current profitability
         rules = await self.pricing_repo.get_active_rules_for_date(property_id, analysis_date)
-        current_profitability = float(rules[0].profitability_percent if rules else Decimal(100))
+        current_profitability = float(rules[0].profitability_percent) if rules else 100.0
 
         # Mock market comparison (in production, integrate with external APIs)
         market_comparison = self._generate_market_comparison(prop.base_price, analysis_date)
@@ -182,7 +181,7 @@ class PricingAnalyticsService:
         return projections
 
     # Private helper methods
-    def _generate_market_comparison(self, base_price: Decimal, analysis_date: date) -> MarketComparison:
+    def _generate_market_comparison(self, base_price: float, analysis_date: date) -> MarketComparison:
         """Generate mock market comparison data"""
         # Simulate market data (in production, integrate with Airbnb/Booking APIs)
         seasonal_factor = 1 + 0.3 * sin(2 * pi * analysis_date.timetuple().tm_yday / 365)
@@ -198,7 +197,7 @@ class PricingAnalyticsService:
             position = "AT"
 
         return MarketComparison(
-            avg_market_price=Decimal(str(round(avg_market_price, 2))),
+            avg_market_price=round(avg_market_price, 2),
             market_occupancy_rate=round(65 + 15 * seasonal_factor, 1),
             competitor_count=random.randint(8, 25),
             price_position=position
@@ -310,29 +309,23 @@ class PricingAnalyticsService:
 
     async def _calculate_revenue_projection(
         self, property_id: uuid.UUID, start_date: date, end_date: date
-    ) -> Decimal:
+    ) -> float:
         """Calculate current revenue projection for date range"""
-        total_days = (end_date - start_date).days
         calendar_data = await self.pricing_service.get_calendar(property_id, start_date, end_date)
-        
-        # Simulate occupancy based on pricing
-        total_revenue = Decimal(0)
+
+        total_revenue = 0.0
         for day_data in calendar_data:
-            # Simple occupancy model based on price competitiveness
-            day_price = day_data['price']
+            day_price = float(day_data['price'])
             occupancy_probability = max(0.2, min(0.9, 1.0 - (day_price / 200)))  # Simplified model
-            expected_revenue = day_price * occupancy_probability
-            total_revenue += expected_revenue
-            
+            total_revenue += day_price * occupancy_probability
+
         return round(total_revenue, 2)
 
     async def _calculate_optimized_revenue(
         self, property_id: uuid.UUID, new_profitability: float,
         start_date: date, end_date: date
-    ) -> Decimal:
+    ) -> float:
         """Calculate revenue projection with new profitability"""
-        # This would simulate the calendar with new profitability
-        # For now, return a simple calculation
         current_revenue = await self._calculate_revenue_projection(property_id, start_date, end_date)
         profitability_factor = new_profitability / 100.0
         return round(current_revenue * profitability_factor * 0.95, 2)  # Account for demand elasticity

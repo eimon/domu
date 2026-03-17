@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Zap, BarChart3, TrendingUp, Settings } from "lucide-react";
 import { 
     PricingAnalytics, 
@@ -64,19 +64,9 @@ export default function ProfitabilityDashboardPage({
         }
     };
 
-    const handleProfitabilityChange = async (newProfitability: number) => {
-        // En una implementación completa, aquí actualizaríamos las proyecciones
-        // basadas en el nuevo nivel de rentabilidad
-        console.log("Profitability changed to:", newProfitability);
-        
-        // Recargar sensitivity analysis con el nuevo valor
-        try {
-            const newSensitivity = await getPriceSensitivity(propertyId, 20);
-            setSensitivity(newSensitivity);
-        } catch (error) {
-            console.error("Error updating sensitivity:", error);
-        }
-    };
+    const handleProfitabilityChange = useCallback((_newProfitability: number) => {
+        // Informativo: el slider es solo visual, no dispara llamadas al backend
+    }, []);
 
     const handleOptimizationResult = (result: PricingOptimizationResponse) => {
         showSuccess(`Optimización completada: ${result.recommended_profitability.toFixed(1)}% rentabilidad recomendada`);

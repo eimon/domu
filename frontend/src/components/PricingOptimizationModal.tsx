@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useActionState } from "react";
+import { useState, useActionState, useEffect } from "react";
 import { X, Zap, Target, TrendingUp, Users, Calendar } from "lucide-react";
 import { optimizePricing, type OptimizationFormState } from "@/actions/pricing_analytics";
 import { PricingOptimizationResponse } from "@/types/pricing_analytics";
@@ -30,19 +30,22 @@ export default function PricingOptimizationModal({
 
     const [state, formAction, isPending] = useActionState(optimizePricing, initialState);
 
-    const handleSubmit = async (formData: FormData) => {
+    useEffect(() => {
+        if (state.success) {
+            const { success: _, error: __, ...result } = state;
+            onOptimizationResult?.(result as PricingOptimizationResponse);
+            onClose();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [state]);
+
+    const handleSubmit = (formData: FormData) => {
         formData.set("property_id", propertyId);
         formData.set("target_occupancy", targetOccupancy.toString());
         formData.set("priority", priority);
         formData.set("date_range_start", dateRange.start);
         formData.set("date_range_end", dateRange.end);
-        
-        const result = await formAction(formData);
-        
-        if (result.success && onOptimizationResult) {
-            onOptimizationResult(result as any);
-            onClose();
-        }
+        formAction(formData);
     };
 
     const priorities = [

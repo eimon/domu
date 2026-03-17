@@ -31,9 +31,10 @@ export default function ProfitabilitySlider({
         const timer = setTimeout(() => {
             onProfitabilityChange(profitability);
         }, 300);
-        
+
         return () => clearTimeout(timer);
-    }, [profitability, onProfitabilityChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [profitability]);
 
     const getProfitabilityColor = (value: number) => {
         if (value < 70) return "text-domu-danger";
