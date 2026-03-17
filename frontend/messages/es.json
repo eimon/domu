@@ -102,6 +102,7 @@
         "noProperties": "No se encontraron propiedades",
         "tabs": {
             "details": "Detalles y Costos",
+            "profitability": "Rentabilidad",
             "calendar": "Calendario",
             "reports": "Reportes"
         },

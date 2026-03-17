@@ -528,6 +528,135 @@ Obtener calendario con precios calculados día por día.
 ]
 ```
 
+## Pricing Analytics
+
+### GET /pricing-analytics/properties/{id}/analytics
+Análisis completo de rentabilidad para una propiedad.
+**Auth:** Authenticated
+
+**Query Params:**
+- `analysis_date`: YYYY-MM-DD (default: hoy)
+
+**Response:** `200 OK`
+```json
+{
+  "property_id": "uuid",
+  "base_price": 100.0,
+  "floor_price": 45.0,
+  "current_profitability": 100.0,
+  "suggested_profitability": 115.0,
+  "market_comparison": {
+    "avg_market_price": 95.0,
+    "market_occupancy_rate": 68.5,
+    "competitor_count": 12,
+    "price_position": "ABOVE" | "AT" | "BELOW"
+  },
+  "seasonal_demand": {
+    "season_name": "Verano",
+    "demand_multiplier": 1.8,
+    "historical_occupancy": 85.0
+  }
+}
+```
+> Todos los campos numéricos son `float` (no `Decimal`) para serialización correcta a JSON.
+
+---
+
+### POST /pricing-analytics/optimize
+Optimización de precios con IA.
+**Auth:** Authenticated
+
+**Body:**
+```json
+{
+  "property_id": "uuid",
+  "target_occupancy": 70.0,
+  "priority": "REVENUE" | "OCCUPANCY" | "BALANCED",
+  "date_range_start": "YYYY-MM-DD",
+  "date_range_end": "YYYY-MM-DD"
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "current_revenue_projection": 12500.0,
+  "optimized_revenue_projection": 14200.0,
+  "recommended_profitability": 120.0,
+  "expected_occupancy": 68.5,
+  "confidence_score": 0.85,
+  "recommendations": ["string"]
+}
+```
+
+---
+
+### GET /pricing-analytics/properties/{id}/projections
+Proyecciones mensuales de rentabilidad.
+**Auth:** Authenticated
+
+**Query Params:**
+- `months_ahead`: int (default: 12)
+
+**Response:** `200 OK` — Array de:
+```json
+{
+  "month": 3,
+  "year": 2026,
+  "projected_revenue": 25000.0,
+  "projected_costs": 15000.0,
+  "projected_profit": 10000.0,
+  "projected_occupancy": 60.0,
+  "confidence_level": "HIGH" | "MEDIUM" | "LOW"
+}
+```
+
+---
+
+### GET /pricing-analytics/properties/{id}/market-insights
+Insights de posicionamiento en el mercado.
+**Auth:** Authenticated
+
+**Response:** `200 OK`
+```json
+{
+  "market_position": "BELOW" | "AT" | "ABOVE",
+  "competitive_gap": 5.0,
+  "market_opportunity": 12.5,
+  "seasonal_factor": 1.4,
+  "recommendation": "INCREASE" | "DECREASE",
+  "confidence": "HIGH" | "MEDIUM" | "LOW"
+}
+```
+
+---
+
+### GET /pricing-analytics/properties/{id}/price-sensitivity
+Análisis de sensibilidad de precios con 3 escenarios.
+**Auth:** Authenticated
+
+**Query Params:**
+- `price_variation`: float (default: 20.0) — variación porcentual a simular
+
+**Response:** `200 OK`
+```json
+{
+  "property_id": "uuid",
+  "base_price": 100.0,
+  "price_scenarios": [
+    {
+      "profitability_percent": 80.0,
+      "expected_occupancy": 75.0,
+      "estimated_monthly_revenue": 18000.0,
+      "scenario_type": "DECREASE" | "CURRENT" | "INCREASE"
+    }
+  ],
+  "recommendation": "string"
+}
+```
+
+---
+
 ### GET /properties/{id}/financial-summary
 Obtener resumen financiero mensual con datos reales.
 **Auth:** Authenticated

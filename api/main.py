@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from core.config import settings
 import models  # noqa: F401 — registers all ORM models before routers trigger configure_mappers()
-from routers import auth, property, guest, booking, cost, pricing, users, base_price
+from routers import auth, property, guest, booking, cost, pricing, pricing_analytics, users, base_price
 from exceptions.handlers import register_exception_handlers
 import logging
 
@@ -19,6 +19,7 @@ app.include_router(guest.router)
 app.include_router(booking.router)
 app.include_router(cost.router)
 app.include_router(pricing.router)
+app.include_router(pricing_analytics.router)
 app.include_router(users.router)
 app.include_router(base_price.router)
 

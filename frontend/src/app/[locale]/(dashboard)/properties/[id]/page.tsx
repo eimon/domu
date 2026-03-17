@@ -12,6 +12,7 @@ import FinancialReport from "@/components/FinancialReport";
 import { PricingRule } from "@/types/api";
 import PropertyActions from "./PropertyActions";
 import BasePriceCard from "@/components/BasePriceCard";
+import ProfitabilityDashboardPage from "@/components/ProfitabilityDashboardPage";
 import { getTranslations } from "next-intl/server";
 
 interface PageProps {
@@ -140,6 +141,15 @@ export default async function PropertyDetailsPage({ params, searchParams }: Page
                         <section>
                             <PricingRulesTable rules={pricingRules} propertyId={property.id} basePrice={property.base_price} />
                         </section>
+                    </div>
+                )}
+
+                {tab === "profitability" && (
+                    <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <ProfitabilityDashboardPage 
+                            propertyId={property.id} 
+                            propertyName={property.name}
+                        />
                     </div>
                 )}
 
