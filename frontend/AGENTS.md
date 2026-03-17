@@ -41,6 +41,7 @@ frontend/src/
 │   ├── costs.ts
 │   ├── guests.ts
 │   ├── pricing.ts
+│   ├── pricing_analytics.ts               # Analytics de rentabilidad + optimización IA
 │   ├── properties.ts
 │   └── reports.ts
 ├── components/                            # Componentes reutilizables (Client)
@@ -54,7 +55,8 @@ frontend/src/
 │   └── utils.ts                           # cn(), formatPrice(), date helpers
 ├── middleware.ts                           # JWT guard + i18n redirect
 └── types/
-    └── api.ts                             # Interfaces y Enums del dominio
+    ├── api.ts                             # Interfaces y Enums del dominio
+    └── pricing_analytics.ts               # Tipos exclusivos del módulo de analytics
 ```
 
 ## Convenciones de Código
@@ -338,6 +340,20 @@ Definidos en `src/types/api.ts`, espejo de los enums del backend:
 ### Perfil de Usuario
 
 - Edición de datos personales y cambio de contraseña.
+
+### Rentabilidad y Analytics de Precios
+
+Tab "Rentabilidad" en el detalle de propiedad (`/properties/[id]?tab=profitability`).
+
+- `ProfitabilityDashboardPage` — página contenedora; carga los 4 endpoints de analytics en paralelo al montar
+- `PricingDashboard` — métricas principales (precio base, posición de mercado, estacionalidad, ocupación histórica) + proyecciones 3M/6M/12M + alertas inteligentes
+- `ProfitabilitySlider` — slider interactivo 0%-200% con feedback inmediato del precio calculado; el callback `onProfitabilityChange` debe ser estable (`useCallback`) para evitar re-renders infinitos
+- `PricingSensitivityChart` — tabla con 3 escenarios de precio (DECREASE / CURRENT / INCREASE) y su impacto en ocupación e ingresos
+- `PricingOptimizationModal` — modal con estrategia (REVENUE / OCCUPANCY / BALANCED), ocupación objetivo y período; usa `useActionState` + `useEffect` sobre `state.success` para reaccionar al resultado (no `await formAction`)
+
+**Tipos:** `src/types/pricing_analytics.ts` — interfaces propias del módulo (`PricingAnalytics`, `PricingOptimizationResponse`, `ProfitabilityProjection`, `MarketInsights`, `PriceSensitivityAnalysis`). No se agregaron a `api.ts` por ser exclusivos de este módulo.
+
+**Nota de serialización:** Los campos monetarios del backend usan `float` en los schemas de analytics (no `Decimal`) para que FastAPI los serialice como números JSON nativos.
 
 ## Utilidades Clave
 
