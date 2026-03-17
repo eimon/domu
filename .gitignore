@@ -38,6 +38,10 @@ postgres_data/
 .vscode/
 .idea/
 
+# Symlinks (agent file aliases)
+CLAUDE.md
+.claude
+
 # Node.js
 node_modules/
 npm-debug.log*

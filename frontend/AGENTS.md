@@ -1,8 +1,8 @@
-# CLAUDE.md — Next.js Frontend Sub-Agent
+# Domu Frontend — Agent Guide
 
-Este archivo complementa el CLAUDE.md raíz. Contiene las convenciones exactas del código para trabajar dentro de `frontend/`.
+Este archivo es la referencia completa para agentes de código (Claude, Cursor, etc.) trabajando dentro de `frontend/`. Contiene las convenciones de código, arquitectura, features implementadas y guía de desarrollo.
 
-**Referencia de features implementadas:** Consultar `README.md` en este directorio para el resumen completo de capacidades y módulos ya construidos.
+Complementa el `CLAUDE.md` raíz del proyecto.
 
 ## Stack Tecnológico
 
@@ -14,6 +14,7 @@ Este archivo complementa el CLAUDE.md raíz. Contiene las convenciones exactas d
 - **Validación:** Zod
 - **HTTP (client-side):** axios (`src/lib/api.ts`)
 - **HTTP (server-side):** fetch nativo vía `serverApi` (`src/lib/server-api.ts`)
+- **Iconos:** `lucide-react`
 
 ## Estructura de Directorios
 
@@ -24,15 +25,17 @@ frontend/src/
 │       ├── (auth)/auth/login/page.tsx     # Página pública de login
 │       └── (dashboard)/                   # Rutas protegidas
 │           ├── layout.tsx                 # Layout con Sidebar + Navbar
-│           ├── page.tsx                   # Dashboard principal (propiedades)
+│           ├── page.tsx                   # Dashboard principal
 │           ├── properties/
 │           │   ├── page.tsx               # Listado de propiedades
 │           │   ├── new/page.tsx           # Crear propiedad
 │           │   └── [id]/page.tsx          # Detalle tabulado de propiedad
 │           ├── bookings/page.tsx
-│           └── guests/page.tsx
+│           ├── guests/page.tsx
+│           └── users/page.tsx
 ├── actions/                               # Server Actions (lógica CRUD)
 │   ├── auth.ts
+│   ├── base_price.ts
 │   ├── bookings.ts
 │   ├── calendar.ts
 │   ├── costs.ts
@@ -41,13 +44,14 @@ frontend/src/
 │   ├── properties.ts
 │   └── reports.ts
 ├── components/                            # Componentes reutilizables (Client)
-├── context/                               # React Context (SidebarContext)
+├── context/                               # ToastContext, ConfirmContext, SidebarContext
 ├── i18n/
 │   ├── routing.ts                         # Definición de locales y navegación
 │   └── request.ts                         # Config de next-intl para RSC
 ├── lib/
-│   ├── api.ts                             # axios client (browser, con token en localStorage)
-│   └── server-api.ts                      # fetch helper (server, con token en cookie)
+│   ├── api.ts                             # axios client (browser, token en localStorage)
+│   ├── server-api.ts                      # fetch helper (server, token en cookie)
+│   └── utils.ts                           # cn(), formatPrice(), date helpers
 ├── middleware.ts                           # JWT guard + i18n redirect
 └── types/
     └── api.ts                             # Interfaces y Enums del dominio
@@ -66,18 +70,16 @@ import { z } from "zod";
 import { serverApi } from "@/lib/server-api";
 import { revalidatePath } from "next/cache";
 
-// 1. Schema de validación con Zod
 const domainSchema = z.object({
     name: z.string().min(1, "Name is required"),
 });
 
-// 2. Tipo de estado para useActionState
 export type DomainFormState = {
     error?: string;
     success?: boolean;
 };
 
-// 3. Action que recibe (prevState, formData) → para useActionState
+// Para useActionState — recibe (prevState, formData)
 export async function createDomain(
     prevState: DomainFormState,
     formData: FormData
@@ -108,7 +110,7 @@ export async function createDomain(
     return { success: true };
 }
 
-// 4. Actions de solo lectura (no usan prevState)
+// Actions de solo lectura (no usan prevState)
 export async function getDomains(): Promise<Domain[]> {
     try {
         const res = await serverApi("/domain-endpoint");
@@ -234,44 +236,126 @@ const t = useTranslations("Properties");
 - Rutas protegidas: todo lo demás → redirige a `/{locale}/auth/login` si no hay token o es inválido
 - Variable de entorno requerida: `JWT_SECRET_KEY`
 
+## Design System — "Obsidian Glass"
+
+Sistema de diseño oscuro con glassmorphism. Documentado en `DESIGN_SYSTEM.md` y aplicado en `globals.css`.
+
+**Clases glass:** `.glass`, `.glass-elevated`, `.glass-modal`, `.glass-sidebar`
+
+**Tokens de color:**
+| Token | Valor | Uso |
+|---|---|---|
+| `domu-primary` | `#818cf8` | Acciones principales, links activos |
+| `domu-success` | `#34d399` | Estados positivos, confirmación |
+| `domu-warning` | `#fbbf24` | Advertencias |
+| `domu-danger` | `#f87171` | Errores, eliminación |
+| `domu-base` | `#0f1117` | Fondo base |
+
+Todos los modales y diálogos usan `glass-modal rounded-2xl shadow-2xl`.
+
+## Sistema Global de UI
+
+- **Toast notifications**: `ToastContext` — `showError(msg)` / `showSuccess(msg)` vía `useToast()`.
+- **Diálogos de confirmación**: `ConfirmContext` — `await confirm(mensaje)` devuelve `boolean` vía `useConfirm()`.
+
+Ambos contextos están registrados en el layout raíz y disponibles en cualquier Client Component.
+
 ## Autenticación
 
 - **Login:** Server Action `login()` en `actions/auth.ts` — obtiene el token del backend y lo guarda en cookie `httpOnly`
 - **Logout:** Server Action `logout()` — borra la cookie y redirige a login
+- **Refresco:** Automático sin duplicar peticiones concurrentes
 - **Token:** Cookie `access_token` (server) / `localStorage` `access_token` (client, para axios)
-- **Variable de entorno frontend:** `NEXT_PUBLIC_API_URL` (default: `http://localhost:8000/api/v1`), `JWT_SECRET_KEY`
+- **Variables de entorno:** `NEXT_PUBLIC_API_URL` (default: `http://localhost:8000/api/v1`), `JWT_SECRET_KEY`
 
 ## Enums del Dominio
 
 Definidos en `src/types/api.ts`, espejo de los enums del backend:
 
 | Enum | Valores |
-|------|---------|
-| `BookingStatus` | `CONFIRMED`, `TENTATIVE`, `CANCELLED` |
+|---|---|
+| `BookingStatus` | `CONFIRMED`, `TENTATIVE`, `CANCELLED`, `PAID` |
 | `BookingSource` | `AIRBNB`, `BOOKING`, `DOMU`, `MANUAL` |
 | `DocumentType` | `DU`, `EXTRANJERO` |
 | `UserRole` | `ADMIN`, `MANAGER`, `OWNER` |
 | `CostCategory` | `RECURRING_MONTHLY`, `PER_DAY_RESERVATION`, `PER_RESERVATION` |
 | `CostCalculationType` | `FIXED_AMOUNT`, `PERCENTAGE` |
 
-## Comandos de Desarrollo
+## Features Implementadas
 
-```bash
-# Instalar dependencias
-cd frontend && npm install
+### Dashboard (Home)
 
-# Servidor de desarrollo (requiere API corriendo en :8000)
-npm run dev   # → http://localhost:3000
+- KPIs del mes: total de propiedades, ingresos, ganancia neta y ocupación promedio.
+- Resumen por propiedad: ocupación, ingresos y ganancia del mes actual.
+- Próximos check-ins: reservas en los próximos 7 días (no canceladas).
 
-# Build de producción
-npm run build
+### Gestión de Propiedades
 
-# Lint
-npm run lint
-```
+- CRUD completo con validaciones de negocio.
+- Autocompletado de dirección con Nominatim (OpenStreetMap) + miniatura de mapa.
+- Detalle tabulado: **Detalles y Costos** / **Calendario** / **Reportes**.
+
+### Costos y Precios
+
+- Categorías: `RECURRING_MONTHLY`, `PER_DAY_RESERVATION`, `PER_RESERVATION`; tipo `FIXED_AMOUNT` o `PERCENTAGE`.
+- **Versionado temporal** de costos y `base_price`: historial con `start_date`/`end_date`.
+  - `ModifyCostDialog` — modifica valor con fecha de vigencia
+  - `PriceHistoryDialog` — historial de versiones
+  - `FinalizeCostDialog` — cierra la versión activa con `end_date`
+  - Revertir al valor anterior
+- `BasePriceCard` — gestión del precio base con el mismo patrón de versionado.
+- Reglas de precio: períodos con rentabilidad % personalizada, visibles en el calendario.
+- `CostsTable`: vista de tabla en desktop, tarjetas en mobile con menú de acciones.
+
+### Calendario Interactivo
+
+- Vista mensual con disponibilidad y precios calculados por día.
+- Refleja reglas de precio activas y costos vigentes en cada fecha.
+
+### Reservas y Pagos
+
+- Estados: `TENTATIVE`, `CONFIRMED`, `CANCELLED`, `PAID`.
+- Acciones: confirmar, cancelar, eliminar según estado.
+- `BookingDetailModal`: datos completos + asignación de huésped si no tiene uno.
+- `AddBookingDialog`: estimación de precio antes de confirmar (consulta al backend).
+- `PayBookingDialog`: registro de pago, historial de pagos y reversión del último pago.
+- `BookingsTable`: vista adaptada a mobile con menú de acciones.
+
+### Huéspedes
+
+- CRUD con tipos de documento (`DU` / `EXTRANJERO`).
+- `GuestsTable` con vista adaptada a mobile.
+
+### Reportes Financieros
+
+- Resumen mensual: ingresos, ocupación, rentabilidad y desglose de costos.
+- Navegación por períodos (selector de mes).
+
+### Usuarios
+
+- `UsersTable` con listado y gestión de usuarios del sistema.
+
+### Perfil de Usuario
+
+- Edición de datos personales y cambio de contraseña.
+
+## Utilidades Clave
+
+- **`formatPrice(value)`**: enteros con punto como separador de miles (ej. `$1.500`).
+- **`cn()`**: `clsx` + `tailwind-merge` para clases condicionales.
+- **Date safety**: fechas como `YYYY-MM-DD` para evitar desfases por zona horaria.
 
 ## Idioma
 
 - Strings de UI en `messages/en.json` y `messages/es.json`
 - Nombres de código (clases, funciones, variables, archivos) en **inglés**
 - Mensajes de error del backend pueden estar en **español** (los muestra tal cual)
+
+## Comandos de Desarrollo
+
+```bash
+cd frontend && npm install
+npm run dev     # → http://localhost:3000 (requiere API en :8000)
+npm run build
+npm run lint
+```
