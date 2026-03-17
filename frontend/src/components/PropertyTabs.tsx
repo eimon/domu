@@ -18,6 +18,7 @@ function PropertyTabsContent({ activeTab }: PropertyTabsProps) {
 
     const tabs = [
         { id: "details", label: t("details") },
+        { id: "profitability", label: t("profitability") },
         { id: "calendar", label: t("calendar") },
         { id: "reports", label: t("reports") },
     ];
